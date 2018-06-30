@@ -9,7 +9,7 @@ function createWindow() {
     width: 800,
     height: 600
   })
-  win.loadFile('App/HTML/index.html')
+  win.loadFile('App/index.html')
 
   win.on('closed', () => {
     win = null
