@@ -1,5 +1,9 @@
 .text{
-  text-indent: 50px;
+  text-indent: 175px;
+}
+
+#selected {
+  background-color: blue;
 }
 
 #sidenav {
