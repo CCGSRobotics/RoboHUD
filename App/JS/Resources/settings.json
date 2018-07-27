@@ -1,0 +1,17 @@
+{
+  "default": {
+    "ip": "192.168.100.1",
+    "port": "5000",
+    "fps": 15,
+    "controller": "logitech_gamepad",
+    "robot": "EmuBot"
+  },
+  
+  "user": {
+    "ip": "192.168.100.1",
+    "port": "5000",
+    "fps": 15,
+    "controller": "logitech_gamepad",
+    "robot": "EmuBot"
+  }
+}
