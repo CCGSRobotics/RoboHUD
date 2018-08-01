@@ -1,8 +1,17 @@
 var shell = require('shelljs');
-const spawn = require('child_process').spawn;
 
-const runTests = spawn('python', ['Resources/Python/test.py', 42]);
+var PythonShell = require('python-shell');
+var pyshell = new PythonShell('App/JS/Resources/Python/test.py');
 
-runTests.stdout.on('data', (data) => {
-  console.log(data)
-})
+pyshell.send('hello');
+
+pyshell.on('message', function (message) {
+  console.log('Message from Python: ' + message);
+});
+
+pyshell.end(function (err,code,signal) {
+  if (err) throw err;
+  console.log('Execution finished.')
+  console.log('The exit code was: ' + code);
+  console.log('The exit signal was: ' + signal);
+});
