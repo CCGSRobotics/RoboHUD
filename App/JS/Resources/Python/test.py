@@ -1,4 +1,6 @@
 import sys
 
-print(sys.argv[1])
-sys.stdout.flush()
+infile = sys.stdin.readlines()
+
+print('hi')
+print(infile[0])
