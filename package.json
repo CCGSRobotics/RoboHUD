@@ -10,6 +10,7 @@
     "electron": "^2.0.5"
   },
   "dependencies": {
+    "npm": "^6.2.0",
     "shelljs": "^0.8.2"
   }
 }
