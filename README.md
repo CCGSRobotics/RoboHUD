@@ -7,4 +7,4 @@ Install Node.js and NPM
 
 Run the following code:
 
-`npm install && npm start`
+`npm install -y && npm start`
