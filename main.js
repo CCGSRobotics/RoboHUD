@@ -9,7 +9,8 @@ function createWindow() {
     width: 800,
     height: 600
   })
-  win.loadFile('App/index.html')
+  win.loadFile('App/control.html')
+  win.webContents.openDevTools()
 
   win.on('closed', () => {
     win = null
