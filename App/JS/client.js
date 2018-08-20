@@ -12,8 +12,14 @@ var pyshell = new PythonShell('App/JS/Resources/Driving\ Code/Client-Code-2018/C
 
 pyshell.on('message', function (message) {
   console.log('Message from Python: ' + message);
-  pyshell.send("RIGHT_TRG 1 1");
 });
+
+setTimeout(function () {
+  pyshell.send("LEFT_TRG 250 3");
+  setTimeout(function() {
+    pyshell.send("LEFT_TRG 0 3");
+  }, 3000);
+}, 3000);
 
 pyshell.end(function (err,code,signal) {
   if (err) throw err;
