@@ -1,3 +1,4 @@
+var net = require('net')
 var haveEvents = 'ongamepadconnected' in window;
 var controllers = {};
 
@@ -86,7 +87,6 @@ function updateStatus() {
 
       var pct = Math.round(val * 100) + "%";
       b.style.backgroundSize = pct + " " + pct;
-
       if (pressed) {
         b.className = "button pressed";
       } else {
