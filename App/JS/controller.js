@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 var net = require('net')
 var haveEvents = 'ongamepadconnected' in window;
 var controllers = {};
@@ -125,3 +126,4 @@ window.addEventListener("gamepaddisconnected", disconnecthandler);
 if (!haveEvents) {
   setInterval(scangamepads, 500);
 }
+
