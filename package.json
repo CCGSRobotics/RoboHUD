@@ -1,20 +1,3 @@
-<<<<<<< HEAD
-{
-  "name": "Robotics",
-  "version": "0.0.0",
-  "description": "An electron application for the CCGS Robotics team",
-  "main": "main.js",
-  "scripts": {
-    "start": "electron ."
-  },
-  "devDependencies": {
-    "electron": "^2.0.5"
-  },
-  "dependencies": {
-    "shelljs": "^0.8.2"
-  }
-}
-=======
 {
   "name": "Robotics",
   "version": "0.0.0",
@@ -32,4 +15,3 @@
     "shelljs": "^0.8.2"
   }
 }
->>>>>>> 4f2e68fe2ffae13d506c60b3e2a3f2433208368a
