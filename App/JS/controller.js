@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 var net = require('net')
 var haveEvents = 'ongamepadconnected' in window;
 var controllers = {};
