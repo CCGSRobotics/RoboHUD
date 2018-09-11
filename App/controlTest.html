@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+
+<html>
+
+  <head>
+
+    <meta charset="UTF-8">
+
+    <title>test</title>
+
+    <script>
+	window.addEventListener("gamepadconnected", function(event) {
+                setInterval(function() {
+                        var gamepad = navigator.getGamepads()[event.gamepad.index];
+                        //console.log(gamepad)
+			var val = Math.round((gamepad.axes[1]+1) * 512)
+			var out = ""
+			if (val < 10) {
+				out += "000"
+				out += val
+			} else if (val < 100) {
+				out += "00"
+				out += val
+			} else if (val < 1000) {
+				out += "0"
+				out += val
+			} else {
+				out += val
+			}
+			document.getElementById('val').innerHTML = out
+                        //var controller = gamepads[0];
+                        //console.log(controller.axis("left trigger"));
+                        //console.log(controller)
+                }, 50);
+        });
+    </script>
+
+  </head>
+
+  <body>
+	<p id="val">0000</p>
+
+  </body>
+
+</html>
