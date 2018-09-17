@@ -1,6 +1,6 @@
 {
   "name": "Robotics",
-  "version": "0.0.0",
+  "version": "0.1",
   "description": "An electron application for the CCGS Robotics team",
   "main": "main.js",
   "scripts": {
