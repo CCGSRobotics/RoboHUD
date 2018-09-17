@@ -45,3 +45,6 @@ client.on('close', function(){
 client.on('end', function(){
 	console.warn("Server terminated connection!")
 })
+client.on('error', function(){
+	console.warn("Connection to server terminated unexpectedly!")
+})
