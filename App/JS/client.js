@@ -1,12 +1,19 @@
 var net = require('net');
 var client = new net.Socket();
 
+function terminateConnection(connection) {
+	connection.write("01-0000");
+	connection.write("02-0000");
+	connection.write("03-0000");
+	connection.write("04-0000");
+}
+
 function axisValue(dynamixel, axis) {
 	var gamepad = navigator.getGamepads()[0];
 	var val = Math.round((gamepad.axes[axis]+1) * 512);
-	if (dynamixel == 1 || dynamixel == 3) {
-		val -= 1024
-	}
+	//if (dynamixel == 1 || dynamixel == 3) {
+	//	val -= 1024
+	//}
 	var out = "";
 	if (val < 10) {
 		out += "000";
@@ -36,6 +43,9 @@ client.connect(9999, '192.168.100.1', function() {
 		setInterval(function() {
 			client.write('04-' + axisValue(4, 1));
 		}, 30);
+		setTimeout(function(){
+			terminateConnection(client)
+		}, 1000)
 	});
 });
 
