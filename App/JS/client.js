@@ -40,5 +40,8 @@ client.connect(9999, '192.168.100.1', function() {
 });
 
 client.on('close', function(){
-	console.warn("Connection to server terminated!")
+	console.warn("Client terminated connection!")
+})
+client.on('end', function(){
+	console.warn("Server terminated connection!")
 })
