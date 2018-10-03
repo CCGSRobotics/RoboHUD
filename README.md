@@ -1,4 +1,4 @@
-# robotics-gui
+# Robotics GUI
 A GUI test for the King's Legacy RoboCup team using Electron
 
 # Installation and setup:
