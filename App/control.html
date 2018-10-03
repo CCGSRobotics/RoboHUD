@@ -6,7 +6,10 @@
     <link rel="stylesheet" href="CSS/main.css">
     <script type="text/javascript" src="JS/main.js"></script>
     <!--<script type="text/javascript" src="JS/controller.js"></script>-->
-    <script type="text/javascript" src="JS/client.js"></script>
+    <script type="text/javascript">
+      const execute = require('./JS/executeShellCommand.js').execute;
+      execute('python3 App/JS/Resources/CurrentEmuBotCode2/client.py');
+    </script>
   </head>
   <body>
     <div id="sidenav">
