@@ -8,7 +8,11 @@
     <!--<script type="text/javascript" src="JS/controller.js"></script>-->
     <script type="text/javascript">
       const execute = require('./JS/executeShellCommand.js').execute;
-      execute('python3 App/JS/Resources/CurrentEmuBotCode2/client.py');
+      if (process.platform == 'win32' || process.platform == 'win64') {
+        execute('py App/JS/Resources/CurrentEmuBotCode2/client.py')
+      } else {
+        execute('python3 App/JS/Resources/CurrentEmuBotCode2/client.py');
+      }
     </script>
   </head>
   <body>
