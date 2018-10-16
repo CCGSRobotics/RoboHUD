@@ -7,7 +7,7 @@ function execute(command) {
 	    console.log('stdout: ' + stdout);
 	    console.log('stderr: ' + stderr);
 	    if (error !== null) {
-	         console.log('exec error: ' + error);
+	         alert('Execution Error. Please report this with the following error message:\n' + error)
 	    }
 	});
 };
