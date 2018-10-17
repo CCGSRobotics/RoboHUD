@@ -3,11 +3,11 @@ body {
 }
 
 #selected {
-  background-color: blue;
+  color: white !important;
 }
 
 #sidenav {
-  text-indent: 0px;
+    text-indent: 0px;
     height: 100%;
     width: relative;
     position: fixed;
