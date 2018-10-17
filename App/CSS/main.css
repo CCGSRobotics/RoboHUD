@@ -2,6 +2,11 @@ body {
   text-indent: 175px;
 }
 
+#main-header {
+    text-align: center;
+    font-weight: bold;
+}
+
 #selected {
   color: white !important;
 }
