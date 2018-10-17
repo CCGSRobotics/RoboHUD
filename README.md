@@ -1,4 +1,4 @@
-https://readthedocs.org/projects/robohud-docs/badge/?version=latest
+![docs](https://readthedocs.org/projects/robohud-docs/badge/?version=latest)
 # Robotics GUI
 A GUI test for the King's Legacy RoboCup team using Electron
 Documented thoroughly at https://robohud-docs.readthedocs.io
