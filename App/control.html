@@ -7,11 +7,8 @@
     <script type="text/javascript" src="JS/main.js"></script>
     <!--<script type="text/javascript" src="JS/controller.js"></script>-->
     <script type="text/javascript">
-      const execute = require('./JS/executeShellCommand.js').execute;
       if (process.platform == 'win32' || process.platform == 'win64') {
         execute('py App/JS/Resources/CurrentEmuBotCode2/client.py')
-      } else {
-        execute('python3 App/JS/Resources/CurrentEmuBotCode2/client.py');
       }
     </script>
   </head>
@@ -24,5 +21,8 @@
       <a href="settings.html">Settings</a>
       <a href="version.html">Version</a>
     </div>
+    <button type="button" name="start" onclick="controlServerCode(false)">[UNSTABLE] Start</button>
+    <button type="button" name="kill" onclick="controlServerCode(true)">[UNSTABLE] Kill</button>
+    <p id="status"></p>
   </body>
 </html>
