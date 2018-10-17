@@ -1,0 +1,6 @@
+language: node_js
+before_install:
+  - npm i -g electron@3.0.4
+cache:
+  directories:
+    - "node_modules"
