@@ -7,7 +7,7 @@
     <script type="text/javascript" src="JS/main.js"></script>
     <script type="text/javascript" src="JS/camera.js"></script>
   </head>
-  <body>
+  <body onload="loaded()">
     <div id="sidenav">
       <a href="index.html">Dashboard</a>
       <a href="camera.html" id="selected">Camera</a>
@@ -15,6 +15,32 @@
       <a href="testing.html">Testing</a>
       <a href="settings.html">Settings</a>
       <a href="version.html">Version</a>
+  </div>
+  <div class="main">
+    <form onsubmit="startCamera()" method="post" id="camera">
+        <input type="text" name="command" value="" id="command" size="75">
+        <input type="submit" name="execute" value="Execute!">
+        <hr>
+        <p>Camera settings:</p>
+        <p class="descriptor">Height:</p>
+        <input type="number" min="0" name="height" value="" id="height" size="5">
+        <br>
+        <p class="descriptor">Width:</p>
+        <input type="number" min="0" name="width" value="" id="width" size="5">
+        <br>
+        <p class="descriptor">Time:</p>
+        <input type="number" min="0" name="time" value="" id="time" size="5">
+        <hr>
+        <p>Network settings:</p>
+        <p class="descriptor">Port:</p>
+        <input type="number" min="0" name="" value="">
+        <br>
+        <input type="radio" name="IP" value="" checked><p class="descriptor" id="settingsIP"></p>
+        <br>
+        <input type="radio" name="IP" value=""><p class="descriptor" id="currentIP">Current IP Address</p>
+        <br>
+        <input type="radio" name="IP" value=""><p class="descriptor" id="customIP">Custom IP Address</p>
+    </form>
     </div>
   </body>
 </html>
