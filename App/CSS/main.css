@@ -1,5 +1,9 @@
-body {
-  text-indent: 175px;
+.main {
+    margin-left: 175px !important
+}
+
+.descriptor {
+    display: inline
 }
 
 #main-header {
