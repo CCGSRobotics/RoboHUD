@@ -9,7 +9,8 @@ function createWindow() {
     width: 800,
     height: 600
   })
-  win.loadFile('App/control.html')
+  // win.loadFile('App/camera.html')
+  win.loadURL('http://localhost:8080')
   win.webContents.openDevTools()
 
   win.on('closed', () => {
