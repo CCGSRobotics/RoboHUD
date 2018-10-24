@@ -7,39 +7,15 @@
     <meta charset="UTF-8">
 
     <title>test</title>
-
+    <script type="text/javascript" src="JS/main.js"></script>
     <script>
-	window.addEventListener("gamepadconnected", function(event) {
-                setInterval(function() {
-                        var gamepad = navigator.getGamepads()[event.gamepad.index];
-                        //console.log(gamepad)
-			var val = Math.round((gamepad.axes[1]+1) * 512)
-			var out = ""
-			if (val < 10) {
-				out += "000"
-				out += val
-			} else if (val < 100) {
-				out += "00"
-				out += val
-			} else if (val < 1000) {
-				out += "0"
-				out += val
-			} else {
-				out += val
-			}
-			document.getElementById('val').innerHTML = out
-                        //var controller = gamepads[0];
-                        //console.log(controller.axis("left trigger"));
-                        //console.log(controller)
-                }, 50);
-        });
+    execute('netcat -l -p 5000 | mplayer -fps 60 -cache 4096 -')
     </script>
 
   </head>
 
   <body>
-	<p id="val">0000</p>
-
+      <video src="http://192.168.100.1:5000"></video>
   </body>
 
 </html>
