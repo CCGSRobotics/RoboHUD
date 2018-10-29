@@ -32,7 +32,7 @@ jobs:
           paths:
             - node_modules
           key: v1-dependencies-{{ checksum "package.json" }}
-        
+      - electron: npm install --save-dev electron
       # run tests!
       - run: electron .
 
