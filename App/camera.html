@@ -10,7 +10,6 @@
   <body onload="loaded()">
     <div id="sidenav">
       <a href="index.html">Dashboard</a>
-      <a href="localhost:8080">Camera View</a>
       <a href="camera.html" id="selected">Camera</a>
       <a href="control.html">Robot Control</a>
       <a href="testing.html">Testing</a>
@@ -19,7 +18,6 @@
   </div>
   <div class="main">
     <form onsubmit="startCamera()" method="post" id="camera">
-        <input type="text" name="command" value="" id="command" size="75">
         <input type="submit" name="execute" value="Execute!">
         <hr>
         <p>Camera settings:</p>
