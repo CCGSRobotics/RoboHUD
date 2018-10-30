@@ -1,4 +1,5 @@
 const execute = require('./JS/executeShellCommand.js').execute;
+
 function controlServerCode(terminate) {
     if (terminate == true) {
         console.log(terminate)
