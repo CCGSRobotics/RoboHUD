@@ -1,4 +1,5 @@
 var settings = require("./JS/Resources/settings.json");
+
 var width = settings.User.Camera["Width"];
 var height = settings.User.Camera["Height"];
 var time = settings.User.Camera["Time"];
@@ -22,6 +23,5 @@ function startCamera() {
     width = document.forms[0].elements[2].value
     time = document.forms[0].elements[3].value
     port = document.forms[0].elements[4].value
-    command = `raspivid -w ${width} -h ${height} -t ${time} ${extraCommands} | nc ${ip} ${port}`;
-    execute(`sshpass -p \"raspberry\" ssh pi@192.168.100.1 '${command}'`)
+    command = `raspivid -w ${width} -h ${height} -t ${time} ${extraCommands} | nc ${ip} ${port}`
 }
