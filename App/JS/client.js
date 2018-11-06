@@ -2,10 +2,10 @@ var net = require('net');
 var client = new net.Socket();
 
 function terminateConnection(connection) {
-	connection.write("010000");
-	connection.write("020000");
-	connection.write("030000");
-	connection.write("040000");
+	connection.write("010");
+	connection.write("020");
+	connection.write("030");
+	connection.write("040");
 }
 
 function axisValue(dynamixel, axis) {
@@ -16,28 +16,22 @@ function axisValue(dynamixel, axis) {
 		console.error("Controller value is out of bounds! (" + val + ")");
 	}
 
-	//Logic to make controller value proper
-	if (val <= 512) {
-		val = (val - 512) * -2;
-	} else if (val < 512) {
-		val <<= 1;
+	// if (val <= 512) {
+	// 	val = (val - 512) * -2;
+	// } else {
+	// 	val = (val - 512) * -2;
+	// 	// val = -val;
+	// 	console.log(val, -val);
+	// }
+	//
+	// // if (dynamixel == 1 || dynamixel == 3) {
+	// // 	val = -val
+	// // }
+	val = (val - 512) * -2;
+	if (dynamixel == 1 || dynamixel == 3) {
+		val = -val;
 	}
-
-	var out = "";
-	if (val < 10) {
-		out += "000";
-		out += val;
-	} else if (val < 100) {
-		out += "00";
-		out += val;
-	} else if (val < 1000) {
-		out += "0";
-		out += val;
-	} else {
-		out += val;
-	}
-
-	return out;
+	return val;
 }
 
 function sleep(ms) {
@@ -46,12 +40,11 @@ function sleep(ms) {
 
 async function pollGamepad(interval) {
 	while (true) {
-		console.log(axisValue(2, 1));
-		client.write('01-' + axisValue(1, 3));
+		client.write('01' + axisValue(1, 3));
 		await sleep(interval);
 		client.write('02' + axisValue(2, 1));
 		await sleep(interval);
-		client.write('03-' + axisValue(3, 3));
+		client.write('03' + axisValue(3, 3));
 		await sleep(interval);
 		client.write('04' + axisValue(4, 1));
 	}
