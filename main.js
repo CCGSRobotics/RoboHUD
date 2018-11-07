@@ -9,7 +9,7 @@ function createWindow() {
     width: 800,
     height: 600
   })
-  win.loadFile('App/control.html')
+  win.loadFile('App/charts.html')
   // win.loadURL('http://localhost:8080')
   win.webContents.openDevTools()
 

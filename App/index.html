@@ -6,29 +6,30 @@
     <link rel="stylesheet" href="CSS/main.css">
     <script type="text/javascript" src="JS/main.js"></script>
     <script type="text/javascript" scr="JS/Resources/Player/server-tcp.js"></script>
+    <script type="text/javascript" src="JS/client.js"></script>
     <script type="text/javascript">
-        execute('node App/JS/Resources/Player/server-tcp.js');
-        function startCamera() {
-            execute(`sshpass -p \"raspberry\" ssh pi@192.168.100.1 'raspivid -t 0 -o - -w 960 -h 540 -fps 25 -pf baseline | nc -k -l 5000'`)
-            var iframe = document.createElement('iframe');
-            iframe.setAttribute('id', 'camera-view');
-            iframe.setAttribute('src', 'http://localhost:8080');
-            iframe.setAttribute('width', '1000');
-            iframe.setAttribute('height', '625');
+      execute('node App/JS/Resources/Player/server-tcp.js');
+      function startCamera() {
+        // execute(`sshpass -p \"raspberry\" ssh pi@192.168.100.1 'raspivid -t 0 -o - -w 960 -h 540 -fps 25 -pf baseline | nc -k -l 5000'`)
+        var iframe = document.createElement('iframe');
+        iframe.setAttribute('id', 'camera-view');
+        iframe.setAttribute('src', 'http://localhost:8080');
+        iframe.setAttribute('width', '1000');
+        iframe.setAttribute('height', '625');
 
-            var markerPoint = document.getElementById('marker');
-            markerPoint.parentNode.insertBefore(iframe, markerPoint);
+        var markerPoint = document.getElementById('marker');
+        markerPoint.parentNode.insertBefore(iframe, markerPoint);
 
-            document.getElementById('cameraToggle').setAttribute('onclick', 'stopCamera()');
-            document.getElementById('cameraToggle').innerHTMl = 'Stop';
-        }
+        document.getElementById('cameraToggle').setAttribute('onclick', 'stopCamera()');
+        document.getElementById('cameraToggle').innerHTMl = 'Stop';
+      }
 
-        function stopCamera() {
-            execute(`sshpass -p \"raspberry\" ssh pi@192.168.100.1 'pkill -f raspivid && pkill -f \"nc -k -l 5000\"'`);
-            var toggleButton = document.getElementById('cameraToggle');
-            document.getElementById('cameraToggle').setAttribute('onclick', 'startCamera()');
-            document.getElementById('cameraToggle').innerHTMl = 'Start';
-        }
+      function stopCamera() {
+        execute(`sshpass -p \"raspberry\" ssh pi@192.168.100.1 'pkill -f raspivid && pkill -f \"nc -k -l 5000\"'`);
+        var toggleButton = document.getElementById('cameraToggle');
+        document.getElementById('cameraToggle').setAttribute('onclick', 'startCamera()');
+        document.getElementById('cameraToggle').innerHTMl = 'Start';
+      }
     </script>
   </head>
   <body>
