@@ -15,18 +15,7 @@ function axisValue(dynamixel, axis) {
 	if (val < 0 || val > 1024) {
 		console.error("Controller value is out of bounds! (" + val + ")");
 	}
-
-	// if (val <= 512) {
-	// 	val = (val - 512) * -2;
-	// } else {
-	// 	val = (val - 512) * -2;
-	// 	// val = -val;
-	// 	console.log(val, -val);
-	// }
-	//
-	// // if (dynamixel == 1 || dynamixel == 3) {
-	// // 	val = -val
-	// // }
+	
 	val = (val - 512) * -2;
 	if (dynamixel == 1 || dynamixel == 3) {
 		val = -val;
