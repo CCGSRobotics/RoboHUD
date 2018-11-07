@@ -1,0 +1,17 @@
+<h1>
+    Mobile GUI!
+</h1>
+<p>
+Connection is feeding to server, touch the screen to move the robot!
+</p>
+<script>
+    var ws = new WebSocket('ws://192.168.0.186:40510');
+
+    ws.onopen = function () {
+        console.log('The websocket has been connected!');
+    }
+
+    ws.onmessage = function (ev) {
+        console.log(ev);
+    }
+</script>
