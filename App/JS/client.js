@@ -1,5 +1,4 @@
 var net = require('net');
-var client = new net.Socket();
 
 function terminateConnection(connection) {
 	connection.write("010");
@@ -15,7 +14,7 @@ function axisValue(dynamixel, axis) {
 	if (val < 0 || val > 1024) {
 		console.error("Controller value is out of bounds! (" + val + ")");
 	}
-	
+
 	val = (val - 512) * -2;
 	if (dynamixel == 1 || dynamixel == 3) {
 		val = -val;
@@ -29,22 +28,17 @@ function sleep(ms) {
 
 async function pollGamepad(interval) {
 	while (true) {
-		client.write('01' + axisValue(1, 3));
+		clientSocket.write('02' + axisValue(1, 3));
 		await sleep(interval);
-		client.write('02' + axisValue(2, 1));
+		clientSocket.write('01' + axisValue(2, 1));
 		await sleep(interval);
-		client.write('03' + axisValue(3, 3));
+		clientSocket.write('04' + axisValue(3, 3));
 		await sleep(interval);
-		client.write('04' + axisValue(4, 1));
+		clientSocket.write('03' + axisValue(4, 1));
 	}
 }
 
-client.connect(9999, '192.168.100.1', function() {
-	window.addEventListener("gamepadconnected", function(event) {
-		pollGamepad(100);
-	});
-});
-
+module.Exports = { pollGamepad };
 // client.on('close', function(){
 // 	console.warn("Client terminated connection!")
 // })
