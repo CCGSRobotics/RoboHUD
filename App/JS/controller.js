@@ -18,7 +18,7 @@ function addgamepad(gamepad) {
 
   var b = document.createElement("div");
   b.className = "buttons";
-  for (var i = 0; i < gamepad.buttons.length; i++) {
+  for (var i = 0; i < gamepad.buttons.length; ++i) {
     var e = document.createElement("span");
     e.className = "button";
     //e.id = "b" + i;
@@ -125,4 +125,3 @@ window.addEventListener("gamepaddisconnected", disconnecthandler);
 if (!haveEvents) {
   setInterval(scangamepads, 500);
 }
-
