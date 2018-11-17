@@ -19,8 +19,9 @@ const server  = http.createServer(app);
 
 const feed    = new RemoteTCPFeedRelay(server, {
   feed_ip   : "192.168.100.1",
-  feed_port : 5000,
+  feed_port : 5002,
 });
 
 
 server.listen(8080);
+console.log("Video server listening on port 8080")
