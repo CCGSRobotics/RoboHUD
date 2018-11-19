@@ -9,49 +9,92 @@
   <body>
 
     <div class="main">
-      <canvas id="myChart" width="400" height="400"></canvas>
-      <script>
-      //http://www.chartjs.org/docs/latest/
-      var Chart = require('chart.js');
-      var ctx = document.getElementById("myChart").getContext('2d');
-      var myChart = new Chart(ctx, {
-          type: 'bar',
-          data: {
-              labels: ["Red", "Blue", "Yellow", "Green", "Purple", "Orange"],
-              datasets: [{
-                  label: '# of Votes',
-                  data: [12, 19, 3, 5, 2, 3],
-                  backgroundColor: [
-                      'rgba(255, 99, 132, 0.2)',
-                      'rgba(54, 162, 235, 0.2)',
-                      'rgba(255, 206, 86, 0.2)',
-                      'rgba(75, 192, 192, 0.2)',
-                      'rgba(153, 102, 255, 0.2)',
-                      'rgba(255, 159, 64, 0.2)'
-                  ],
-                  borderColor: [
-                      'rgba(255,99,132,1)',
-                      'rgba(54, 162, 235, 1)',
-                      'rgba(255, 206, 86, 1)',
-                      'rgba(75, 192, 192, 1)',
-                      'rgba(153, 102, 255, 1)',
-                      'rgba(255, 159, 64, 1)'
-                  ],
-                  borderWidth: 1
-              }]
-          },
-          options: {
-              scales: {
-                  yAxes: [{
-                      ticks: {
-                          beginAtZero:true
-                      }
-                  }]
-              }
-          }
-      });
-      console.log(myChart)
+      <div id="chart"></div>
+      <script type="text/javascript" src="JS/charts.js"></script>
       </script>
+      <style>
+      #chart {
+        max-width: 650px;
+        margin: 35px auto;
+      }
+      </style>
+      <script type="text/javascript">
+      var options = {
+            chart: {
+                type: 'radialBar',
+            },
+            plotOptions: {
+                radialBar: {
+                    startAngle: -90,
+                    endAngle: 90,
+                    track: {
+                        background: "#e7e7e7",
+                        strokeWidth: '97%',
+                        margin: 5, // margin is in pixels
+                        shadow: {
+                            enabled: true,
+                            top: 2,
+                            left: 0,
+                            color: '#999',
+                            opacity: 1,
+                            blur: 2
+                        }
+                    },
+                    dataLabels: {
+                        name: {
+                            show: false
+                        },
+                        value: {
+                            offsetY: 15,
+                            fontSize: '22px'
+                        }
+                    }
+                }
+            },
+            fill: {
+                gradient: {
+                    enabled: true,
+                    shade: 'light',
+                    shadeIntensity: 0.4,
+                    inverseColors: false,
+                    opacityFrom: 1,
+                    opacityTo: 1,
+                    stops: [0, 50, 53, 91]
+                },
+            },
+            series: [76],
+            labels: ['Average Results'],
+
+        }
+
+       var chart = new ApexCharts(
+            document.querySelector("#chart"),
+            options
+        );
+        chart.render();
+        setTimeout(function() {
+          chart.updateSeries([50], true)
+        }, 1000)
+      </script>
+      <!-- <script>
+      var options = {
+        chart: {
+          type: 'bar'
+        },
+        series: [{
+          name: 'sales',
+          data: [30,40,45,50,49,60,70,91,125]
+        }],
+        xaxis: {
+          categories: [1991,1992,1993,1994,1995,1996,1997, 1998,1999]
+        }
+      }
+      var chart = new ApexCharts(document.querySelector("#chart"), options);
+      chart.render();
+      </script> -->
     </div>
   </body>
 </html>
+
+<div id="chart">
+</div>

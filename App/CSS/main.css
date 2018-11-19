@@ -6,6 +6,11 @@
     display: inline
 }
 
+#chart {
+  max-width: 650px;
+  margin: 35px auto;
+}
+
 #main-header {
     text-align: center;
     font-weight: bold;
