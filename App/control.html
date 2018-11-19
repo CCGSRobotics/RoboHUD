@@ -5,7 +5,7 @@
     <title>Robot Control</title>
     <link rel="stylesheet" href="CSS/main.css">
     <script type="text/javascript" src="JS/main.js"></script>
-    <!--<script type="text/javascript" src="JS/controller.js"></script>-->
+    <script type="text/javascript" src="JS/client.js"></script>
     <script type="text/javascript">
       if (process.platform == 'win32' || process.platform == 'win64') {
         execute('py App/JS/Resources/CurrentEmuBotCode2/client.py')
@@ -22,8 +22,8 @@
       <a href="version.html">Version</a>
     </div>
     <div class="main">
-        <button type="button" name="start" onclick="controlServerCode(false)">[UNSTABLE] Start</button>
-        <button type="button" name="kill" onclick="controlServerCode(true)">[UNSTABLE] Kill</button>
+        <button type="button" name="start" onclick="controlServerCode(false)">[UNSTABLE PYTHON] Start</button>
+        <button type="button" name="kill" onclick="controlServerCode(true)">[UNSTABLE PYTHON] Kill</button>
         <p id="status"></p>
     </div>
   </body>
