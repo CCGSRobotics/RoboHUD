@@ -8,7 +8,7 @@ function execute(command) {
 	    console.log('Stdout: ' + stdout);
 	    console.error('Stderr: ' + stderr);
 	    if (error !== null) {
-			if (hasErrored < 5) {
+			if (hasErrored < 999999999) {
 		         alert('Execution Error. Try looking at the documentation for possible sources of error. If the problem persists, please report this with the following error message:\n' + error)
 				 hasErrored += 1
 			} else {
