@@ -4,13 +4,6 @@
   </head>
   <body>
 
-    <button type="button" onclick="wsavc.playStream()">Start Video</button>
-    <button type="button" onclick="wsavc.stopStream()">Stop Video</button>
-    <button type="button" onclick="wsavc.disconnect()">Disconnect</button>
-    <br/>
-    <br/>
-    <br/>
-
   <!-- provide WSAvcPlayer -->
     <script type="text/javascript" src="http-live-player.js">;</script>
     <script type="text/javascript">
@@ -26,7 +19,9 @@ wsavc.connect(uri);
 
 //expose instance for button callbacks
 window.wsavc = wsavc;
-
+setTimeout(function(){
+  wsavc.playStream()
+}, 1000)
     </script>
   </body>
 </html>
