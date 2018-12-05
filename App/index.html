@@ -63,12 +63,12 @@
               callback(err);
           });
           // execute the callback once the process has finished running
-          process.on('exit', function (code) {
-              if (invoked) return;
-              invoked = true;
-              var err = code === 0 ? null : new Error('exit code ' + code);
-              callback(err);
-          });
+          // process.on('exit', function (code) {
+          //     if (invoked) return;
+          //     invoked = true;
+          //     var err = code === 0 ? null : new Error('exit code ' + code);
+          //     console.error(err);
+          // });
       }
 
       client.connect(5000, '192.168.100.1', function() {
@@ -80,7 +80,7 @@
         console.log(`Wrote '${data}' to server`);
       }
 
-      function start() {
+      setTimeout(function() {
         // console.log("test")
         writeToServer('VIDEO')
         var video = runScript('App/JS/Resources/Player/server-tcp.js');
@@ -96,39 +96,14 @@
         }, 1000)
         writeToServer('START');
         // console.log("test 2")
-        document.getElementById('toggle').style.visibility = 'hidden';
         setTimeout(function() {
           clientSocket.connect(9999, '192.168.100.1', function() {
           	window.addEventListener("gamepadconnected", function(event) {
           		pollGamepad(130);
           	});
           });
-
-          // video.kill('SIGINT')
-          // runScript('./App/JS/Resources/Player/server-tcp.js', function (err) {
-          //     if (err) throw err;
-          // });
-
         }, 3000)
-        // // setTimeout(function() {
-        // console.log('Starting client...');
-        // var client = childProcess('./JS/client.js');
-        // client.stdout.on('data', function (data) {
-        //   console.log('stdout: ' + data.toString());
-        // });
-        // client.stderr.on('data', function (data) {
-        //   console.log('stderr: ' + data.toString());
-        // });
-        // client.on('exit', function (code) {
-        //   console.log('child process exited with code ' + code.toString());
-        // });
-          // runScript('./JS/Resources/server-tcp.js', function (err) {
-          //     if (err) throw err;
-          // });
-          // //Opens camera feed
-
-        // }, 3000)
-      }
+      }, 3000)
     </script>
     <script type="text/javascript">
       // execute('node App/JS/Resources/Player/server-tcp.js');
@@ -145,7 +120,6 @@
     </div>
     <div class="main">
         <h1 class="text" id="main-header">Dashboard - Robotics GUI</h1>
-        <button type="button" name="button" onclick="start()" id="toggle">Start</button>
         <p id="marker"></p>
     </div>
   </body>
