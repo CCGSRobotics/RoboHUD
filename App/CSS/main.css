@@ -1,9 +1,13 @@
-.main {
+/* .main {
     margin-left: 175px !important
-}
+} */
 
 .descriptor {
     display: inline
+}
+
+#camera-view {
+  align: center;
 }
 
 #chart {
