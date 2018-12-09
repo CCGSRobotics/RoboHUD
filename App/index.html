@@ -5,13 +5,10 @@
     <title>Dashboard</title>
     <link rel="stylesheet" href="CSS/main.css">
     <script type="text/javascript" src="JS/main.js"></script>
-    <!-- <script type="text/javascript" scr="JS/Resources/Player/server-tcp.js"></script> -->
-    <!-- <script type="text/javascript" src="JS/client.js"></script> -->
     <script type="text/javascript">
       var net = require('net');
       var client = new net.Socket();
       var childProcess = require('child_process');
-      // var pollGamepad = require('./JS/client.js').pollGamepad;
       var clientSocket = new net.Socket();
 
       function terminateConnection(connection) {
@@ -21,8 +18,7 @@
       	connection.write("040");
       }
 
-      function axisValue(dynamixel, axis) {
-      	var gamepad = navigator.getGamepads()[0];
+      function axisValue(dynamixel, axis, gamepad) {
       	var val = Math.round((gamepad.axes[axis]+1) * 512);
 
       	if (val < 0 || val > 1024) {
@@ -42,33 +38,30 @@
 
       async function pollGamepad(interval) {
       	while (true) {
-      		clientSocket.write('02' + axisValue(1, 3));
+          var gamepad = navigator.getGamepads()[0];
+          var wheel1 = axisValue(1, 3, gamepad)
+          var wheel3 = axisValue(3, 3, gamepad)
+          var wheel2 = axisValue(2, 1, gamepad)
+          var wheel4 = axisValue(2, 1, gamepad)
+
+      		clientSocket.write('02' + wheel1);
       		await sleep(interval);
-          clientSocket.write('04' + axisValue(3, 3));
+          clientSocket.write('04' + wheel3);
       		await sleep(interval);
-      		clientSocket.write('01' + axisValue(2, 1));
+      		clientSocket.write('01' + wheel2);
       		await sleep(interval);
-      		clientSocket.write('03' + axisValue(4, 1));
+      		clientSocket.write('03' + wheel4);
       	}
       }
 
       function runScript(scriptPath, callback) {
-          // keep track of whether callback has been invoked to prevent multiple invocations
           var invoked = false;
           var process = childProcess.fork(scriptPath);
-          // listen for errors as they may prevent the exit event from firing
           process.on('error', function (err) {
               if (invoked) return;
               invoked = true;
               callback(err);
           });
-          // execute the callback once the process has finished running
-          // process.on('exit', function (code) {
-          //     if (invoked) return;
-          //     invoked = true;
-          //     var err = code === 0 ? null : new Error('exit code ' + code);
-          //     console.error(err);
-          // });
       }
 
       client.connect(5000, '192.168.100.1', function() {
@@ -81,7 +74,6 @@
       }
 
       setTimeout(function() {
-        // console.log("test")
         writeToServer('VIDEO')
         var video = runScript('App/JS/Resources/Player/server-tcp.js');
         setTimeout(function() {
@@ -95,29 +87,17 @@
           markerPoint.parentNode.insertBefore(iframe, markerPoint);
         }, 1000)
         writeToServer('START');
-        // console.log("test 2")
         setTimeout(function() {
           clientSocket.connect(9999, '192.168.100.1', function() {
           	window.addEventListener("gamepadconnected", function(event) {
-          		pollGamepad(130);
+          		pollGamepad(30);
           	});
           });
         }, 3000)
       }, 3000)
     </script>
-    <script type="text/javascript">
-      // execute('node App/JS/Resources/Player/server-tcp.js');
-    </script>
   </head>
   <body>
-    <div id="sidenav">
-      <a href="index.html" id="selected">Dashboard</a>
-      <a href="camera.html">Camera</a>
-      <a href="control.html">Robot Control</a>
-      <a href="testing.html">Testing</a>
-      <a href="settings.html">Settings</a>
-      <a href="version.html">Version</a>
-    </div>
     <div class="main">
         <h1 class="text" id="main-header">Dashboard - Robotics GUI</h1>
         <p id="marker"></p>
