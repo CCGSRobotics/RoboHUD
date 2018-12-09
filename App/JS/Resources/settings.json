@@ -1,49 +1,73 @@
 {
   "Default": {
     "Pi": {
-        "ip": "192.168.100.1",
-        "port": "5000"
+      "IP": "192.168.100.1",
+      "Ports": {
+          "DrivingPort": 9999,
+          "ServerPort": 5000
+        },
     },
-    "Computer": {
-        "ip": "192.168.100.72",
-        "port": "5000"
-    },
-    "Camera": {
-        "Width": 960,
-        "Height": 540,
-        "Time": 0,
-        "Extra Commands": "-o - -hf",
-        "Network": {
-            "Port": 5000,
-            "IP": "192.168.100.72"
-        }
-    },
-    "fps": 15,
-    "controller": "logitech_gamepad",
-    "robot": "EmuBot"
-  },
-
-  "User": {
-      "Pi": {
-          "ip": "192.168.100.1",
-          "port": "5000"
-      },
-      "Computer": {
-          "ip": "192.168.100.72",
-          "port": "5000"
-      },
+    "Client": {
       "Camera": {
-          "Width": 960,
-          "Height": 540,
-          "Time": 0,
-          "Extra Commands": "-o - -hf",
-          "Network": {
-              "Port": 5000,
-              "IP": "192.168.100.72"
-          }
+        "IP": "localhost:8080",
+        "ScriptPath": "App/JS/Resources/Player/server-tcp.js"
       },
-    "fps": 15,
-    "controller": "logitech_gamepad",
-    "robot": "EmuBot"
+      "Interval": 30,
+      "Controller": {
+        "Axes": {
+          "TODO": "Change axes to proper values",
+          "LeftUp": 1,
+          "LeftDown": 1,
+          "RightUp": 1,
+          "RightDown": 1
+        },
+        "Buttons": {
+          "TODO": "Modify camera settings to correct values",
+          "CameraPanLeft": 1,
+          "CameraPanRight": 1,
+          "CameraTiltUp": 1,
+          "CameraTiltDown": 1,
+          "ArmMoveUp": 1,
+          "ArmMoveDown": 1,
+          "ValueReset": 1
+        }
+      }
+    }
+  },
+  
+  "User": {
+    "Pi": {
+      "IP": "192.168.100.1",
+      "Ports": {
+          "DrivingPort": 9999,
+          "ServerPort": 5000
+        },
+    },
+    "Client": {
+      "Camera": {
+        "IP": "localhost:8080",
+        "ScriptPath": "App/JS/Resources/Player/server-tcp.js"
+      },
+      "Interval": 30,
+      "Controller": {
+        "Axes": {
+          "TODO": "Change axes to proper values",
+          "LeftUp": 1,
+          "LeftDown": 1,
+          "RightUp": 1,
+          "RightDown": 1
+        },
+        "Buttons": {
+          "TODO": "Modify camera settings to correct values",
+          "CameraPanLeft": 1,
+          "CameraPanRight": 1,
+          "CameraTiltUp": 1,
+          "CameraTiltDown": 1,
+          "ArmMoveUp": 1,
+          "ArmMoveDown": 1,
+          "ValueReset": 1
+        }
+      }
+    }
   }
 }
