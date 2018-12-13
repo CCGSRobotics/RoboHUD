@@ -2,29 +2,13 @@
 <html lang="en" dir="ltr">
   <head>
     <meta charset="UTF-8">
-    <title>Robot Control</title>
+    <title>Controller Test</title>
     <link rel="stylesheet" href="CSS/main.css">
     <script type="text/javascript" src="JS/main.js"></script>
-    <script type="text/javascript" src="JS/client.js"></script>
-    <script type="text/javascript">
-      if (process.platform == 'win32' || process.platform == 'win64') {
-        execute('py App/JS/Resources/CurrentEmuBotCode2/client.py')
-      }
-    </script>
+    <script type="text/javascript" src="JS/controller.js"></script>
   </head>
   <body>
-    <div id="sidenav">
-      <a href="index.html">Dashboard</a>
-      <a href="camera.html">Camera</a>
-      <a href="control.html" id="selected">Robot Control</a>
-      <a href="testing.html">Testing</a>
-      <a href="settings.html">Settings</a>
-      <a href="version.html">Version</a>
-    </div>
-    <div class="main">
-        <button type="button" name="start" onclick="controlServerCode(false)">[UNSTABLE PYTHON] Start</button>
-        <button type="button" name="kill" onclick="controlServerCode(true)">[UNSTABLE PYTHON] Kill</button>
-        <p id="status"></p>
-    </div>
+    <div id="controllers"></div>
+    <p id="marker"></p>
   </body>
 </html>
