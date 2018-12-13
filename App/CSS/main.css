@@ -1,9 +1,37 @@
 /* .main {
     margin-left: 175px !important
 } */
+.positive {
+  background-color: green
+}
+
+.negative {
+  background-color: red
+}
+
+.axis {
+  background-color: #00FFFF
+}
+
+.button {
+  background-color: orange
+}
+
+.linear {
+  background-color: purple
+}
+
+.binary {
+  background-color: yellow
+}
 
 .descriptor {
     display: inline
+}
+
+table, th, td {
+  border: 1px solid black;
+  border-collapse: collapse;
 }
 
 #camera-view {
