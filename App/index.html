@@ -10,13 +10,64 @@
       var client = new net.Socket();
       var childProcess = require('child_process');
       var clientSocket = new net.Socket();
+      var jointSpeed = 500;
+      var direction = 5270;
+      var stopped = [true, true, true, true, true, true, true, true, true, true, true, true, true, true, true]
+      var video;
+      var leftCameraButton = 1;
+      var rightCameraButton = 0;
 
       function terminateConnection(connection) {
-      	connection.write("010");
-      	connection.write("020");
-      	connection.write("030");
-      	connection.write("040");
+      	connection.write('010');
+      	connection.write('020');
+      	connection.write('030');
+      	connection.write('040');
       }
+
+      function cameraTilt(dynamixel, button, gamepad, step, speed) {
+        var movementSpeed;
+
+        // if (gamepad.buttons[leftCameraButton].pressed || gamepad.buttons[rightCameraButton].pressed) {
+          movementSpeed = speed;
+
+          if (gamepad.buttons[leftCameraButton].pressed && direction < (8570 - step)) {
+            stopped[button] = false;
+            direction += step;
+          } else if (gamepad.buttons[rightCameraButton].pressed  && direction > (1670 + step)) {
+            stopped[button] = false;
+            direction -= step;
+          } else if (stopped[button] == false){
+          stopped[button] = true;
+          return `0${dynamixel}${direction}${500}`
+        }
+        return `0${dynamixel}${direction}${movementSpeed}`
+      }
+
+      // function buttonValue(dynamixel, button, gamepad, step, speed) {
+      //   var movementSpeed;
+      //
+      //   if (gamepad.buttons[button].pressed) {
+      //     movementSpeed = speed
+      //
+      //     if (dynamixel == 7) {
+      //       if (button == leftCameraButton) {
+      //         if (direction < (8570 - step)) {
+      //           stopped[button] = false
+      //           direction += step
+      //         }
+      //       } else if (button == rightCameraButton) {
+      //         if (direction > (190 + step)) {
+      //           stopped[button] = false
+      //           direction -= step
+      //         }
+      //       }
+      //     }
+      //   } else if (stopped[button] == false){
+      //     stopped[button] = true;
+      //     return `0${dynamixel}${direction}${500}`
+      //   }
+      //   return `0${dynamixel}${direction}${movementSpeed}`
+      // }
 
       function axisValue(dynamixel, axis, gamepad) {
       	var val = Math.round((gamepad.axes[axis]+1) * 512);
@@ -43,6 +94,7 @@
           var wheel3 = axisValue(3, 3, gamepad)
           var wheel2 = axisValue(2, 1, gamepad)
           var wheel4 = axisValue(2, 1, gamepad)
+          var cameraTiltValue = cameraTilt(7, leftCameraButton, gamepad, 300, jointSpeed)
 
       		clientSocket.write('02' + wheel1);
       		await sleep(interval);
@@ -51,6 +103,11 @@
       		clientSocket.write('01' + wheel2);
       		await sleep(interval);
       		clientSocket.write('03' + wheel4);
+          await sleep(interval)
+          clientSocket.write(cameraTiltValue);
+          await sleep(interval)
+          // clientSocket.write(rightCamera);
+          // await sleep(interval)
       	}
       }
 
@@ -75,7 +132,10 @@
 
       setTimeout(function() {
         writeToServer('VIDEO')
-        var video = runScript('App/JS/Resources/Player/server-tcp.js');
+        video = childProcess.fork('App/JS/Resources/Player/server-tcp.js');
+        video.on('error', function(err) {
+          console.error(`Video error: ${err}`)
+        })
         setTimeout(function() {
           var iframe = document.createElement('iframe');
           iframe.setAttribute('id', 'camera-view');
@@ -90,7 +150,7 @@
         setTimeout(function() {
           clientSocket.connect(9999, '192.168.100.1', function() {
           	window.addEventListener("gamepadconnected", function(event) {
-          		pollGamepad(30);
+          		pollGamepad(10);
           	});
           });
         }, 3000)
