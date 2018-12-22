@@ -87,6 +87,15 @@
       	return new Promise(resolve => setTimeout(resolve, ms));
       }
 
+      async function writeStartingValues(interval) {
+        clientSocket.write("0502000200");
+        await sleep(interval);
+        clientSocket.write("0602000200");
+        await sleep(interval);
+        clientSocket.write("0705120512");
+        await sleep(interval);
+      }
+
       async function pollGamepad(interval) {
       	while (true) {
           var gamepad = navigator.getGamepads()[0];
@@ -147,8 +156,9 @@
           markerPoint.parentNode.insertBefore(iframe, markerPoint);
         }, 1000)
         writeToServer('START');
-        setTimeout(function() {
-          clientSocket.connect(9999, '192.168.100.1', function() {
+        setTimeout(async function() {
+          clientSocket.connect(9999, '192.168.100.1', async function() {
+            await writeStartingValues(30)
           	window.addEventListener("gamepadconnected", function(event) {
           		pollGamepad(30);
           	});
