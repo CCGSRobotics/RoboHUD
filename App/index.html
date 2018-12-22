@@ -24,7 +24,7 @@
       	connection.write('040');
       }
 
-      function cameraTilt(dynamixel, button, gamepad, step, speed) {
+      function cameraPan(dynamixel, button, gamepad, step, speed) {
         var movementSpeed;
 
         // if (gamepad.buttons[leftCameraButton].pressed || gamepad.buttons[rightCameraButton].pressed) {
@@ -103,7 +103,7 @@
           var wheel3 = axisValue(3, 3, gamepad)
           var wheel2 = axisValue(2, 1, gamepad)
           var wheel4 = axisValue(2, 1, gamepad)
-          var cameraTiltValue = cameraTilt(7, leftCameraButton, gamepad, 300, jointSpeed)
+          var cameraPanValue = cameraPan(7, leftCameraButton, gamepad, 300, jointSpeed)
 
       		clientSocket.write('02' + wheel1);
       		await sleep(interval);
@@ -113,7 +113,7 @@
       		await sleep(interval);
       		clientSocket.write('03' + wheel4);
           await sleep(interval)
-          clientSocket.write(cameraTiltValue);
+          clientSocket.write(cameraPanValue);
           await sleep(interval)
           // clientSocket.write(rightCamera);
           // await sleep(interval)
