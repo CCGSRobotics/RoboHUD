@@ -20,9 +20,9 @@ jointMode(11)
 
 class MyTCPHandler(SocketServer.BaseRequestHandler):
     def handle(self):
-        while True:
+        # while True:
             #sc.flush()
-            self.data = self.request.recv(2048).decode('utf-8').strip()
+            self.data = self.request[0].decode('utf-8').strip()
             new = self.data.split('\n')
             for i in new:
                 if i != "":
@@ -38,9 +38,9 @@ class MyTCPHandler(SocketServer.BaseRequestHandler):
                         if ID < 5:
                             try:
                                 moveWheel(ID, int(i[2:]))
-                            except: 
+                            except e:
+                                print(e) 
                                 print('brokeWheel ',ID)
-                                pass
                         else:
                             try:
                                 moveJoint(ID, int(i[2:-4]), i[-4:])
@@ -53,8 +53,8 @@ class MyTCPHandler(SocketServer.BaseRequestHandler):
 if __name__ == "__main__":
     HOST, PORT = "", 9999
     
-SocketServer.TCPServer.allow_reuse_address = True
-server = SocketServer.TCPServer((HOST, PORT), MyTCPHandler)
+SocketServer.UDPServer.allow_reuse_address = True
+server = SocketServer.UDPServer((HOST, PORT), MyTCPHandler)
 
 print('Servre Started')
 server.serve_forever()
