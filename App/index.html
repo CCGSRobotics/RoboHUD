@@ -7,9 +7,10 @@
     <script type="text/javascript" src="JS/main.js"></script>
     <script type="text/javascript">
       var net = require('net');
+      var dgram = require('dgram');
       var client = new net.Socket();
       var childProcess = require('child_process');
-      var clientSocket = new net.Socket();
+      var clientSocket = new dgram.createSocket('udp4');
       var jointSpeed = 500;
       var direction = 5270;
       var stopped = [true, true, true, true, true, true, true, true, true, true, true, true, true, true, true]
@@ -88,16 +89,15 @@
       }
 
       async function writeStartingValues(interval) {
-        clientSocket.write("0502000200");
+        clientSocket.send("0502000200", 9999, '192.168.100.1');
         await sleep(interval);
-        clientSocket.write("0602000200");
+        clientSocket.send("0602000200", 9999, '192.168.100.1');
         await sleep(interval);
-        clientSocket.write("0705120512");
+        clientSocket.send("0705120512", 9999, '192.168.100.1');
         await sleep(interval);
       }
 
-      async function pollGamepad(interval) {
-      	while (true) {
+      async function pollGamepad(gamepad) {
           var gamepad = navigator.getGamepads()[0];
           var wheel1 = axisValue(1, 3, gamepad)
           var wheel3 = axisValue(3, 3, gamepad)
@@ -105,19 +105,18 @@
           var wheel4 = axisValue(2, 1, gamepad)
           var cameraPanValue = cameraPan(7, leftCameraButton, gamepad, 300, jointSpeed)
 
-      		clientSocket.write('02' + wheel1);
-      		await sleep(interval);
-          clientSocket.write('04' + wheel3);
-      		await sleep(interval);
-      		clientSocket.write('01' + wheel2);
-      		await sleep(interval);
-      		clientSocket.write('03' + wheel4);
-          await sleep(interval)
-          clientSocket.write(cameraPanValue);
-          await sleep(interval)
-          // clientSocket.write(rightCamera);
+      		clientSocket.send('02' + wheel1, 9999, '192.168.100.1');
+      		// await sleep(interval);
+          clientSocket.send('04' + wheel3, 9999, '192.168.100.1');
+      		// await sleep(interval);
+      		clientSocket.send('01' + wheel2, 9999, '192.168.100.1');
+      		// await sleep(interval);
+      		clientSocket.send('03' + wheel4, 9999, '192.168.100.1');
           // await sleep(interval)
-      	}
+          clientSocket.send(cameraPanValue, 9999, '192.168.100.1');
+          // await sleep(interval)
+          // clientSocket.send(rightCamera);
+          // await sleep(interval)
       }
 
       function runScript(scriptPath, callback) {
@@ -157,12 +156,13 @@
         }, 1000)
         writeToServer('START');
         setTimeout(async function() {
-          clientSocket.connect(9999, '192.168.100.1', async function() {
+          // clientSocket.connect(9999, '192.168.100.1', async function() {
             await writeStartingValues(30)
-          	window.addEventListener("gamepadconnected", function(event) {
-          		pollGamepad(30);
+            let gamepadInterval;
+            window.addEventListener("gamepadconnected", function(event) {
+          		gamepadInterval = setInterval(pollGamepad, 30, event.gamepad);
           	});
-          });
+          // });
         }, 3000)
       }, 3000)
     </script>
