@@ -27,50 +27,19 @@
 
       function cameraPan(dynamixel, button, gamepad, step, speed) {
         var movementSpeed;
+        movementSpeed = speed;
 
-        // if (gamepad.buttons[leftCameraButton].pressed || gamepad.buttons[rightCameraButton].pressed) {
-          movementSpeed = speed;
-
-          if (gamepad.buttons[leftCameraButton].pressed && direction < (8570 - step)) {
-            stopped[button] = false;
-            direction += step;
-          } else if (gamepad.buttons[rightCameraButton].pressed  && direction > (1670 + step)) {
-            stopped[button] = false;
-            direction -= step;
-          } else if (stopped[button] == false){
-          stopped[button] = true;
-          return `0${dynamixel}${direction}${500}`
+        if (gamepad.buttons[leftCameraButton].pressed && direction < (8570 - step)) {
+          stopped[leftCameraButton] = false;
+          direction += step;
+        } else if (gamepad.buttons[rightCameraButton].pressed  && direction > (1670 + step)) {
+          stopped[rightCameraButton] = false;
+          direction -= step;
         }
-        return `0${dynamixel}${direction}${movementSpeed}`
+      return `0${dynamixel}${direction}${movementSpeed}`
       }
 
-      // function buttonValue(dynamixel, button, gamepad, step, speed) {
-      //   var movementSpeed;
-      //
-      //   if (gamepad.buttons[button].pressed) {
-      //     movementSpeed = speed
-      //
-      //     if (dynamixel == 7) {
-      //       if (button == leftCameraButton) {
-      //         if (direction < (8570 - step)) {
-      //           stopped[button] = false
-      //           direction += step
-      //         }
-      //       } else if (button == rightCameraButton) {
-      //         if (direction > (190 + step)) {
-      //           stopped[button] = false
-      //           direction -= step
-      //         }
-      //       }
-      //     }
-      //   } else if (stopped[button] == false){
-      //     stopped[button] = true;
-      //     return `0${dynamixel}${direction}${500}`
-      //   }
-      //   return `0${dynamixel}${direction}${movementSpeed}`
-      // }
-
-      function axisValue(dynamixel, axis, gamepad) {
+      function moveWheel(dynamixel, axis, gamepad) {
       	var val = Math.round((gamepad.axes[axis]+1) * 512);
 
       	if (val < 0 || val > 1024) {
@@ -97,26 +66,23 @@
         await sleep(interval);
       }
 
-      async function pollGamepad(gamepad) {
+      async function pollGamepad(gamepad, interval) {
           var gamepad = navigator.getGamepads()[0];
-          var wheel1 = axisValue(1, 3, gamepad)
-          var wheel3 = axisValue(3, 3, gamepad)
-          var wheel2 = axisValue(2, 1, gamepad)
-          var wheel4 = axisValue(2, 1, gamepad)
-          var cameraPanValue = cameraPan(7, leftCameraButton, gamepad, 300, jointSpeed)
+          var wheel1 = moveWheel(1, 3, gamepad)
+          var wheel3 = moveWheel(3, 3, gamepad)
+          var wheel2 = moveWheel(2, 1, gamepad)
+          var wheel4 = moveWheel(2, 1, gamepad)
+          var cameraPanValue = cameraPan(7, leftCameraButton, gamepad, 150, jointSpeed)
 
       		clientSocket.send('02' + wheel1, 9999, '192.168.100.1');
-      		// await sleep(interval);
+      		await sleep(interval);
           clientSocket.send('04' + wheel3, 9999, '192.168.100.1');
-      		// await sleep(interval);
+      		await sleep(interval);
       		clientSocket.send('01' + wheel2, 9999, '192.168.100.1');
-      		// await sleep(interval);
+      		await sleep(interval);
       		clientSocket.send('03' + wheel4, 9999, '192.168.100.1');
-          // await sleep(interval)
+          await sleep(interval)
           clientSocket.send(cameraPanValue, 9999, '192.168.100.1');
-          // await sleep(interval)
-          // clientSocket.send(rightCamera);
-          // await sleep(interval)
       }
 
       function runScript(scriptPath, callback) {
@@ -156,13 +122,14 @@
         }, 1000)
         writeToServer('START');
         setTimeout(async function() {
-          // clientSocket.connect(9999, '192.168.100.1', async function() {
-            await writeStartingValues(30)
-            let gamepadInterval;
-            window.addEventListener("gamepadconnected", function(event) {
-          		gamepadInterval = setInterval(pollGamepad, 30, event.gamepad);
-          	});
-          // });
+          await writeStartingValues(30)
+          let gamepadInterval;
+          window.addEventListener("gamepadconnected", function(event) {
+        		gamepadInterval = setInterval(pollGamepad, 30, event.gamepad, 5);
+        	});
+          window.addEventListener("gamepaddisconnected", function(event) {
+        		clearInterval(gamepadInterval);
+        	});
         }, 3000)
       }, 3000)
     </script>
