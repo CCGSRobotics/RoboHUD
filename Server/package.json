@@ -5,7 +5,8 @@
   "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server.js"
+    "start": "rm -rf logs/; node test.js",
+    "clear-logs": "rm -rf logs/"
   },
   "author": "",
   "license": "ISC"
