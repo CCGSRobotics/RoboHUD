@@ -13,27 +13,27 @@
       var clientSocket = new dgram.createSocket('udp4');
       var jointSpeed = 500;
       var direction = 5270;
-      var stopped = [true, true, true, true, true, true, true, true, true, true, true, true, true, true, true]
       var video;
       var leftCameraButton = 14;
       var rightCameraButton = 15;
+      var stopped = [[true, 0], [true, 0], [true, 0], [true, 0], [true, 0]];
 
       function terminateConnection(connection) {
-      	connection.write('010');
-      	connection.write('020');
-      	connection.write('030');
-      	connection.write('040');
+      	connection.send('010', 9999, '192.168.100.1');
+      	connection.send('020', 9999, '192.168.100.1');
+      	connection.send('030', 9999, '192.168.100.1');
+      	connection.send('040', 9999, '192.168.100.1');
+
+        connection.close()
       }
 
-      function cameraPan(dynamixel, button, gamepad, step, speed) {
+      function cameraPan(dynamixel, gamepad, step, speed) {
         var movementSpeed;
         movementSpeed = speed;
 
         if (gamepad.buttons[leftCameraButton].pressed && direction < (8570 - step)) {
-          stopped[leftCameraButton] = false;
           direction += step;
         } else if (gamepad.buttons[rightCameraButton].pressed  && direction > (1670 + step)) {
-          stopped[rightCameraButton] = false;
           direction -= step;
         }
       return `0${dynamixel}${direction}${movementSpeed}`
@@ -50,7 +50,22 @@
       	if (dynamixel == 1 || dynamixel == 3) {
       		val = -val;
       	}
-      	return val;
+
+        val = -val
+
+        if (val == 0) {
+          if (stopped[dynamixel][0] == false) {
+            stopped[dynamixel][0] = true;
+            clientSocket.send(`0${dynamixel}0`, 9999, '192.168.100.1');
+          } else if (stopped[dynamixel][1] == 1) {
+            clientSocket.send(`0${dynamixel}0`, 9999, '192.168.100.1');
+          }
+          stopped[dynamixel][1] += 1
+        } else {
+          clientSocket.send(`0${dynamixel}${val}`, 9999, '192.168.100.1');
+          stopped[dynamixel][0] = false;
+          stopped[dynamixel][1] = 0
+        }
       }
 
       function sleep(ms) {
@@ -68,20 +83,16 @@
 
       async function pollGamepad(gamepad, interval) {
           var gamepad = navigator.getGamepads()[0];
-          var wheel1 = moveWheel(1, 3, gamepad)
-          var wheel3 = moveWheel(3, 3, gamepad)
-          var wheel2 = moveWheel(2, 1, gamepad)
-          var wheel4 = moveWheel(2, 1, gamepad)
-          var cameraPanValue = cameraPan(7, leftCameraButton, gamepad, 150, jointSpeed)
+          var cameraPanValue = cameraPan(7, gamepad, 300, jointSpeed);
 
-      		clientSocket.send('02' + wheel1, 9999, '192.168.100.1');
-      		await sleep(interval);
-          clientSocket.send('04' + wheel3, 9999, '192.168.100.1');
-      		await sleep(interval);
-      		clientSocket.send('01' + wheel2, 9999, '192.168.100.1');
-      		await sleep(interval);
-      		clientSocket.send('03' + wheel4, 9999, '192.168.100.1');
-          await sleep(interval)
+          moveWheel(1, 1, gamepad)
+          await sleep(interval);
+          moveWheel(3, 1, gamepad)
+          await sleep(interval);
+          moveWheel(2, 3, gamepad)
+          await sleep(interval);
+          moveWheel(4, 3, gamepad)
+          await sleep(interval);
           clientSocket.send(cameraPanValue, 9999, '192.168.100.1');
       }
 
