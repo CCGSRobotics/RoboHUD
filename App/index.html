@@ -12,10 +12,13 @@
       var childProcess = require('child_process');
       var clientSocket = new dgram.createSocket('udp4');
       var jointSpeed = 500;
-      var direction = 5270;
+      var panDirection = 5270;
+      var tiltDirection = 2000;
       var video;
       var leftCameraButton = 14;
       var rightCameraButton = 15;
+      var upCameraButton = 0;
+      var downCameraButton = 1;
       var stopped = [[true, 0], [true, 0], [true, 0], [true, 0], [true, 0]];
 
       function terminateConnection(connection) {
@@ -31,12 +34,26 @@
         var movementSpeed;
         movementSpeed = speed;
 
-        if (gamepad.buttons[leftCameraButton].pressed && direction < (8570 - step)) {
-          direction += step;
-        } else if (gamepad.buttons[rightCameraButton].pressed  && direction > (1670 + step)) {
-          direction -= step;
+        if (gamepad.buttons[leftCameraButton].pressed && panDirection < (8570 - step)) {
+          panDirection += step;
+        } else if (gamepad.buttons[rightCameraButton].pressed  && panDirection > (1670 + step)) {
+          panDirection -= step;
         }
-      return `0${dynamixel}${direction}${movementSpeed}`
+      return `0${dynamixel}${panDirection}${movementSpeed}`
+      }
+
+      function cameraTilt(dynamixel, gamepad, step, speed) {
+        var movementSpeed;
+        movementSpeed = speed;
+
+        //8000(down), 2000 (up)
+
+        if (gamepad.buttons[downCameraButton].pressed && tiltDirection < (8000 - step)) {
+          tiltDirection += step;
+        } else if (gamepad.buttons[upCameraButton].pressed  && tiltDirection > (2000 + step)) {
+          tiltDirection -= step;
+        }
+      return `0${dynamixel}${tiltDirection}${movementSpeed}`
       }
 
       function moveWheel(dynamixel, axis, gamepad) {
@@ -84,6 +101,7 @@
       async function pollGamepad(gamepad, interval) {
           var gamepad = navigator.getGamepads()[0];
           var cameraPanValue = cameraPan(7, gamepad, 300, jointSpeed);
+          var cameraTiltValue = cameraTilt(6, gamepad, 300, jointSpeed);
 
           moveWheel(1, 1, gamepad)
           await sleep(interval);
@@ -94,6 +112,8 @@
           moveWheel(4, 3, gamepad)
           await sleep(interval);
           clientSocket.send(cameraPanValue, 9999, '192.168.100.1');
+          await sleep(interval);
+          clientSocket.send(cameraTiltValue, 9999, '192.168.100.1');
       }
 
       function runScript(scriptPath, callback) {
