@@ -7,9 +7,10 @@
     "start": "electron ."
   },
   "devDependencies": {
-    "electron": "^3.0.4"
+    "electron": "^3.0.14"
   },
   "dependencies": {
+    "@json-editor/json-editor": "^1.2.1",
     "apexcharts": "^2.2.2",
     "chart.js": "^2.7.3",
     "express": "^3.21.2",
