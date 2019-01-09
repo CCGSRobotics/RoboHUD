@@ -5,31 +5,71 @@
     <title></title>
   </head>
   <body>
+    <div id='general_editor_holder'></div>
+    <button id='general_submit'>Submit (console.log)</button>
     <div id='wheel_editor_holder'></div>
     <button id='wheel_submit'>Submit (console.log)</button>
     <script type="text/javascript">
-      const JSONEditor = require('@json-editor/json-editor');
+    const JSONEditor = require('@json-editor/json-editor');
 
+      var generalEditor = new JSONEditor(document.getElementById('general_editor_holder'),{
+        schema: {
+          "type": "object",
+          "properties": {
+            "name": { "type": "string" },
+            "test": { "type": "string" }
+          },
+          "format": "categories",
+          "basicCategoryTitle": "Main"
+        }
+      });
+
+      generalEditor.on('ready',function() {
+        wheelEditor.validate();
+      });
+
+      document.getElementById('general_submit').addEventListener('click',function() {
+        console.log(wheelEditor.getValue());
+      });
+    </script>
+    <script type="text/javascript">
       var wheelEditor = new JSONEditor(document.getElementById('wheel_editor_holder'),{
         schema: {
             type: "object",
-            title: "Wheels",
+            title: "Wheels & Joints",
             properties: {
-              wheel1: {
-                title: "Wheel 1 Dynamixel #",
-                type: "integer",
+              "Save Title": {
+                "type": "string",
+                "default": "NewSave"
               },
-              wheel2: {
-                title: "Wheel 2 Dynamixel #",
-                type: "integer"
-              },
-              wheel3: {
-                title: "Wheel 3 Dynamixel #",
-                type: "integer"
-              },
-              wheel4: {
-                title: "Wheel 4 Dynamixel #",
-                type: "integer"
+              "Dynamixels": {
+                "type": "array",
+                "format": "table",
+                "title": "Dynamixels",
+                "uniqueItems": true,
+                "items": {
+                  "type": "object",
+                  "title": "Dynamixel",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "enum": [
+                        "wheel",
+                        "joint"
+                      ],
+                      "default": "wheel"
+                    },
+                    "id": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "default": [
+                  {
+                    "type": "wheel",
+                    "id": "0"
+                  }
+                ]
               }
             }
         }
