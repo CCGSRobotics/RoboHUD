@@ -1,8 +1,8 @@
 import socketserver as SocketServer
 import sys
 from GPIO import *
-#SwitchOFF()
-#SwitchON()
+SwitchOFF()
+SwitchON()
 from emuBot import *
 
 wheelMode(1)
@@ -16,7 +16,6 @@ jointMode(8)
 jointMode(9)
 jointMode(10)
 jointMode(11)
-#SwitchON() #Added for testing.
 
 class MyTCPHandler(SocketServer.BaseRequestHandler):
     def handle(self):
@@ -56,7 +55,7 @@ if __name__ == "__main__":
 SocketServer.UDPServer.allow_reuse_address = True
 server = SocketServer.UDPServer((HOST, PORT), MyTCPHandler)
 
-print('Servre Started')
+print('Server Started')
 server.serve_forever()
 
 
