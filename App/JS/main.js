@@ -1,5 +1,4 @@
 const execute = require('./JS/executeShellCommand.js').execute;
-var settings = require('./JS/Resources/settings.json')
 
 function controlServerCode(terminate) {
     if (terminate == true) {

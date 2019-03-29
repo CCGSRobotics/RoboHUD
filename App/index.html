@@ -11,14 +11,25 @@
       var client = new net.Socket();
       var childProcess = require('child_process');
       var clientSocket = new dgram.createSocket('udp4');
-      var jointSpeed = 500;
-      var panDirection = 5270;
-      var tiltDirection = 2000;
+      const settings = require('./JS/Resources/Settings/flipperBot.json')
+      // var jointSpeed = 500;
+      // var panDirection = 5270;
+      // var tiltDirection = 2000;
+      // var leftCameraButton = 14;
+      // var rightCameraButton = 15;
+      // var upCameraButton = 12;
+      // var downCameraButton = 13;
+      // console.log(settings)
+      const jointSpeed = settings["Client"]["Controller"]["Joints"].JointSpeed
+      const panDirectionDefault = settings["Client"]["Controller"]["Joints"].PanDirection
+      const tiltDirectionDefault = settings["Client"]["Controller"]["Joints"].TiltDirection
+      const leftCameraButton = settings["Client"]["Controller"]["Buttons"].CameraPanLeft
+      const rightCameraButton = settings["Client"]["Controller"]["Buttons"].CameraPanRight
+      const upCameraButton = settings["Client"]["Controller"]["Buttons"].CameraTiltUp
+      const downCameraButton = settings["Client"]["Controller"]["Buttons"].CameraTiltDown
+      var panDirection = panDirectionDefault
+      var tiltDirection = tiltDirectionDefault
       var video;
-      var leftCameraButton = 14;
-      var rightCameraButton = 15;
-      var upCameraButton = 12;
-      var downCameraButton = 13;
       var lastVals = [];
       var multiplier = 1;
       var moves = [];
@@ -149,8 +160,8 @@
       }
 
       async function writeStartingValues(interval) {
-        panDirection = 5270;
-        tiltDirection = 2000;
+        panDirection = panDirectionDefault
+        tiltDirection = tiltDirectionDefault
         clientSocket.send("0902000200", 9999, '192.168.100.1');
         await sleep(interval);
         clientSocket.send("1002000200", 9999, '192.168.100.1');
@@ -218,16 +229,17 @@
           let gamepadInterval;
           window.addEventListener("gamepadconnected", function(event) {
         		gamepadInterval = setInterval(() => {
-              pollGamepad(event.gamepad, 40, false);
               var gamepad = navigator.getGamepads()[0];
-
-              terminateConnection((gamepad.buttons[6].value == 0) ? true : false,
-              (gamepad.buttons[7].value == 0) ? true : false);
-
               if (gamepad.buttons[9].value > 0) {
                 terminateConnection(true, true);
                 writeStartingValues();
               }
+
+              pollGamepad(event.gamepad, 40, false);
+
+              terminateConnection((gamepad.buttons[6].value == 0) ? true : false,
+              (gamepad.buttons[7].value == 0) ? true : false);
+
             }, 160);
         	});
           window.addEventListener("gamepaddisconnected", function(event) {
