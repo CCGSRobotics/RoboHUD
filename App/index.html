@@ -12,14 +12,6 @@
       var childProcess = require('child_process');
       var clientSocket = new dgram.createSocket('udp4');
       const settings = require('./JS/Resources/Settings/flipperBot.json')
-      // var jointSpeed = 500;
-      // var panDirection = 5270;
-      // var tiltDirection = 2000;
-      // var leftCameraButton = 14;
-      // var rightCameraButton = 15;
-      // var upCameraButton = 12;
-      // var downCameraButton = 13;
-      // console.log(settings)
       const jointSpeed = settings["Client"]["Controller"]["Joints"].JointSpeed
       const panDirectionDefault = settings["Client"]["Controller"]["Joints"].PanDirection
       const tiltDirectionDefault = settings["Client"]["Controller"]["Joints"].TiltDirection
@@ -65,8 +57,6 @@
         var movementSpeed;
         movementSpeed = speed;
 
-        //8000(down), 2000 (up)
-
         if (gamepad.buttons[downCameraButton].pressed && tiltDirection < (8000 - step)) {
           tiltDirection += step;
         } else if (gamepad.buttons[upCameraButton].pressed  && tiltDirection > (2000 + step)) {
@@ -76,48 +66,14 @@
       }
 
       function sendWheelValue(dynamixel, val) {
-        // if (dynamixel == 1 || dynamixel == 3) {
-        //   if (lastVals[0] == val) {
-        //     return;
-        //   }
-        // } else {
-        //   if (lastVals[1] == val) {
-        //     return;
-        //   }
-        // }
-        // console.log(val)
-
         if (lastVals[dynamixel][0] != val) {
           clientSocket.send(`0${dynamixel}${val}`, 9999, '192.168.100.1');
-          // moves.push(`0${dynamixel}${val}`);
-          // console.log(val);
         }
 
         if (val == 0 && lastVals[dynamixel][1] <= 30) {
           clientSocket.send(`0${dynamixel}0`, 9999, '192.168.100.1');
-          // moves.push(`0${dynamixel}0`);
           lastVals[dynamixel][1]++;
-          // console.log(val)
         }
-
-        // if (lastVals[dynamixel][1] < 5) {
-        //   clientSocket.send(`0${dynamixel}${val}`, 9999, '192.168.100.1');
-        //   lastVals[dynamixel][1]++;
-        //   return;
-        // }
-        // if (val == 0) {
-        //   if (lastVals[dynamixel][0] == false) {
-        //     lastVals[dynamixel][0] = true;
-        //     clientSocket.send(`0${dynamixel}0`, 9999, '192.168.100.1');
-        //   } else if (lastVals[dynamixel][1] <= 35) {
-        //     clientSocket.send(`0${dynamixel}0`, 9999, '192.168.100.1');
-        //   }
-        //   lastVals[dynamixel][1] += 1
-        // } else {
-        //   clientSocket.send(`0${dynamixel}${val}`, 9999, '192.168.100.1');
-        //   lastVals[dynamixel][0] = false;
-        //   lastVals[dynamixel][1] = 0
-        // }
       }
 
       function moveWheel(dynamixel, axis, gamepad, sticks) {
@@ -128,8 +84,6 @@
         } else {
           val = Math.round((gamepad.buttons[axis].value) * 1024);
         }
-
-        // val = -val
 
       	if (val < -1024 || val > 1024) {
       		console.error("Controller value is out of bounds! (" + val + ")");
@@ -148,11 +102,6 @@
         }
 
         sendWheelValue(dynamixel, val);
-
-        // clientSocket.send(`0${dynamixel}${val}`, 9999, '192.168.100.1');
-
-        // console.log(val)
-        // console.log(`0${dynamixel}${val}`)
       }
 
       function sleep(ms) {
@@ -182,9 +131,7 @@
           moveWheel(2, 7, gamepad, sticks)
           await sleep(interval);
           moveWheel(4, 7, gamepad, sticks)
-          // await sleep(interval);
           clientSocket.send(cameraPanValue, 9999, '192.168.100.1');
-          // await sleep(interval);
           clientSocket.send(cameraTiltValue, 9999, '192.168.100.1');
       }
 
