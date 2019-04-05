@@ -143,13 +143,13 @@
           // var cameraPanValue = cameraPan('11', gamepad, 300, jointSpeed);
           // var cameraTiltValue = cameraTilt('10', gamepad, 300, jointSpeed);
 
-          moveWheel(1, 6, gamepad, sticks)
+          moveWheel(1, 7, gamepad, sticks)
           // await sleep(interval);
-          moveWheel(3, 6, gamepad, sticks)
+          moveWheel(3, 7, gamepad, sticks)
           // await sleep(interval);
-          moveWheel(2, 7, gamepad, sticks)
+          moveWheel(2, 6, gamepad, sticks)
           // await sleep(interval);
-          moveWheel(4, 7, gamepad, sticks)
+          moveWheel(4, 6, gamepad, sticks)
           // await sleep(interval);
           cameraPan('11', gamepad, 300, jointSpeed);
           // await sleep(interval);
@@ -208,8 +208,8 @@
 
               pollGamepad(event.gamepad, 40, false);
 
-              terminateConnection((gamepad.buttons[6].value == 0) ? true : false,
-              (gamepad.buttons[7].value == 0) ? true : false);
+              terminateConnection((gamepad.buttons[7].value == 0) ? true : false,
+              (gamepad.buttons[6].value == 0) ? true : false);
 
               if (gamepad.buttons[4].pressed && !multipliers[0][0]) {
                 multipliers[0][1] *= -1;
