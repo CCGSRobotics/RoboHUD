@@ -23,7 +23,7 @@
       var tiltDirection = tiltDirectionDefault
       var video;
       var lastVals = [];
-      var multiplier = 1;
+      var multipliers = [[false, -1], [false, -1]]
       var moves = [];
 
       for (var i = 0; i <= 20; i++) {
@@ -50,7 +50,11 @@
         } else if (gamepad.buttons[rightCameraButton].pressed  && panDirection > (1670 + step)) {
           panDirection -= step;
         }
-      return `${dynamixel}${panDirection}${movementSpeed}`
+
+        if (lastVals[dynamixel][0] != panDirection) {
+          clientSocket.send(`${dynamixel}${panDirection}${movementSpeed}`, 9999, '192.168.100.1');
+          lastVals[dynamixel][0] = panDirection;
+        }
       }
 
       function cameraTilt(dynamixel, gamepad, step, speed) {
@@ -62,7 +66,11 @@
         } else if (gamepad.buttons[upCameraButton].pressed  && tiltDirection > (2000 + step)) {
           tiltDirection -= step;
         }
-      return `${dynamixel}${tiltDirection}${movementSpeed}`
+
+        if (lastVals[dynamixel][0] != tiltDirection) {
+          clientSocket.send(`${dynamixel}${tiltDirection}${movementSpeed}`, 9999, '192.168.100.1');
+          lastVals[dynamixel][0] = tiltDirection;
+        }
       }
 
       function sendWheelValue(dynamixel, val) {
@@ -70,10 +78,10 @@
           clientSocket.send(`0${dynamixel}${val}`, 9999, '192.168.100.1');
         }
 
-        if (val == 0 && lastVals[dynamixel][1] <= 30) {
-          clientSocket.send(`0${dynamixel}0`, 9999, '192.168.100.1');
-          lastVals[dynamixel][1]++;
-        }
+        // if (val == 0 && lastVals[dynamixel][1] <= 30) {
+        //   clientSocket.send(`0${dynamixel}0`, 9999, '192.168.100.1');
+        //   lastVals[dynamixel][1]++;
+        // }
       }
 
       function moveWheel(dynamixel, axis, gamepad, sticks) {
@@ -89,8 +97,11 @@
       		console.error("Controller value is out of bounds! (" + val + ")");
       	}
 
-      	if (dynamixel == 1 || dynamixel == 3) {
+      	if (dynamixel == 2 || dynamixel == 4) {
       		val = -val;
+          val *= multipliers[0][1];
+        } else {
+          val *= multipliers[1][1];
         }
 
         if (-150 <= val >= 150) {
@@ -117,22 +128,34 @@
         await sleep(interval);
         clientSocket.send("1105120512", 9999, '192.168.100.1');
         await sleep(interval);
+        clientSocket.send("0502000200", 9999, '192.168.100.1');
+        await sleep(interval);
+        clientSocket.send("0608000200", 9999, '192.168.100.1');
+        await sleep(interval);
+        clientSocket.send("0708000200", 9999, '192.168.100.1');
+        await sleep(interval);
+        clientSocket.send("0802000200", 9999, '192.168.100.1');
+        await sleep(interval);
       }
 
       async function pollGamepad(gamepad, interval, sticks) {
           var gamepad = navigator.getGamepads()[0];
-          var cameraPanValue = cameraPan('11', gamepad, 300, jointSpeed);
-          var cameraTiltValue = cameraTilt('10', gamepad, 300, jointSpeed);
+          // var cameraPanValue = cameraPan('11', gamepad, 300, jointSpeed);
+          // var cameraTiltValue = cameraTilt('10', gamepad, 300, jointSpeed);
 
           moveWheel(1, 6, gamepad, sticks)
-          await sleep(interval);
+          // await sleep(interval);
           moveWheel(3, 6, gamepad, sticks)
-          await sleep(interval);
+          // await sleep(interval);
           moveWheel(2, 7, gamepad, sticks)
-          await sleep(interval);
+          // await sleep(interval);
           moveWheel(4, 7, gamepad, sticks)
-          clientSocket.send(cameraPanValue, 9999, '192.168.100.1');
-          clientSocket.send(cameraTiltValue, 9999, '192.168.100.1');
+          // await sleep(interval);
+          cameraPan('11', gamepad, 300, jointSpeed);
+          // await sleep(interval);
+          cameraTilt('10', gamepad, 300, jointSpeed);
+          // clientSocket.send(cameraPanValue, 9999, '192.168.100.1');
+          // clientSocket.send(cameraTiltValue, 9999, '192.168.100.1');
       }
 
       function runScript(scriptPath, callback) {
@@ -180,12 +203,27 @@
               if (gamepad.buttons[9].value > 0) {
                 terminateConnection(true, true);
                 writeStartingValues();
+                multipliers = [[false, -1], [false, -1]]
               }
 
               pollGamepad(event.gamepad, 40, false);
 
               terminateConnection((gamepad.buttons[6].value == 0) ? true : false,
               (gamepad.buttons[7].value == 0) ? true : false);
+
+              if (gamepad.buttons[4].pressed && !multipliers[0][0]) {
+                multipliers[0][1] *= -1;
+                multipliers[0][0] = true;
+              } else {
+                multipliers[0][0] = false;
+              }
+
+              if (gamepad.buttons[5].pressed && !multipliers[1][0]) {
+                multipliers[1][1] *= -1;
+                multipliers[1][0] = true;
+              } else {
+                multipliers[1][0] = false;
+              }
 
             }, 160);
         	});
