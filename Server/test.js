@@ -50,7 +50,8 @@ function spawnNewChild(command, args) {
   });
 
   child.on('exit', function (code, signal) {
-    console.time().debug(`Child process exited with code ${code} and signal ${signal}`);
+    if (signal == null) console.time().stdout('Child process terminated successfully');
+    else console.time().debug(`Child process exited with code ${code} and signal ${signal}`);
   });
 
   child.on('error', function(data) {
@@ -60,7 +61,8 @@ function spawnNewChild(command, args) {
   return child;
 }
 setTimeout(function() {
-  var pythonServer = spawnNewChild('python3', ['./Server-Code-2018/RoboCupServer-Current.py']);
+  // var pythonServer = spawnNewChild('python3', ['./Server-Code-2018/RoboCupServer-Current.py']);
+  spawnNewChild('python3', ['count.py'])
 }, 1500)
 
 // console.time().fun('hello world');

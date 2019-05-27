@@ -9,5 +9,8 @@
     "clear-logs": "rm -rf logs/"
   },
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "scribe-js": "^2.0.4"
+  }
 }
