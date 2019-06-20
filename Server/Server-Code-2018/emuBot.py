@@ -1,10 +1,11 @@
-from pyax12.connection import Connection
 import time
 import threading
+
 from dynamixel_sdk import *
-sc = Connection(port="/dev/ttyACM0", baudrate=1000000)
+
 portHandler = PortHandler("/dev/ttyUSB0")
 packetHandler = PacketHandler(1.0)
+
 if portHandler.openPort():
   # print("Succeeded to open the port"
   pass
@@ -22,32 +23,61 @@ else:
   getch()
   quit()
 
-sc.flush()
-
-# Set up a dynamixel so that it behaves like joint
-
 
 def jointMode(ID):
-  sc.set_cw_angle_limit(ID, 0, False)
-  sc.set_ccw_angle_limit(ID, 1023, False)
+  if ID < 9:
+    dxl_comm_result, dxl_error = packetHandler.write4ByteTxRx(portHandler, ID, 6, 1024)
+    if dxl_comm_result != COMM_SUCCESS:
+        print("%s" % packetHandler.getTxRxResult(dxl_comm_result))
+    elif dxl_error != 0:
+        print("%s" % packetHandler.getRxPacketError(dxl_error))
 
-# Set up an MX-28 dynamixel
+     dxl_comm_result, dxl_error = packetHandler.write4ByteTxRx(portHandler, ID, 8, 3072)
+    if dxl_comm_result != COMM_SUCCESS:
+        print("%s" % packetHandler.getTxRxResult(dxl_comm_result))
+    elif dxl_error != 0:
+        print("%s" % packetHandler.getRxPacketError(dxl_error))
+        
+  elif ID == 9:    
+    dxl_comm_result, dxl_error = packetHandler.write4ByteTxRx(portHandler, ID, 6, 0)
+    if dxl_comm_result != COMM_SUCCESS:
+        print("%s" % packetHandler.getTxRxResult(dxl_comm_result))
+    elif dxl_error != 0:
+        print("%s" % packetHandler.getRxPacketError(dxl_error))
 
+    dxl_comm_result, dxl_error = packetHandler.write4ByteTxRx(portHandler, ID, 8, 2560)
+    if dxl_comm_result != COMM_SUCCESS:
+        print("%s" % packetHandler.getTxRxResult(dxl_comm_result))
+    elif dxl_error != 0:
+      print("%s" % packetHandler.getRxPacketError(dxl_error))
+      
+  elif ID > 9:
+    dxl_comm_result, dxl_error = packetHandler.write4ByteTxRx(portHandler, ID, 6, 0)
+    if dxl_comm_result != COMM_SUCCESS:
+        print("%s" % packetHandler.getTxRxResult(dxl_comm_result))
+    elif dxl_error != 0:
+        print("%s" % packetHandler.getRxPacketError(dxl_error))
 
-# def jointModeMX28(ID):
-  # Set up a dynamixel so that it behaves like wheel
+    dxl_comm_result, dxl_error = packetHandler.write4ByteTxRx(portHandler, ID, 8, 1023)
+    if dxl_comm_result != COMM_SUCCESS:
+        print("%s" % packetHandler.getTxRxResult(dxl_comm_result))
+    elif dxl_error != 0:
+      print("%s" % packetHandler.getRxPacketError(dxl_error))
+
 
 
 def wheelMode(ID):
-  sc.set_ccw_angle_limit(ID, 0, False)
-  sc.set_cw_angle_limit(ID, 0, False)
+  dxl_comm_result, dxl_error = packetHandler.write4ByteTxRx(portHandler, ID, 6, 0)
+  if dxl_comm_result != COMM_SUCCESS:
+      print("%s" % packetHandler.getTxRxResult(dxl_comm_result))
+  elif dxl_error != 0:
+      print("%s" % packetHandler.getRxPacketError(dxl_error))
 
-# Print useful information about an individual dynamixel servo
-
-
-def readDxl(ID):
-  sc.flush()
-  sc.pretty_print_control_table(ID)
+   dxl_comm_result, dxl_error = packetHandler.write4ByteTxRx(portHandler, ID, 8, 0)
+  if dxl_comm_result != COMM_SUCCESS:
+      print("%s" % packetHandler.getTxRxResult(dxl_comm_result))
+  elif dxl_error != 0:
+      print("%s" % packetHandler.getRxPacketError(dxl_error))
 
 # Move a dynamixel that has been set up as a joint
 def moveJoint(ID, position, speed):
@@ -57,7 +87,7 @@ def moveJoint(ID, position, speed):
 # Move a dynamixel that has been set up as a wheel
 # Negative speed moves CW, positive speed moves CCW
 
-def moveJointMX28(ID, position):
+def moveJointM(ID, position):
   dxl_comm_result, dxl_error = packetHandler.write4ByteTxRx(portHandler, ID, 30, position)
   if dxl_comm_result != COMM_SUCCESS:
       print("%s" % packetHandler.getTxRxResult(dxl_comm_result))
@@ -82,14 +112,8 @@ def moveWheel(ID, speed):
           # Limit allowed forward speed to prevent errors
           speed = 1023
 
-  sc.flush()
-  sc.goto(int(ID), 0, int(speed), degrees=False)
-
-
-'''moveWheel(1,100)
-moveWheel(2,100)
-moveWheel(3,100)
-moveWheel(4,100)
-moveWheel(5,100)
-moveWheel(6,100)
-moveWheel(7,100)'''
+  dxl_comm_result, dxl_error = packetHandler.write4ByteTxRx(portHandler, ID, 32, speed)
+  if dxl_comm_result != COMM_SUCCESS:
+      print("%s" % packetHandler.getTxRxResult(dxl_comm_result))
+  elif dxl_error != 0:
+      print("%s" % packetHandler.getRxPacketError(dxl_error))
