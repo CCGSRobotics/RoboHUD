@@ -6,26 +6,6 @@
     <link rel="stylesheet" href="CSS/main.css">
     <script type="text/javascript" src="JS/main.js"></script>
     <script type="text/javascript">
-      var net = require('net');
-      var dgram = require('dgram');
-      var client = new net.Socket();
-      var childProcess = require('child_process');
-      var clientSocket = new dgram.createSocket('udp4');
-      const settings = require('./JS/Resources/Settings/flipperBot.json')
-      const jointSpeed = settings["Client"]["Controller"]["Joints"].JointSpeed
-      const panDirectionDefault = settings["Client"]["Controller"]["Joints"].PanDirection
-      const tiltDirectionDefault = settings["Client"]["Controller"]["Joints"].TiltDirection
-      const leftCameraButton = settings["Client"]["Controller"]["Buttons"].CameraPanLeft
-      const rightCameraButton = settings["Client"]["Controller"]["Buttons"].CameraPanRight
-      const upCameraButton = settings["Client"]["Controller"]["Buttons"].CameraTiltUp
-      const downCameraButton = settings["Client"]["Controller"]["Buttons"].CameraTiltDown
-      var panDirection = panDirectionDefault
-      var tiltDirection = tiltDirectionDefault
-      var video;
-      var lastVals = [];
-      var multipliers = [[false, -1], [false, -1]]
-      var moves = [];
-
       for (var i = 0; i <= 20; i++) {
         lastVals.push([0, 9999]);
       }
@@ -177,61 +157,61 @@
         console.log(`Wrote '${data}' to server`);
       }
 
-      setTimeout(function() {
-        writeToServer('VIDEO')
-        video = childProcess.fork('App/JS/Resources/Player/server-tcp.js');
-        video.on('error', function(err) {
-          console.error(`Video error: ${err}`)
-        })
-        setTimeout(function() {
-          var iframe = document.createElement('iframe');
-          iframe.setAttribute('id', 'camera-view');
-          iframe.setAttribute('src', 'http://localhost:8080');
-          iframe.setAttribute('width', '1000');
-          iframe.setAttribute('height', '625');
-          var markerPoint = document.getElementById('marker');
+      // setTimeout(function() {
+      //   writeToServer('VIDEO')
+      //   video = childProcess.fork('App/JS/Resources/Player/server-tcp.js');
+      //   video.on('error', function(err) {
+      //     console.error(`Video error: ${err}`)
+      //   })
+      //   setTimeout(function() {
+      //     var iframe = document.createElement('iframe');
+      //     iframe.setAttribute('id', 'camera-view');
+      //     iframe.setAttribute('src', 'http://localhost:8080');
+      //     iframe.setAttribute('width', '1000');
+      //     iframe.setAttribute('height', '625');
+      //     var markerPoint = document.getElementById('marker');
 
-          markerPoint.parentNode.insertBefore(iframe, markerPoint);
-        }, 1000)
-        writeToServer('START');
-        setTimeout(async function() {
-          await writeStartingValues(30);
-          let gamepadInterval;
-          window.addEventListener("gamepadconnected", function(event) {
-        		gamepadInterval = setInterval(() => {
-              var gamepad = navigator.getGamepads()[0];
-              if (gamepad.buttons[9].value > 0) {
-                terminateConnection(true, true);
-                writeStartingValues();
-                multipliers = [[false, -1], [false, -1]]
-              }
+      //     markerPoint.parentNode.insertBefore(iframe, markerPoint);
+      //   }, 1000)
+      //   writeToServer('START');
+      //   setTimeout(async function() {
+      await writeStartingValues(30);
+      let gamepadInterval;
+      window.addEventListener("gamepadconnected", function(event) {
+        gamepadInterval = setInterval(() => {
+          var gamepad = navigator.getGamepads()[0];
+          if (gamepad.buttons[9].value > 0) {
+            terminateConnection(true, true);
+            writeStartingValues();
+            multipliers = [[false, -1], [false, -1]]
+          }
 
-              pollGamepad(event.gamepad, 40, false);
+          pollGamepad(event.gamepad, 40, false);
 
-              terminateConnection((gamepad.buttons[7].value == 0) ? true : false,
-              (gamepad.buttons[6].value == 0) ? true : false);
+          terminateConnection((gamepad.buttons[7].value == 0) ? true : false,
+          (gamepad.buttons[6].value == 0) ? true : false);
 
-              if (gamepad.buttons[4].pressed && !multipliers[0][0]) {
-                multipliers[0][1] *= -1;
-                multipliers[0][0] = true;
-              } else {
-                multipliers[0][0] = false;
-              }
+          if (gamepad.buttons[4].pressed && !multipliers[0][0]) {
+            multipliers[0][1] *= -1;
+            multipliers[0][0] = true;
+          } else {
+            multipliers[0][0] = false;
+          }
 
-              if (gamepad.buttons[5].pressed && !multipliers[1][0]) {
-                multipliers[1][1] *= -1;
-                multipliers[1][0] = true;
-              } else {
-                multipliers[1][0] = false;
-              }
+          if (gamepad.buttons[5].pressed && !multipliers[1][0]) {
+            multipliers[1][1] *= -1;
+            multipliers[1][0] = true;
+          } else {
+            multipliers[1][0] = false;
+          }
 
-            }, 160);
-        	});
-          window.addEventListener("gamepaddisconnected", function(event) {
-        		clearInterval(gamepadInterval);
-        	});
-        }, 3000)
-      }, 3000)
+        }, 160);
+      });
+      window.addEventListener("gamepaddisconnected", function(event) {
+        clearInterval(gamepadInterval);
+      });
+      //   }, 3000)
+      // }, 3000)
     </script>
   </head>
   <body>
