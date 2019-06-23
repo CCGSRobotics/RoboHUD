@@ -1,8 +1,8 @@
 language: node_js
+node_js:
+  - "10.16.0"
 cache: npm
 sudo: true
-before_install:
-  script: sudo npm cache clean -f && sudo npm install -g n && sudo n stable
 jobs:
   allow_failures:
    - script: eslint -c .eslintrc.json App/JS/client.js
@@ -12,9 +12,9 @@ jobs:
       script: eslint -c .eslintrc.json App/JS/client.js
     - stage: Install
       script: echo "Installing dependencies"
-      script: npm install
-      script: npm install --save-dev electron-packager
-      script: npm install --save-dev electron-installer-debian
+      script: sudo npm install
+      script: sudo npm install --save-dev electron-packager
+      script: sudo npm install --save-dev electron-installer-debian
     - stage: Build
       script: echo "Building for all available platforms..."
       script: node ./node_modules/electron-packager/bin/electron-packager.js . RoboHUD --platform=linux --arch=x64 --icon=Assets/icon.png --out=Builds
