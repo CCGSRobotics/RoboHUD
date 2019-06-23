@@ -63,10 +63,6 @@ function sendWheelValue(dynamixel, val) {
 		lastVals[dynamixel] = val;
 	}
 
-	// if (val == 0 && lastVals[dynamixel][1] <= 30) {
-	//   clientSocket.send(`0${dynamixel}0`, 9999, '192.168.100.1');
-	//   lastVals[dynamixel][1]++;
-	// }
 }
 
 function moveWheel(dynamixel, axis, gamepad, sticks) {
@@ -92,7 +88,6 @@ function moveWheel(dynamixel, axis, gamepad, sticks) {
 	if (-150 <= val >= 150) {
 		val = 0;
 	}
-	// console.log(val)
 	sendWheelValue(dynamixel, val);
 }
 
@@ -142,45 +137,20 @@ async function writeStartingValues(interval) {
 	}
 	moveJointWithPercentage(9, 0);
 	lastVals[9] = 0;
-	// clientSocket.send("0902000200", 9999, '192.168.100.1');
-	// await sleep(interval);
-	// clientSocket.send("1002000200", 9999, '192.168.100.1');
-	// await sleep(interval);
-	// clientSocket.send("1105120512", 9999, '192.168.100.1');
-	// await sleep(interval);
-	// clientSocket.send("0502000200", 9999, '192.168.100.1');
-	// await sleep(interval);
-	// clientSocket.send("0608000200", 9999, '192.168.100.1');
-	// await sleep(interval);
-	// clientSocket.send("0708000200", 9999, '192.168.100.1');
-	// await sleep(interval);
-	// clientSocket.send("0802000200", 9999, '192.168.100.1');
-	// await sleep(interval);
 }
 
 async function pollGamepad(gamepad, interval, sticks) {
 		var gamepad = navigator.getGamepads()[0];
-		// var cameraPanValue = cameraPan('11', gamepad, 300, jointSpeed);
-		// var cameraTiltValue = cameraTilt('10', gamepad, 300, jointSpeed);
 
 		moveWheel(1, 6, gamepad, sticks)
-		// await sleep(interval);
 		moveWheel(3, 6, gamepad, sticks)
-		// await sleep(interval);
 		moveWheel(2, 7, gamepad, sticks)
-		// await sleep(interval);
 		moveWheel(4, 7, gamepad, sticks)
 		moveFlipper(5, 1, false, 0);
 		moveFlipper(7, 1, true, 10);
 		moveFlipper(6, 3, false, 0);
 		moveFlipper(8, 3, true, 11);
 		moveArm(9, 3, 0);
-		// await sleep(interval);
-		// cameraPan('11', gamepad, 300, jointSpeed);
-		// await sleep(interval);
-		// cameraTilt('10', gamepad, 300, jointSpeed);
-		// clientSocket.send(cameraPanValue, 9999, '192.168.100.1');
-		// clientSocket.send(cameraTiltValue, 9999, '192.168.100.1');
 }
 
 function runScript(scriptPath, callback) {
@@ -201,26 +171,6 @@ function runScript(scriptPath, callback) {
 //   client.write(data);
 //   console.log(`Wrote '${data}' to server`);
 // }
-
-// setTimeout(function() {
-//   writeToServer('VIDEO')
-//   video = childProcess.fork('App/JS/Resources/Player/server-tcp.js');
-//   video.on('error', function(err) {
-//     console.error(`Video error: ${err}`)
-//   })
-//   setTimeout(function() {
-//     var iframe = document.createElement('iframe');
-//     iframe.setAttribute('id', 'camera-view');
-//     iframe.setAttribute('src', 'http://localhost:8080');
-//     iframe.setAttribute('width', '1000');
-//     iframe.setAttribute('height', '625');
-//     var markerPoint = document.getElementById('marker');
-
-//     markerPoint.parentNode.insertBefore(iframe, markerPoint);
-//   }, 1000)
-//   writeToServer('START');
-//   setTimeout(async function() {
-// await writeStartingValues(30);
 let gamepadInterval;
 writeStartingValues();
 window.addEventListener("gamepadconnected", function(event) {
@@ -233,9 +183,6 @@ window.addEventListener("gamepadconnected", function(event) {
 		}
 
 		pollGamepad(event.gamepad, 40, false);
-
-		// terminateConnection((gamepad.buttons[7].value == 0) ? true : false,
-		// (gamepad.buttons[6].value == 0) ? true : false);
 
 		if (gamepad.buttons[4].pressed && !multipliers[0][0]) {
 			multipliers[0][1] *= -1;
@@ -256,5 +203,3 @@ window.addEventListener("gamepadconnected", function(event) {
 window.addEventListener("gamepaddisconnected", function(event) {
 	clearInterval(gamepadInterval);
 });
-//   }, 3000)
-// }, 3000)
