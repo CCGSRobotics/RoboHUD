@@ -53,10 +53,14 @@
         }
       }
 
-      function moveJoint(ID, percentage) {
+      function moveJointWithPercentage(ID, percentage) {
         destination = 1023 + (percentage * 2048) / 100;
         if (ID == 5 || ID == 8) {
           destination = 3071 - (percentage*2048)/100;
+        }
+        if (ID == 9) {
+          destination = (percentage * 2680) / 100;
+          console.log(destination);
         }
         clientSocket.send(`0${ID} ${destination} 200`, 9999, '192.168.100.1');
       }
@@ -100,6 +104,21 @@
         sendWheelValue(dynamixel, val);
       }
 
+      function moveArm(dynamixel, upButton, downButton) {
+        var gamepad = navigator.getGamepads()[0];
+        if (gamepad.buttons[upButton].value > 0) {
+          if (lastVals[dynamixel] != lastVals[dynamixel]+10 && lastVals[dynamixel] < 100) {
+            moveJointWithPercentage(dynamixel, lastVals[dynamixel]+10);
+            lastVals[dynamixel] += 10;
+          }
+        } else if (gamepad.buttons[downButton].value > 0) {
+          if (lastVals[dynamixel] != lastVals[dynamixel] - 10 && lastVals[dynamixel] > 0) {
+            moveJointWithPercentage(dynamixel, lastVals[dynamixel] - 10);
+            lastVals[dynamixel] -= 10;
+          }
+        }
+      }
+
       function moveFlipper(dynamixel, axis, holdMode, holdButton) {
         var gamepad = navigator.getGamepads()[0];
         var change = Math.round((gamepad.axes[axis])*10)
@@ -108,7 +127,7 @@
           if(val >= 0 && val <= 100) {
             if (val != lastVals[dynamixel]) {
               lastVals[dynamixel] = val;
-              moveJoint(dynamixel, val);
+              moveJointWithPercentage(dynamixel, val);
             }
           }
         }
@@ -126,9 +145,11 @@
           lastVals[i] = 0;
         }
         for (var i = 5; i <= 8; i++) {
-          moveJoint(i, 100);
+          moveJointWithPercentage(i, 100);
           lastVals[i] = 100;
         }
+        moveJointWithPercentage(9, 0);
+        lastVals[9] = 0;
         // clientSocket.send("0902000200", 9999, '192.168.100.1');
         // await sleep(interval);
         // clientSocket.send("1002000200", 9999, '192.168.100.1');
@@ -161,6 +182,7 @@
           moveFlipper(7, 1, true, 10);
           moveFlipper(6, 3, false, 0);
           moveFlipper(8, 3, true, 11);
+          moveArm(9, 3, 0);
           // await sleep(interval);
           // cameraPan('11', gamepad, 300, jointSpeed);
           // await sleep(interval);
