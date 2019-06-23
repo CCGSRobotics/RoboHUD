@@ -23,5 +23,5 @@ jobs:
         api_key: $personal_access_token
         skip_cleanup: true
         file:
-          - Build/Linux-x64.zip
+          - Builds/Linux-x64.zip
         draft: true
