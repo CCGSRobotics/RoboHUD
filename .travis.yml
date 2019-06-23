@@ -2,7 +2,7 @@ language: node_js
 cache: npm
 jobs:
   allow_failures:
-    - script: eslint -c .eslintrc.json App/JS/client.js
+   - script: eslint -c .eslintrc.json App/JS/client.js
   include:
     - stage: Lint
       script: npm install --save-dev eslint eslint-config-google
@@ -16,7 +16,7 @@ jobs:
       script: echo "Building for all available platforms..."
       script: node ./node_modules/electron-packager/bin/electron-packager.js . RoboHUD --platform=linux --arch=x64 --icon=Assets/icon.png --out=Builds
       script: electron-installer-debian --src Builds/RoboHUD-linux-x64 --dest Build/installers/ --arch amd64
-      - stage: GitHub Release
+    - stage: GitHub Release
       script: echo "Deploying to GitHub releases..."
       deploy:
         provider: releases
