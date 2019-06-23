@@ -14,10 +14,9 @@ jobs:
       script: echo "Installing dependencies"
       script: npm install
       script: npm install --save-dev electron-packager
-      script: npm install --save-dev electron-installer-debian && npm install electron-installer-debian
       script: echo "Building for all available platforms..."
       script: node ./node_modules/electron-packager/bin/electron-packager.js . RoboHUD --platform=linux --arch=x64 --icon=Assets/icon.png --out=Builds
-      script: node node_modules/electron-installer-debian/src/cli.js --src Builds/RoboHUD-linux-x64 --dest Build/installers/ --arch amd64
+      script: zip Linux-x64.zip Builds/RoboHUD-linux-x64 -r
     - stage: GitHub Release
       script: echo "Deploying to GitHub releases..."
       deploy:
@@ -25,5 +24,5 @@ jobs:
         api_key: $personal_access_token
         skip_cleanup: true
         file:
-          - Build/installers/*
+          - Build/Linux-x64.zip
         draft: true
