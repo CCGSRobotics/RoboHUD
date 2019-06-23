@@ -52,6 +52,14 @@
           lastVals[dynamixel][0] = tiltDirection;
         }
       }
+      
+      function moveJoint(ID, percentage) {
+        destination = 1023 + (percentage * 2048) / 100;
+        if (ID == 5 || ID == 8) {
+          destination = 3071 - (percentage*2048)/100;
+        }
+        clientSocket.send(`0${ID} ${destination} 200`, 9999, '192.168.100.1');
+      }
 
       function sendWheelValue(dynamixel, val) {
         if (lastVals[dynamixel][0] != val) {
