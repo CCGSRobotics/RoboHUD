@@ -10,14 +10,12 @@ jobs:
     - stage: Lint
       script: sudo npm install -g eslint eslint-config-google
       script: eslint -c .eslintrc.json App/JS/client.js
-    - stage: Build
+    - stage: Build & release
       script: echo "Installing dependencies"
       script: npm install
       script: npm install --save-dev electron-packager
       script: echo "Building for all available platforms..."
       script: node ./node_modules/electron-packager/bin/electron-packager.js . RoboHUD --platform=linux --arch=x64 --icon=Assets/icon.png --out=Builds && zip Builds/Linux-x64.zip Builds/RoboHUD-linux-x64 -r
-    - stage: GitHub Release
-      script: echo "Deploying to GitHub releases..."
       deploy:
         provider: releases
         api_key: $personal_access_token
