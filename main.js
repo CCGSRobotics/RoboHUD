@@ -6,8 +6,8 @@ let win;
 
 function createWindow() {
   win = new BrowserWindow({
-    width: 800,
-    height: 600
+    width: 1600,
+    height: 1200
   });
   win.loadFile('App/loading.html');
   setTimeout(function() {
