@@ -2,6 +2,13 @@ for (var i = 0; i <= 20; i++) {
 	lastVals.push(0);
 }
 
+/**
+ * Moves any dynamixel that has been assigned jointMode in terms of the percentage of maximum rotation of the servo
+ * @param {!number} ID The ID of the dynamixel to control
+ * @param {!number} percentage The percentage out of 100 that you want to move the joint to
+ * @example <caption>Moving servo 5 to 50% of its range, or straight forwards</caption>
+ * moveJointWithPercentage(5, 50);
+ */
 function moveJointWithPercentage(ID, percentage) {
 	destination = 1023 + (percentage * 2048) / 100;
 	if (ID == 5 || ID == 8) {
@@ -14,14 +21,25 @@ function moveJointWithPercentage(ID, percentage) {
 	clientSocket.send(`0${ID} ${destination} 200`, 9999, '192.168.100.1');
 }
 
+/**
+ * Sends a wheel value to the server given an ID and a speed, providing the instruction has not already been sent
+ * @param {!number} dynamixel The ID of the dynamixel you wish to move
+ * @param {!number} val The speed at which you wish to move
+ */
 function sendWheelValue(dynamixel, val) {
 	if (!(lastVals[dynamixel] == val)) {
 		clientSocket.send(`0${dynamixel}${val}`, 9999, '192.168.100.1');
 		lastVals[dynamixel] = val;
 	}
-
 }
 
+/**
+ * Interprets an action on the controller to pass onto sendWheelValue
+ * @param {!number} dynamixel The ID of the dynamixel you wish to move
+ * @param {!number} axis The index of the axis on the gamepad to get positional data from
+ * @param {object} gamepad Any gamepad object in the array returned from navigator.getGamepads()
+ * @param {boolean} sticks True if using sticks, false for triggers
+ */
 function moveWheel(dynamixel, axis, gamepad, sticks) {
 	var val;
 	if (sticks) {
@@ -48,6 +66,12 @@ function moveWheel(dynamixel, axis, gamepad, sticks) {
 	sendWheelValue(dynamixel, val);
 }
 
+/**
+ * Moves the arm joint of a servo if the corresponding button has been pressed
+ * @param {!number} dynamixel The ID of the dynamixel you wish to move
+ * @param {!number} upButton The index of the button responsible for moving the arm upwards
+ * @param {!number} downButton The index of the button responsible for moving the arm downwards
+ */
 function moveArm(dynamixel, upButton, downButton) {
 	var gamepad = navigator.getGamepads()[0];
 	if (gamepad.buttons[upButton].value > 0) {
@@ -63,7 +87,14 @@ function moveArm(dynamixel, upButton, downButton) {
 	}
 }
 
-function moveFlipper(dynamixel, axis, holdMode, holdButton) {
+/**
+ * Interprts an action on the controller to pass onto moveJointWithPercentage
+ * @param {!number} dynamixel The ID of the dynamixel you wish to move
+ * @param {} axis The index of the axis on the gamepad to get postional data from
+ * @param {boolean} holdMode [false] If the flipper is moved by clicking the axis button
+ * @param {number} holdButton [0] The index of the button if holdMode is set to true
+ */
+function moveFlipper(dynamixel, axis, holdMode = false, holdButton = 0) {
 	var gamepad = navigator.getGamepads()[0];
 	var change = Math.round((gamepad.axes[axis])*10)
 	if (holdMode && gamepad.buttons[holdButton].value > 0 || !holdMode && gamepad.buttons[dynamixel == 5? 10 : 11].value == 0) {
@@ -77,11 +108,21 @@ function moveFlipper(dynamixel, axis, holdMode, holdButton) {
 	}
 }
 
+/**
+ * Sleeps an async function that awaits the returned promise
+ * @example <caption>Sleep for .1 seconds</caption>
+ * await sleep(100);
+ * @param {number} ms The amount of milliseconds to "sleep" for before resolving the promise
+ * @returns {Promise} Promise that resolves after {ms} amount of milliseconds
+ */
 function sleep(ms) {
 	return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-async function writeStartingValues(interval) {
+/**
+ * Writes the default values to the server
+ */
+async function writeDefaultValues() {
 	panDirection = panDirectionDefault
 	tiltDirection = tiltDirectionDefault
 	for (var i = 1; i <= 4; i++) {
@@ -96,7 +137,12 @@ async function writeStartingValues(interval) {
 	lastVals[9] = 0;
 }
 
-async function pollGamepad(gamepad, interval, sticks) {
+/**
+ *
+ * @param {object} gamepad Any gamepad object in the array returned from navigator.getGamepads()
+ * @param {boolean} sticks [false] True if the user controls via sticks, false for triggers
+ */
+async function pollGamepad(gamepad, sticks = false) {
 		var gamepad = navigator.getGamepads()[0];
 
 		moveWheel(1, 6, gamepad, sticks)
@@ -119,12 +165,12 @@ async function pollGamepad(gamepad, interval, sticks) {
 //   console.log(`Wrote '${data}' to server`);
 // }
 let gamepadInterval;
-writeStartingValues();
+writeDefaultValues();
 window.addEventListener("gamepadconnected", function(event) {
 	gamepadInterval = setInterval(() => {
 		var gamepad = navigator.getGamepads()[0];
 		if (gamepad.buttons[9].value > 0) {
-			writeStartingValues();
+			writeDefaultValues();
 			multipliers = [[false, -1], [false, -1]]
 		}
 
