@@ -2,49 +2,6 @@ for (var i = 0; i <= 20; i++) {
 	lastVals.push(0);
 }
 
-function terminateConnection(left, right) {
-	if (left) {
-		clientSocket.send("0100", 9999, '192.168.100.1');
-		clientSocket.send("0300", 9999, '192.168.100.1');
-	}
-	if (right) {
-		clientSocket.send("0200", 9999, '192.168.100.1');
-		clientSocket.send("0400", 9999, '192.168.100.1');
-	}
-}
-
-function cameraPan(dynamixel, gamepad, step, speed) {
-	var movementSpeed;
-	movementSpeed = speed;
-
-	if (gamepad.buttons[leftCameraButton].pressed && panDirection < (8570 - step)) {
-		panDirection += step;
-	} else if (gamepad.buttons[rightCameraButton].pressed  && panDirection > (1670 + step)) {
-		panDirection -= step;
-	}
-
-	if (lastVals[dynamixel] != panDirection) {
-		clientSocket.send(`${dynamixel}${panDirection}${movementSpeed}`, 9999, '192.168.100.1');
-		lastVals[dynamixel] = panDirection;
-	}
-}
-
-function cameraTilt(dynamixel, gamepad, step, speed) {
-	var movementSpeed;
-	movementSpeed = speed;
-
-	if (gamepad.buttons[downCameraButton].pressed && tiltDirection < (8000 - step)) {
-		tiltDirection += step;
-	} else if (gamepad.buttons[upCameraButton].pressed  && tiltDirection > (2000 + step)) {
-		tiltDirection -= step;
-	}
-
-	if (lastVals[dynamixel] != tiltDirection) {
-		clientSocket.send(`${dynamixel}${tiltDirection}${movementSpeed}`, 9999, '192.168.100.1');
-		lastVals[dynamixel] = tiltDirection;
-	}
-}
-
 function moveJointWithPercentage(ID, percentage) {
 	destination = 1023 + (percentage * 2048) / 100;
 	if (ID == 5 || ID == 8) {
@@ -153,16 +110,6 @@ async function pollGamepad(gamepad, interval, sticks) {
 		moveArm(9, 3, 0);
 }
 
-function runScript(scriptPath, callback) {
-		var invoked = false;
-		var process = childProcess.fork(scriptPath);
-		process.on('error', function (err) {
-				if (invoked) return;
-				invoked = true;
-				callback(err);
-		});
-}
-
 // client.connect(5000, '192.168.100.1', function() {
 //   console.log("Connected to server interface");
 // })
@@ -177,7 +124,6 @@ window.addEventListener("gamepadconnected", function(event) {
 	gamepadInterval = setInterval(() => {
 		var gamepad = navigator.getGamepads()[0];
 		if (gamepad.buttons[9].value > 0) {
-			terminateConnection(true, true);
 			writeStartingValues();
 			multipliers = [[false, -1], [false, -1]]
 		}
