@@ -1,3 +1,4 @@
+[![Build Status](https://travis-ci.com/CCGSRobotics/RoboHUD.svg?branch=master)](https://travis-ci.com/CCGSRobotics/RoboHUD)
 ![docs](https://readthedocs.org/projects/robohud-docs/badge/?version=latest)
 # RoboHUD GUI
 
