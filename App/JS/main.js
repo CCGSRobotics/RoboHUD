@@ -16,3 +16,4 @@ var tiltDirection = tiltDirectionDefault
 var video;
 var lastVals = [];
 var multipliers = [[false, -1], [false, -1]]
+let gamepad;
