@@ -1,6 +1,8 @@
 language: node_js
 cache: npm
 sudo: true
+before_install:
+  script: sudo npm cache clean -f && sudo npm install -g n && sudo n stable
 jobs:
   allow_failures:
    - script: eslint -c .eslintrc.json App/JS/client.js
