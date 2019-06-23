@@ -1,5 +1,5 @@
 for (var i = 0; i <= 20; i++) {
-	lastVals.push(0);
+  lastVals.push(0);
 }
 
 /**
@@ -10,15 +10,15 @@ for (var i = 0; i <= 20; i++) {
  * moveJointWithPercentage(5, 50);
  */
 function moveJointWithPercentage(ID, percentage) {
-	destination = 1023 + (percentage * 2048) / 100;
-	if (ID == 5 || ID == 8) {
-		destination = 3071 - (percentage*2048)/100;
-	}
-	if (ID == 9) {
-		destination = (percentage * 2680) / 100;
-		console.log(destination);
-	}
-	clientSocket.send(`0${ID} ${destination} 200`, 9999, '192.168.100.1');
+  destination = 1023 + (percentage * 2048) / 100;
+  if (ID == 5 || ID == 8) {
+    destination = 3071 - (percentage*2048)/100;
+  }
+  if (ID == 9) {
+    destination = (percentage * 2680) / 100;
+    console.log(destination);
+  }
+  clientSocket.send(`0${ID} ${destination} 200`, 9999, '192.168.100.1');
 }
 
 /**
@@ -27,10 +27,10 @@ function moveJointWithPercentage(ID, percentage) {
  * @param {!number} val The speed at which you wish to move
  */
 function sendWheelValue(dynamixel, val) {
-	if (!(lastVals[dynamixel] == val)) {
-		clientSocket.send(`0${dynamixel}${val}`, 9999, '192.168.100.1');
-		lastVals[dynamixel] = val;
-	}
+  if (!(lastVals[dynamixel] == val)) {
+    clientSocket.send(`0${dynamixel}${val}`, 9999, '192.168.100.1');
+    lastVals[dynamixel] = val;
+  }
 }
 
 /**
@@ -41,29 +41,29 @@ function sendWheelValue(dynamixel, val) {
  * @param {boolean} sticks True if using sticks, false for triggers
  */
 function moveWheel(dynamixel, axis, gamepad, sticks) {
-	var val;
-	if (sticks) {
-		val = Math.round((gamepad.axes[axis] + 1) * 512);
-		val = (val - 512) * -2;
-	} else {
-		val = Math.round((gamepad.buttons[axis].value) * 1024);
-	}
+  let val;
+  if (sticks) {
+    val = Math.round((gamepad.axes[axis] + 1) * 512);
+    val = (val - 512) * -2;
+  } else {
+    val = Math.round((gamepad.buttons[axis].value) * 1024);
+  }
 
-	if (val < -1024 || val > 1024) {
-		console.error("Controller value is out of bounds! (" + val + ")");
-	}
+  if (val < -1024 || val > 1024) {
+    console.error('Controller value is out of bounds! (' + val + ')');
+  }
 
-	if (dynamixel == 2 || dynamixel == 4) {
-		val = -val;
-		val *= multipliers[0][1];
-	} else {
-		val *= multipliers[1][1];
-	}
+  if (dynamixel == 2 || dynamixel == 4) {
+    val = -val;
+    val *= multipliers[0][1];
+  } else {
+    val *= multipliers[1][1];
+  }
 
-	if (-150 <= val >= 150) {
-		val = 0;
-	}
-	sendWheelValue(dynamixel, val);
+  if (-150 <= val >= 150) {
+    val = 0;
+  }
+  sendWheelValue(dynamixel, val);
 }
 
 /**
@@ -73,18 +73,18 @@ function moveWheel(dynamixel, axis, gamepad, sticks) {
  * @param {!number} downButton The index of the button responsible for moving the arm downwards
  */
 function moveArm(dynamixel, upButton, downButton) {
-	var gamepad = navigator.getGamepads()[0];
-	if (gamepad.buttons[upButton].value > 0) {
-		if (lastVals[dynamixel] != lastVals[dynamixel]+10 && lastVals[dynamixel] < 100) {
-			moveJointWithPercentage(dynamixel, lastVals[dynamixel]+10);
-			lastVals[dynamixel] += 10;
-		}
-	} else if (gamepad.buttons[downButton].value > 0) {
-		if (lastVals[dynamixel] != lastVals[dynamixel] - 10 && lastVals[dynamixel] > 0) {
-			moveJointWithPercentage(dynamixel, lastVals[dynamixel] - 10);
-			lastVals[dynamixel] -= 10;
-		}
-	}
+  const gamepad = navigator.getGamepads()[0];
+  if (gamepad.buttons[upButton].value > 0) {
+    if (lastVals[dynamixel] != lastVals[dynamixel]+10 && lastVals[dynamixel] < 100) {
+      moveJointWithPercentage(dynamixel, lastVals[dynamixel]+10);
+      lastVals[dynamixel] += 10;
+    }
+  } else if (gamepad.buttons[downButton].value > 0) {
+    if (lastVals[dynamixel] != lastVals[dynamixel] - 10 && lastVals[dynamixel] > 0) {
+      moveJointWithPercentage(dynamixel, lastVals[dynamixel] - 10);
+      lastVals[dynamixel] -= 10;
+    }
+  }
 }
 
 /**
@@ -95,17 +95,17 @@ function moveArm(dynamixel, upButton, downButton) {
  * @param {number} holdButton [0] The index of the button if holdMode is set to true
  */
 function moveFlipper(dynamixel, axis, holdMode = false, holdButton = 0) {
-	var gamepad = navigator.getGamepads()[0];
-	var change = Math.round((gamepad.axes[axis])*10)
-	if (holdMode && gamepad.buttons[holdButton].value > 0 || !holdMode && gamepad.buttons[dynamixel == 5? 10 : 11].value == 0) {
-		var val = lastVals[dynamixel] + change;
-		if(val >= 0 && val <= 100) {
-			if (val != lastVals[dynamixel]) {
-				lastVals[dynamixel] = val;
-				moveJointWithPercentage(dynamixel, val);
-			}
-		}
-	}
+  const gamepad = navigator.getGamepads()[0];
+  const change = Math.round((gamepad.axes[axis])*10);
+  if (holdMode && gamepad.buttons[holdButton].value > 0 || !holdMode && gamepad.buttons[dynamixel == 5? 10 : 11].value == 0) {
+    const val = lastVals[dynamixel] + change;
+    if (val >= 0 && val <= 100) {
+      if (val != lastVals[dynamixel]) {
+        lastVals[dynamixel] = val;
+        moveJointWithPercentage(dynamixel, val);
+      }
+    }
+  }
 }
 
 /**
@@ -113,28 +113,28 @@ function moveFlipper(dynamixel, axis, holdMode = false, holdButton = 0) {
  * @example <caption>Sleep for .1 seconds</caption>
  * await sleep(100);
  * @param {number} ms The amount of milliseconds to "sleep" for before resolving the promise
- * @returns {Promise} Promise that resolves after {ms} amount of milliseconds
+ * @return {Promise} Promise that resolves after {ms} amount of milliseconds
  */
 function sleep(ms) {
-	return new Promise(resolve => setTimeout(resolve, ms));
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 /**
  * Writes the default values to the server
  */
 async function writeDefaultValues() {
-	panDirection = panDirectionDefault
-	tiltDirection = tiltDirectionDefault
-	for (var i = 1; i <= 4; i++) {
-		sendWheelValue(i, 0);
-		lastVals[i] = 0;
-	}
-	for (var i = 5; i <= 8; i++) {
-		moveJointWithPercentage(i, 100);
-		lastVals[i] = 100;
-	}
-	moveJointWithPercentage(9, 0);
-	lastVals[9] = 0;
+  panDirection = panDirectionDefault;
+  tiltDirection = tiltDirectionDefault;
+  for (var i = 1; i <= 4; i++) {
+    sendWheelValue(i, 0);
+    lastVals[i] = 0;
+  }
+  for (var i = 5; i <= 8; i++) {
+    moveJointWithPercentage(i, 100);
+    lastVals[i] = 100;
+  }
+  moveJointWithPercentage(9, 0);
+  lastVals[9] = 0;
 }
 
 /**
@@ -143,17 +143,17 @@ async function writeDefaultValues() {
  * @param {boolean} sticks [false] True if the user controls via sticks, false for triggers
  */
 async function pollGamepad(gamepad, sticks = false) {
-		var gamepad = navigator.getGamepads()[0];
+  var gamepad = navigator.getGamepads()[0];
 
-		moveWheel(1, 6, gamepad, sticks)
-		moveWheel(3, 6, gamepad, sticks)
-		moveWheel(2, 7, gamepad, sticks)
-		moveWheel(4, 7, gamepad, sticks)
-		moveFlipper(5, 1, false, 0);
-		moveFlipper(7, 1, true, 10);
-		moveFlipper(6, 3, false, 0);
-		moveFlipper(8, 3, true, 11);
-		moveArm(9, 3, 0);
+  moveWheel(1, 6, gamepad, sticks);
+  moveWheel(3, 6, gamepad, sticks);
+  moveWheel(2, 7, gamepad, sticks);
+  moveWheel(4, 7, gamepad, sticks);
+  moveFlipper(5, 1, false, 0);
+  moveFlipper(7, 1, true, 10);
+  moveFlipper(6, 3, false, 0);
+  moveFlipper(8, 3, true, 11);
+  moveArm(9, 3, 0);
 }
 
 // client.connect(5000, '192.168.100.1', function() {
@@ -166,32 +166,31 @@ async function pollGamepad(gamepad, sticks = false) {
 // }
 let gamepadInterval;
 writeDefaultValues();
-window.addEventListener("gamepadconnected", function(event) {
-	gamepadInterval = setInterval(() => {
-		var gamepad = navigator.getGamepads()[0];
-		if (gamepad.buttons[9].value > 0) {
-			writeDefaultValues();
-			multipliers = [[false, -1], [false, -1]]
-		}
+window.addEventListener('gamepadconnected', function(event) {
+  gamepadInterval = setInterval(() => {
+    const gamepad = navigator.getGamepads()[0];
+    if (gamepad.buttons[9].value > 0) {
+      writeDefaultValues();
+      multipliers = [[false, -1], [false, -1]];
+    }
 
-		pollGamepad(event.gamepad, 40, false);
+    pollGamepad(event.gamepad, 40, false);
 
-		if (gamepad.buttons[4].pressed && !multipliers[0][0]) {
-			multipliers[0][1] *= -1;
-			multipliers[0][0] = true;
-		} else {
-			multipliers[0][0] = false;
-		}
+    if (gamepad.buttons[4].pressed && !multipliers[0][0]) {
+      multipliers[0][1] *= -1;
+      multipliers[0][0] = true;
+    } else {
+      multipliers[0][0] = false;
+    }
 
-		if (gamepad.buttons[5].pressed && !multipliers[1][0]) {
-			multipliers[1][1] *= -1;
-			multipliers[1][0] = true;
-		} else {
-			multipliers[1][0] = false;
-		}
-
-	}, 160);
+    if (gamepad.buttons[5].pressed && !multipliers[1][0]) {
+      multipliers[1][1] *= -1;
+      multipliers[1][0] = true;
+    } else {
+      multipliers[1][0] = false;
+    }
+  }, 160);
 });
-window.addEventListener("gamepaddisconnected", function(event) {
-	clearInterval(gamepadInterval);
+window.addEventListener('gamepaddisconnected', function(event) {
+  clearInterval(gamepadInterval);
 });
