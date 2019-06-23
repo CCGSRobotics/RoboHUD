@@ -7,7 +7,7 @@
     <script type="text/javascript" src="JS/main.js"></script>
     <script type="text/javascript">
       for (var i = 0; i <= 20; i++) {
-        lastVals.push([0, 9999]);
+        lastVals.push(0);
       }
 
       function terminateConnection(left, right) {
@@ -31,9 +31,9 @@
           panDirection -= step;
         }
 
-        if (lastVals[dynamixel][0] != panDirection) {
+        if (lastVals[dynamixel] != panDirection) {
           clientSocket.send(`${dynamixel}${panDirection}${movementSpeed}`, 9999, '192.168.100.1');
-          lastVals[dynamixel][0] = panDirection;
+          lastVals[dynamixel] = panDirection;
         }
       }
 
@@ -47,12 +47,12 @@
           tiltDirection -= step;
         }
 
-        if (lastVals[dynamixel][0] != tiltDirection) {
+        if (lastVals[dynamixel] != tiltDirection) {
           clientSocket.send(`${dynamixel}${tiltDirection}${movementSpeed}`, 9999, '192.168.100.1');
-          lastVals[dynamixel][0] = tiltDirection;
+          lastVals[dynamixel] = tiltDirection;
         }
       }
-      
+
       function moveJoint(ID, percentage) {
         destination = 1023 + (percentage * 2048) / 100;
         if (ID == 5 || ID == 8) {
@@ -62,8 +62,9 @@
       }
 
       function sendWheelValue(dynamixel, val) {
-        if (lastVals[dynamixel][0] != val) {
+        if (!(lastVals[dynamixel] == val)) {
           clientSocket.send(`0${dynamixel}${val}`, 9999, '192.168.100.1');
+          lastVals[dynamixel] = val;
         }
 
         // if (val == 0 && lastVals[dynamixel][1] <= 30) {
@@ -95,11 +96,7 @@
         if (-150 <= val >= 150) {
           val = 0;
         }
-
-        if (val == -0) {
-          val = 0;
-        }
-
+        // console.log(val)
         sendWheelValue(dynamixel, val);
       }
 
@@ -139,9 +136,9 @@
           // await sleep(interval);
           moveWheel(4, 6, gamepad, sticks)
           // await sleep(interval);
-          cameraPan('11', gamepad, 300, jointSpeed);
+          // cameraPan('11', gamepad, 300, jointSpeed);
           // await sleep(interval);
-          cameraTilt('10', gamepad, 300, jointSpeed);
+          // cameraTilt('10', gamepad, 300, jointSpeed);
           // clientSocket.send(cameraPanValue, 9999, '192.168.100.1');
           // clientSocket.send(cameraTiltValue, 9999, '192.168.100.1');
       }
@@ -156,14 +153,14 @@
           });
       }
 
-      client.connect(5000, '192.168.100.1', function() {
-        console.log("Connected to server interface");
-      })
-
-      function writeToServer(data) {
-        client.write(data);
-        console.log(`Wrote '${data}' to server`);
-      }
+      // client.connect(5000, '192.168.100.1', function() {
+      //   console.log("Connected to server interface");
+      // })
+      //
+      // function writeToServer(data) {
+      //   client.write(data);
+      //   console.log(`Wrote '${data}' to server`);
+      // }
 
       // setTimeout(function() {
       //   writeToServer('VIDEO')
@@ -183,7 +180,7 @@
       //   }, 1000)
       //   writeToServer('START');
       //   setTimeout(async function() {
-      await writeStartingValues(30);
+      // await writeStartingValues(30);
       let gamepadInterval;
       window.addEventListener("gamepadconnected", function(event) {
         gamepadInterval = setInterval(() => {
