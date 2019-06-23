@@ -1,11 +1,12 @@
 language: node_js
 cache: npm
+sudo: true
 jobs:
   allow_failures:
    - script: eslint -c .eslintrc.json App/JS/client.js
   include:
     - stage: Lint
-      script: npm install --save-dev eslint eslint-config-google
+      script: sudo npm install -g eslint eslint-config-google
       script: eslint -c .eslintrc.json App/JS/client.js
     - stage: Install
       script: echo "Installing dependencies"
