@@ -3,6 +3,8 @@ node_js:
   - "10.16.0"
 cache: npm
 sudo: true
+before_script:
+  export TZ=Australia/Perth
 jobs:
   allow_failures:
    - script: eslint -c .eslintrc.json App/JS/client.js
