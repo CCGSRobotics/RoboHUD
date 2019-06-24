@@ -22,5 +22,5 @@ jobs:
         skip_cleanup: true
         file:
           - Builds/Linux-x64.zip
-        name: Automatic Travis build on $(date + '%d.%m.%Y at %R')
+        name: Automatic Travis build on $(date +'%d.%m.%Y %R')
         draft: true
