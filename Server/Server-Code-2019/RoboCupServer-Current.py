@@ -18,7 +18,7 @@ jointMode(9)
 #jointMode(11)
 #moveWheel(4, 1023)
 lastValues = [0 for i in range(5)]
-numberOfDynamixels = 11
+numberOfActiveDynamixels = 9
 
 class MyTCPHandler(SocketServer.BaseRequestHandler):
     def handle(self):
@@ -32,7 +32,7 @@ class MyTCPHandler(SocketServer.BaseRequestHandler):
                 if i == "restart":
                     restart()
                 elif i == "softwareResetServos":
-                    for ID in range(1,numberOfDynamixels):
+                    for ID in range(1,numberOfActiveDynamixels):
                         softwareResetServo(ID)
                 else:
                     ID = int(i[0]+i[1])
