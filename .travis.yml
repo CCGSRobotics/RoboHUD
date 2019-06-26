@@ -16,7 +16,7 @@ jobs:
       script: sudo npm install -g eslint eslint-config-google
       script: eslint -c .eslintrc.json App/JS/client.js
     - stage: Lint C++
-      script: pip3 install cpplint
+      script: sudo -H pip3 install cpplint
       script: cpplint Scripts/roman.cpp
     - stage: Build & release
       script: echo "Installing dependencies"
