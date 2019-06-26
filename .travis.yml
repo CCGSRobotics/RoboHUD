@@ -4,7 +4,7 @@ language:
 node_js:
   - "10.16.0"
 python:
-  - "3.7"
+  - "3.6.3"
 cache: 
   - npm
   - pip
@@ -18,7 +18,7 @@ jobs:
     - stage: Lint
       script: sudo npm install -g eslint eslint-config-google htmlhint
       script: sudo -H pip3 install cpplint
-      script: python3.6 --version && python3.6 Scripts/lint.py
+      script: python3.6.3 --version && python3.6.3 Scripts/lint.py
     - stage: Build & release
       script: echo "Installing dependencies"
       script: npm install
