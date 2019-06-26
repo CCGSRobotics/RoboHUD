@@ -23,7 +23,7 @@ for root, dirs, files in os.walk(".", topdown=True):
             filename, ext = name[:index], name[index+1:]
             if ext in lint:
                 print(os.path.join(root, name))
-                result = os.system(f"%s %s" % (lint[ext], os.path.join(root, name)))
+                result = os.system(" ".join([lint[ext], os.path.join(root, name)]))
                 if result != 0:
                     bad_files.append(os.path.join(root, name))
                 else:
@@ -31,9 +31,9 @@ for root, dirs, files in os.walk(".", topdown=True):
                     print("\33[32mFile passed all linting tests!\33[0m\n")
 
 for i in good_files:
-    print(f"\33[32m%s\33[0m" % (i))
+    print("\33[32m" + i + "\33[0m")
 for i in bad_files:
-    print(f"\33[31m%s\33[0m" % (i))
+    print("\33[31m" + i + "\33[0m")
 
 class LintingError(Exception):
     pass
@@ -42,4 +42,4 @@ if len(bad_files) != 0:
     if len(bad_files) == 1: 
         raise LintingError("1 file breaks its corresponding styleguide")
     else: 
-        raise LintingError(f"%d files break their corresponding styleguides" % len(bad_files))
+        raise LintingError(" ".join([str(len(bad_files)), "files break their corresponding styleguides"]))
