@@ -1,29 +1,17 @@
 import RPi.GPIO as GPIO
 from time import *
 
+pin = 20
+
 def GPIOsetup():
     GPIO.setwarnings(False)
     GPIO.setmode(GPIO.BCM)
-    GPIO.setup(16,GPIO.OUT)
+    GPIO.setup(pin,GPIO.OUT)
 
-def SwitchON():
+def restart():
     GPIOsetup()
-    GPIO.output(16,0)
-    print("ON")
+    GPIO.output(pin,1)
+    print("[Dynamixels]: OFF")
+    GPIO.output(pin,0)
+    print("[Dynamixels]: ON")
     return
-
-def SwitchOFF():
-    GPIOsetup()
-    GPIO.output(16,1)
-    print("OFF")
-    return
-
-def STester():
-    for i in range(1000):
-        SwitchON()
-        sleep(0.5)
-        SwitchOFF()
-        sleep(0.5)
-
-#SwitchOFF()
-#STester()
