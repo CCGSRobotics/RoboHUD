@@ -18,7 +18,7 @@ jobs:
     - stage: Lint
       script: sudo npm install -g eslint eslint-config-google htmlhint
       script: sudo -H pip3 install cpplint
-      script: python3 --version && python3 Scripts/lint.py
+      script: python3 Scripts/lint.py
     - stage: Build & release
       script: echo "Installing dependencies"
       script: npm install
