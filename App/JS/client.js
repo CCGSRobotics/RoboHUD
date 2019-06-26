@@ -2,6 +2,18 @@ for (let i = 0; i <= 20; i++) {
   lastVals.push(0);
 }
 
+function sendWithCheck(message, port, ip) {
+  if (!message.includes('NaN')) {
+    clientSocket.send(message, port, ip);
+  } else {
+    console.log(message);
+  }
+}
+// Tells the server to restart the dynamixels through the relay circuit.
+function restart() {sendWithCheck("restart", 9999, '192.168.100.1');}
+
+function softwareResetServos() {sendWithCheck("softwareResetServos", 9999, '192.168.100.1');}
+
 /**
  * Moves any dynamixel that has been assigned jointMode in terms of\
  * the percentage of maximum rotation of the servo
@@ -12,6 +24,7 @@ for (let i = 0; i <= 20; i++) {
  * or straight forwards</caption>
  * moveJointWithPercentage(5, 50);
  */
+
 function moveJointWithPercentage(ID, percentage) {
   destination = 1023 + (percentage * 2048) / 100;
   if (ID == 5 || ID == 8) {
@@ -19,11 +32,18 @@ function moveJointWithPercentage(ID, percentage) {
   }
   if (ID == 9) {
     destination = (percentage * 2680) / 100;
-    console.log(destination);
   }
-  clientSocket.send(`0${ID} ${destination} 200`, 9999, '192.168.100.1');
+  // Ensures sent servo destination data fits within their limits.
+  if(destination > flipperJointLimits[ID-5][1]) {destination = flipperJointLimits[ID-5][1];}
+  if(destination < flipperJointLimits[ID-5][0]) {destination = flipperJointLimits[ID-5][0];}
+
+  sendWithCheck(`0${ID} ${destination} 200`, 9999, '192.168.100.1');
 }
 
+function changeFlipperSelection() {
+  if(flipperSelect) {flipperSelect = false;}
+  else {flipperSelect = true;}
+}
 /**
  * Sends a wheel value to the server given an ID and a speed,\
  * providing the instruction has not already been sent
@@ -32,7 +52,7 @@ function moveJointWithPercentage(ID, percentage) {
  */
 function sendWheelValue(dynamixel, val) {
   if (!(lastVals[dynamixel] == val)) {
-    clientSocket.send(`0${dynamixel}${val}`, 9999, '192.168.100.1');
+    sendWithCheck(`0${dynamixel}${val}`, 9999, '192.168.100.1');
     lastVals[dynamixel] = val;
   }
 }
@@ -103,19 +123,28 @@ function moveArm(dynamixel, upButton, downButton) {
  *  the axis button
  * @param {number} holdButton [0] The index of the button to hold
  */
-function moveFlipper(dynamixel, axis, holdMode = false, holdButton = 0) {
+function moveFlipper(dynamixel, axis) {
   const gamepad = navigator.getGamepads()[0];
   const change = Math.round((gamepad.axes[axis])*10);
-  if (holdMode && gamepad.buttons[holdButton].value > 0 ||
-    !holdMode && gamepad.buttons[dynamixel == 5? 10 : 11].value == 0) {
-    const val = lastVals[dynamixel] + change;
-    if (val >= 0 && val <= 100) {
-      if (val != lastVals[dynamixel]) {
-        lastVals[dynamixel] = val;
-        moveJointWithPercentage(dynamixel, val);
-      }
+  if(flipperSelect && (dynamixel == 5 || dynamixel == 6)) {
+    var val = lastVals[dynamixel] + change;
+    if(val < 0) {val = 0;}
+    else if (val > 100) {val = 100;}
+    if (val != lastVals[dynamixel]) {
+      lastVals[dynamixel] = val;
+      moveJointWithPercentage(dynamixel, val);
     }
   }
+  else if(!flipperSelect && (dynamixel == 7 || dynamixel == 8)) {
+    var val = lastVals[dynamixel] + change;
+    if(val < 0) {val = 0;}
+    else if (val > 100) {val = 100;}
+    if (val != lastVals[dynamixel]) {
+      lastVals[dynamixel] = val;
+      moveJointWithPercentage(dynamixel, val);
+    }
+  }
+
 }
 
 /**
@@ -146,14 +175,14 @@ async function writeDefaultValues() {
 async function pollGamepad(gamepad, sticks = false) {
   gamepad = navigator.getGamepads()[0];
 
-  moveWheel(1, 6, gamepad, sticks);
-  moveWheel(3, 6, gamepad, sticks);
-  moveWheel(2, 7, gamepad, sticks);
-  moveWheel(4, 7, gamepad, sticks);
-  moveFlipper(5, 1, false, 0);
-  moveFlipper(7, 1, true, 10);
-  moveFlipper(6, 3, false, 0);
-  moveFlipper(8, 3, true, 11);
+  moveWheel(1, 6, navigator.getGamepads()[0], false);
+  moveWheel(3, 6, navigator.getGamepads()[0], false);
+  moveWheel(2, 7, navigator.getGamepads()[0], false);
+  moveWheel(4, 7, navigator.getGamepads()[0], false);
+  moveFlipper(5, 1);
+  moveFlipper(7, 1);
+  moveFlipper(6, 3);
+  moveFlipper(8, 3);
   moveArm(9, 3, 0);
 }
 
@@ -165,6 +194,7 @@ async function pollGamepad(gamepad, sticks = false) {
 //   client.write(data);
 //   console.log(`Wrote '${data}' to server`);
 // }
+
 let gamepadInterval;
 writeDefaultValues();
 window.addEventListener('gamepadconnected', function(event) {
@@ -177,20 +207,36 @@ window.addEventListener('gamepadconnected', function(event) {
 
     pollGamepad(event.gamepad, 40, false);
 
-    if (gamepad.buttons[4].pressed && !multipliers[0][0]) {
-      multipliers[0][1] *= -1;
-      multipliers[0][0] = true;
+    if (gamepad.buttons[5].pressed && !multipliers[0][0]) {
+      while(gamepad.buttons[5].pressed) {
+        multipliers[0][1] *= -1;
+        multipliers[0][0] = true;
+      }
     } else {
-      multipliers[0][0] = false;
+      while(gamepad.buttons[5].pressed) {
+        multipliers[0][0] = false;
+      }
     }
 
-    if (gamepad.buttons[5].pressed && !multipliers[1][0]) {
-      multipliers[1][1] *= -1;
-      multipliers[1][0] = true;
+    if (gamepad.buttons[4].pressed && !multipliers[1][0]) {
+      while(gamepad.buttons[4].pressed) {
+        multipliers[1][1] *= -1;
+        multipliers[1][0] = true;
+      }
     } else {
-      multipliers[1][0] = false;
+      while(gamepad.buttons[4].pressed) {
+        multipliers[1][0] = false;
+      }
     }
-  }, 160);
+
+
+    if (gamepad.buttons[16].pressed) {
+      restart()
+    }
+    if (gamepad.buttons[1].pressed) {
+      changeFlipperSelection();
+    }
+  }, 200);
 });
 window.addEventListener('gamepaddisconnected', function(event) {
   clearInterval(gamepadInterval);
