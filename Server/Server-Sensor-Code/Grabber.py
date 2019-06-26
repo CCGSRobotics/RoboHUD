@@ -2,7 +2,7 @@ import serial
 import socketserver as SocketServer
 import time
 ''' NOTE: EDIT THIS LINE BELOW IF THE USB PORT ADDRESS CHANGED.'''
-arduino_port_address = "COM6" # Use "COM[NUMBER]"" for Windows | "/dev/ttyUSB0" for Linux/Mac
+arduino_port_address = "/dev/ttyUSB1" # Use "COM[NUMBER]"" for Windows | "/dev/ttyUSB0" for Linux/Mac
 
 serialLine = serial.Serial(arduino_port_address, baudrate=115200, timeout=5)
 
@@ -22,10 +22,10 @@ def readData():
 
     ''' sensor_identifier is the identifer of the sensor, set in the Ardiuno's memory.
         sensor_value is the analog value read from the sensor. '''
-    
+
     sensor_identifier = string[0]
     sensor_value = ''
-    
+
     ''' This loop goes though each character of "string"
         and retrives the analog value from the string '''
     for x in range(1,len(string)):
@@ -33,7 +33,7 @@ def readData():
             sensor_value = sensor_value + string[x]
         else:
             break
-            
+
     ''' "sensor" is a dictionary that has two attributes, "value" and "identifier" '''
     sensor = {}
     sensor['value'] = int(sensor_identifier)
@@ -48,13 +48,13 @@ def moveGrabber(percentage):
     moveMicroServo(2, percentage+10)
     time.sleep(0.1)
     moveMicroServo(3, percentage+10)
-    
+
 def moveCameras(positions):
     moveMicroServo(4, int(positions[0]))
     time.sleep(0.1)
     moveMicroServo(5, int(positions[1])+10)
 
-        
+
 
 print("Arduino Communication Line established. All systems are go!")
 #CODE BELOW IS TO RUN THIS CODE ON THE SERVER
@@ -83,10 +83,10 @@ while True:
 
     else:
         servo_percentage_position = int(s)
-        
+
         moveGrabber(servo_percentage_position)
-    
-    
+
+
     ''' The code below relates to receiving data from the Arduino, and sending it to the operator's device.'''
     '''for x in range(numOfSensors):
         while 1:
@@ -97,8 +97,3 @@ while True:
                 pass
         if sensor['identifier'] == 't':
             sensor['value'] = round((57*(sensor['value']-20))/100,1)'''
-
-
-    
-    
-

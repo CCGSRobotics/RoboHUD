@@ -16,4 +16,17 @@ var tiltDirection = tiltDirectionDefault
 var video;
 var lastVals = [];
 var multipliers = [[false, -1], [false, -1]]
+var flipperSelect = true // true: front flippers | false: back flippers
 let gamepad;
+
+// Flipper limits are set inside the client, to avoid fake [Overload] Errors occuring on the server side.
+// Array order is servo ID [5,6,7,8,9]
+var flipperJointLimits = [
+  [1023,3072], // ID: 5  | Model: MX-28
+  [1023,3072], // ID: 6  | Model: MX-28
+  [1023,3072], // ID: 7  | Model: MX-28
+  [1023,3072], // ID: 8  | Model: MX-28
+  [0,2560],    // ID: 9  | Model: MX-28
+  [0,1023],    // ID: 10 | Model: AX-12
+  [0,1023],    // ID: 11 | Model: AX-12
+]
