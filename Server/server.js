@@ -27,7 +27,7 @@ net.createServer(function(socket) {
 		console.log(parsedData)
 		if (parsedData == 'START') {
 			console.log('Starting Python server...');
-			var serverCode = execute('python3 Server-Code-2018/RoboCupServer-Current.py')
+			var serverCode = execute('python3 Server-Code-2019/RoboCupServer-Current.py')
 
 			serverCode.stdout.on('data', function (data) {
 				console.log('stdout: ' + data.toString());
