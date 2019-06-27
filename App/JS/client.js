@@ -100,16 +100,15 @@ function moveWheel(dynamixel, axis, gamepad, sticks) {
 function moveArm(dynamixel, upButton, downButton) {
   gamepad = navigator.getGamepads()[0];
   if (gamepad.buttons[upButton].value > 0) {
-    if (lastVals[dynamixel] != lastVals[dynamixel]+10 &&
-      lastVals[dynamixel] < 100) {
-      moveJointWithPercentage(dynamixel, lastVals[dynamixel]+10);
-      lastVals[dynamixel] += 10;
+    if (lastVals[dynamixel] != lastVals[dynamixel]+1 && lastVals[dynamixel] < 100) {
+      moveJointWithPercentage(dynamixel, lastVals[dynamixel]+1);
+      lastVals[dynamixel] += 1;
     }
   } else if (gamepad.buttons[downButton].value > 0) {
-    if (lastVals[dynamixel] != lastVals[dynamixel] - 10 &&
+    if (lastVals[dynamixel] != lastVals[dynamixel] - 1 &&
       lastVals[dynamixel] > 0) {
-      moveJointWithPercentage(dynamixel, lastVals[dynamixel] - 10);
-      lastVals[dynamixel] -= 10;
+      moveJointWithPercentage(dynamixel, lastVals[dynamixel] - 1);
+      lastVals[dynamixel] -= 1;
     }
   }
 }
@@ -125,7 +124,7 @@ function moveArm(dynamixel, upButton, downButton) {
  */
 function moveFlipper(dynamixel, axis) {
   const gamepad = navigator.getGamepads()[0];
-  const change = Math.round((gamepad.axes[axis])*10);
+  const change = Math.round((gamepad.axes[axis])*5);
   if(flipperSelect && (dynamixel == 5 || dynamixel == 6)) {
     var val = lastVals[dynamixel] + change;
     if(val < 0) {val = 0;}
@@ -208,35 +207,34 @@ window.addEventListener('gamepadconnected', function(event) {
     pollGamepad(event.gamepad, 40, false);
 
     if (gamepad.buttons[5].pressed && !multipliers[0][0]) {
-      while(gamepad.buttons[5].pressed) {
-        multipliers[0][1] *= -1;
-        multipliers[0][0] = true;
-      }
-    } else {
-      while(gamepad.buttons[5].pressed) {
-        multipliers[0][0] = false;
-      }
+      multipliers[0][1] *= -1;
+      multipliers[0][0] = true;
+    } else if(!gamepad.buttons[5].pressed){
+      multipliers[0][0] = false;
     }
 
     if (gamepad.buttons[4].pressed && !multipliers[1][0]) {
-      while(gamepad.buttons[4].pressed) {
-        multipliers[1][1] *= -1;
-        multipliers[1][0] = true;
-      }
-    } else {
-      while(gamepad.buttons[4].pressed) {
-        multipliers[1][0] = false;
-      }
+      multipliers[1][1] *= -1;
+      multipliers[1][0] = true;
+    } else if(!gamepad.buttons[4].pressed) {
+      multipliers[1][0] = false;
     }
-
 
     if (gamepad.buttons[16].pressed) {
-      restart()
+      // restart() Current mechanicak relay isn't working
+      softwareResetServos();
     }
-    if (gamepad.buttons[1].pressed) {
+    if (gamepad.buttons[1].pressed && !b_button_state) {
+      b_button_state = true;
       changeFlipperSelection();
     }
-  }, 200);
+    else if(!gamepad.buttons[1].pressed) {
+      b_button_state = false;
+    }
+    console.clear();
+    console.log(lastVals
+    )
+  }, 50);
 });
 window.addEventListener('gamepaddisconnected', function(event) {
   clearInterval(gamepadInterval);
