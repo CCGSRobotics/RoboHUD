@@ -12,7 +12,7 @@ def loopServoReset(setup):
             if ID == numberOfActiveDynamixels:
                 print("---------- // -----------")
             if setup:
-                if ID <= 4:
+                if ID <= 4 || ID == 11:
                     wheelMode(ID)
                 else:
                     jointMode(ID)
@@ -39,7 +39,7 @@ class MyUCPHandler(SocketServer.BaseRequestHandler):
                     loopServoReset(False)
                 else:
                     ID = int(i[0]+i[1])
-                    if ID < 5:
+                    if ID <= 4 || ID == 11:
                         try:
                             if lastValues[ID] != int(i[2:]):
                                 moveWheel(ID, int(i[2:]))
