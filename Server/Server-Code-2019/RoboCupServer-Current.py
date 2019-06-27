@@ -1,26 +1,30 @@
 import socketserver as SocketServer
 import sys
 from GPIO import *
-SwitchOFF()
-SwitchON()
 from emuBot import *
 
-wheelMode(1)
-wheelMode(2)
-wheelMode(3)
-wheelMode(4)
-jointMode(5)
-jointMode(6)
-jointMode(7)
-jointMode(8)
-jointMode(9)
-#jointMode(10)
-#jointMode(11)
-#moveWheel(4, 1023)
-lastValues = [0 for i in range(5)]
 numberOfActiveDynamixels = 9
 
-class MyTCPHandler(SocketServer.BaseRequestHandler):
+def loopServoReset(setup):
+    for ID in range(1,numberOfActiveDynamixels+1):
+        try:
+            softwareResetServo(ID)
+            if ID == numberOfActiveDynamixels:
+                print("---------- // -----------")
+            if setup:
+                if ID <= 4:
+                    wheelMode(ID)
+                else:
+                    jointMode(ID)
+        except:
+            print("Setup of ID: " + str(ID) + " failed.")
+
+loopServoReset(True)
+
+lastValues = [0 for i in range(5)]
+
+
+class MyUCPHandler(SocketServer.BaseRequestHandler):
     def handle(self):
         self.data = self.request[0].decode('utf-8').strip()
         new = self.data.split('\n')
@@ -32,8 +36,7 @@ class MyTCPHandler(SocketServer.BaseRequestHandler):
                 if i == "restart":
                     restart()
                 elif i == "softwareResetServos":
-                    for ID in range(1,numberOfActiveDynamixels):
-                        softwareResetServo(ID)
+                    loopServoReset(False)
                 else:
                     ID = int(i[0]+i[1])
                     if ID < 5:
@@ -48,7 +51,6 @@ class MyTCPHandler(SocketServer.BaseRequestHandler):
                         pos, speed = map(int, [round(float(x)) for x in i.split()[1:]])
                         try:
                             moveJoint(ID, pos, speed)
-                            #moveJoint(ID, int(i[2:-4]), i[-4:])
                         except:
                             print(i[2:-4])
                             print('BrokeJoint ', ID)
@@ -60,7 +62,7 @@ if __name__ == "__main__":
     HOST, PORT = "", 9999
 
 SocketServer.UDPServer.allow_reuse_address = True
-server = SocketServer.UDPServer((HOST, PORT), MyTCPHandler)
+server = SocketServer.UDPServer((HOST, PORT), MyUCPHandler)
 
-print('Server Started')
+print('Dynamixel Server Started')
 server.serve_forever()
