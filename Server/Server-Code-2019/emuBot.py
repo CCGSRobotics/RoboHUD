@@ -33,21 +33,26 @@ def dxlErrors(commResult, error):
     print("%s" % packetHandler.getRxPacketError(dxl_error))
 
 def softwareResetServo(ID):
+    #print("Restarting Servo ID: " + str(ID))
+
+
     # Disables the torque on the motor
-    dxl_comm_result, dxl_error = packetHandler.write2ByteTxRx(portHandler, ID, 24, 0)
+    dxl_comm_result, dxl_error = packetHandler.write1ByteTxRx(portHandler, ID, 24, 0)
     dxlErrors(dxl_comm_result, dxl_error)
 
     # Turns off the servo LED.
-    dxl_comm_result, dxl_error = packetHandler.write2ByteTxRx(portHandler, ID, 25, 1)
+    dxl_comm_result, dxl_error = packetHandler.write1ByteTxRx(portHandler, ID, 25, 0)
     dxlErrors(dxl_comm_result, dxl_error)
 
     # Sets the torque limit back to its maximum
     dxl_comm_result, dxl_error = packetHandler.write2ByteTxRx(portHandler, ID, 34, 1023)
     dxlErrors(dxl_comm_result, dxl_error)
 
+
      # Enables the torque on the motor
-    dxl_comm_result, dxl_error = packetHandler.write2ByteTxRx(portHandler, ID, 24, 1)
+    dxl_comm_result, dxl_error = packetHandler.write1ByteTxRx(portHandler, ID, 24, 1)
     dxlErrors(dxl_comm_result, dxl_error)
+
 
 
 def jointMode(ID):
