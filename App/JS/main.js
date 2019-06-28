@@ -29,3 +29,4 @@ var flipperJointLimits = [
   [250,800],    // ID: 10 | Model: AX-12
 ]
 var b_button_state = false;
+var grabberMultipler = 0;

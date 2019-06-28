@@ -2,6 +2,25 @@ for (let i = 0; i <= 20; i++) {
   lastVals.push(0);
 }
 
+var GrabberSlider = document.getElementById("grabberSpeed");
+var GrabberOutput = document.getElementById("grabberSpeedDisplay");
+
+// Update the current slider value (each time you drag the slider handle)
+GrabberSlider.oninput = function() {
+  GrabberOutput.innerHTML = "Grabber Speed: " + this.value + "%";
+  moveWheel(11,grabberMultipler * this.value * 1023/100);
+}
+
+var WristSlider = document.getElementById("wristPosition");
+var WristOutput = document.getElementById("wristPositionDisplay");
+// Update the current slider value (each time you drag the slider handle)
+WristSlider.oninput = function() {
+  WristOutput.innerHTML = "Wrist Position: " + this.value + "%";
+  moveJointWithPercentage(10,this.value);
+}
+
+function grabberDirection(G_M) {grabberMultipler = G_M;}
+
 function sendWithCheck(message, port, ip) {
   if (!message.includes('NaN')) {
     clientSocket.send(message, port, ip);
@@ -44,6 +63,7 @@ function changeFlipperSelection() {
   if(flipperSelect) {flipperSelect = false;}
   else {flipperSelect = true;}
 }
+
 /**
  * Sends a wheel value to the server given an ID and a speed,\
  * providing the instruction has not already been sent
