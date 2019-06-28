@@ -26,7 +26,7 @@ var flipperJointLimits = [
   [1023,3072], // ID: 7  | Model: MX-28
   [1023,3072], // ID: 8  | Model: MX-28
   [0,2560],    // ID: 9  | Model: MX-28
-  [0,1023],    // ID: 10 | Model: AX-12
-  [0,1023],    // ID: 11 | Model: AX-12
+  [250,800],    // ID: 10 | Model: AX-12
+  [300,720],    // ID: 11 | Model: AX-12
 ]
 var b_button_state = false;
