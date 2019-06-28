@@ -11,7 +11,7 @@
     <div class="main">
         <h1 class="text" id="main-header">Dashboard - Robotics GUI</h1>
         <p id="marker"></p>
-        
+
         <div class="slidecontainer">
           <h4>Grabber Direction </h4>
           <button type="button" onclick="grabberDirection(-1)">CCW</button>
@@ -20,13 +20,13 @@
 
           <h4>Grabber Speed</h4>
           <p id="grabberSpeedDisplay"> Grabber Speed: 0</p>
-          <input type="range" min="0" max="100" value="50" class="slider" id="grabberSpeed">
+          <input type="range" min="0" max="100" value="0" class="slider" id="grabberSpeed">
         </div>
 
         <div class="slidecontainer">
           <h4>Wrist Position</h4>
-          <p id="wristPositionDisplay"> Grabber Speed: 0</p>
-          <input type="range" min="0" max="100" value="50" class="slider" id="wristPosition">
+          <p id="wristPositionDisplay"> Wrist Position: 0</p>
+          <input type="range" min="0" max="100" value="0" class="slider" id="wristPosition" oninput="moveWrist()">
         </div>
     </div>
   </body>
