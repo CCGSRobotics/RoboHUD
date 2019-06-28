@@ -35,7 +35,6 @@ def dxlErrors(commResult, error):
 def softwareResetServo(ID):
     #print("Restarting Servo ID: " + str(ID))
 
-
     # Disables the torque on the motor
     dxl_comm_result, dxl_error = packetHandler.write1ByteTxRx(portHandler, ID, 24, 0)
     dxlErrors(dxl_comm_result, dxl_error)
@@ -76,6 +75,9 @@ def jointMode(ID):
 
     dxl_comm_result, dxl_error = packetHandler.write2ByteTxRx(portHandler, ID, 8, 1023)
     dxlErrors(dxl_comm_result, dxl_error)
+
+  dxl_comm_result, dxl_error = packetHandler.write1ByteTxRx(portHandler, ID, 24, 1)
+  dxlErrors(dxl_comm_result, dxl_error)
 
 
 

@@ -11,6 +11,23 @@
     <div class="main">
         <h1 class="text" id="main-header">Dashboard - Robotics GUI</h1>
         <p id="marker"></p>
+        
+        <div class="slidecontainer">
+          <h4>Grabber Direction </h4>
+          <button type="button" onclick="grabberDirection(-1)">CCW</button>
+          <button type="button" onclick="grabberDirection(0)">Stationary</button>
+          <button type="button" onclick="grabberDirection(1)">CW</button>
+
+          <h4>Grabber Speed</h4>
+          <p id="grabberSpeedDisplay"> Grabber Speed: 0</p>
+          <input type="range" min="0" max="100" value="50" class="slider" id="grabberSpeed">
+        </div>
+
+        <div class="slidecontainer">
+          <h4>Wrist Position</h4>
+          <p id="wristPositionDisplay"> Grabber Speed: 0</p>
+          <input type="range" min="0" max="100" value="50" class="slider" id="wristPosition">
+        </div>
     </div>
   </body>
 </html>
