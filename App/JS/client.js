@@ -1,10 +1,9 @@
 for (let i = 0; i <= 20; i++) {
   lastVals.push(0);
 }
-
+/*
 var GrabberSlider = document.getElementById("grabberSpeed");
 var GrabberOutput = document.getElementById("grabberSpeedDisplay");
-
 // Update the current slider value (each time you drag the slider handle)
 GrabberSlider.oninput = function() {
   GrabberOutput.innerHTML = "Grabber Speed: " + this.value + "%";
@@ -18,7 +17,7 @@ WristSlider.oninput = function() {
   WristOutput.innerHTML = "Wrist Position: " + this.value + "%";
   moveJointWithPercentage(10,this.value);
 }
-
+*/
 function grabberDirection(G_M) {grabberMultipler = G_M;}
 
 function sendWithCheck(message, port, ip) {
@@ -244,16 +243,13 @@ window.addEventListener('gamepadconnected', function(event) {
       // restart() Current mechanicak relay isn't working
       softwareResetServos();
     }
-    if (gamepad.buttons[1].pressed && !b_button_state) {
+    if (gamepad.buttons[8].pressed && !b_button_state) {
       b_button_state = true;
       changeFlipperSelection();
     }
-    else if(!gamepad.buttons[1].pressed) {
+    else if(!gamepad.buttons[8].pressed) {
       b_button_state = false;
     }
-    console.clear();
-    console.log(lastVals
-    )
   }, 50);
 });
 window.addEventListener('gamepaddisconnected', function(event) {
