@@ -19,8 +19,8 @@
           <button type="button" onclick="grabberDirection(1)">CW</button>
 
           <h4>Grabber Speed</h4>
-          <p id="grabberSpeedDisplay"> Grabber Speed: 0</p>
-          <input type="range" min="0" max="100" value="0" class="slider" id="grabberSpeed">
+          <p id="grabberPositionDisplay">Grabber position: 0%</p>
+          <!-- <input type="range" min="0" max="60" value="0" class="slider" id="grabberPosition" onchange="moveGrabberSlider();"> -->
         </div>
 
         <div class="slidecontainer">
@@ -29,5 +29,8 @@
           <input type="range" min="0" max="100" value="0" class="slider" id="wristPosition" oninput="moveWrist()">
         </div>
     </div>
+    <!-- <script type="text/javascript">
+      document.getElementById('grabberPosition').step = grabberStep
+    </script> -->
   </body>
 </html>

@@ -18,6 +18,42 @@ WristSlider.oninput = function() {
   moveJointWithPercentage(10,this.value);
 }
 */
+
+function updateGrabberState() {
+  canMove = false;
+  document.getElementById('grabberPositionDisplay').innerHTML = `Grabber position: ${Math.round((grabberValue/60)*100)}%`;
+  // document.getElementById('grabberPosition').value = grabberValue;
+  setTimeout(function() {
+    canMove = true;
+  }, 250);
+}
+
+// function moveGrabberSlider() {
+//   var slider = document.getElementById('grabberPosition');
+//   if (canMove) {
+//     grabberValue = parseInt(slider.value);
+//     console.log(grabberValue, slider)
+//     updateGrabberState();
+//   }
+// }
+
+document.onkeydown = async function(e) {
+  var key = e.key;
+  if (key == "ArrowLeft") {
+    clientSocket.send('11-100', 25565, '192.168.100.1');
+  } else if (key == "ArrowRight") {
+    clientSocket.send('11100', 25565, '192.168.100.1');
+  } else if (key == "ArrowDown" && grabberValue > 0 && canMove) {
+    grabberValue -= grabberStep;
+    updateGrabberState();
+    clientSocket.send(`${grabberValue}`, 25565, '192.168.100.1');
+  } else if (key == "ArrowUp" && grabberValue < 60 && canMove) {
+    grabberValue += grabberStep;
+    updateGrabberState();
+    clientSocket.send(`${grabberValue}`, 25565, '192.168.100.1');
+  }
+}
+
 function grabberDirection(G_M) {grabberMultipler = G_M;}
 
 function sendWithCheck(message, port, ip) {
