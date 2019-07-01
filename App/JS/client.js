@@ -54,6 +54,13 @@ document.onkeydown = async function(e) {
   }
 }
 
+document.onkeyup = async function(e) {
+  var key = e.key;
+  if (key == "ArrowLeft" || key == "ArrowRight") {
+    clientSocket.send('0', 25565, '192.168.100.1');
+  }
+}
+
 function grabberDirection(G_M) {grabberMultipler = G_M;}
 
 function sendWithCheck(message, port, ip) {
