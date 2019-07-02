@@ -57,9 +57,9 @@ document.onkeydown = async function(e) {
   var key = e.key;
   if (key == "ArrowLeft") {
     // sendWheelValue(11, -1024);
-    clientSocket.send('11-1024', 9999, '192.168.100.1');
-  } else if (key == "ArrowRight") {
     clientSocket.send('111024', 9999, '192.168.100.1');
+  } else if (key == "ArrowRight") {
+    clientSocket.send('11-1024', 9999, '192.168.100.1');
   } else if (key == "ArrowDown" && grabberValue > 0 && canMove) {
     grabberValue -= grabberStep;
     updateGrabberState();
