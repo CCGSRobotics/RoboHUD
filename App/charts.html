@@ -108,7 +108,7 @@
               range: XAXISRANGE
           },
           yaxis: {
-              max: 600
+              max: 1023
           },
           legend: {
               show: false
@@ -125,12 +125,12 @@
       window.setInterval(function () {
           getNewSeries(lastDate, {
               min: 10,
-              max: 590
+              max: 1013
           })
           chart.updateSeries([{
               data: data
           }])
-      }, 100)
+      }, 500)
       </script>
       <!-- <script>
       var options = {
