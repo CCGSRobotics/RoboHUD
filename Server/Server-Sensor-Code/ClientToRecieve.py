@@ -1,8 +1,8 @@
 import socket
 import sys
 
-HOST, PORT = "", 25565
-data = "sense"
+HOST, PORT = "127.0.0.1", 25565
+data = "GET"
 
 # SOCK_DGRAM is the socket type to use for UDP sockets
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
