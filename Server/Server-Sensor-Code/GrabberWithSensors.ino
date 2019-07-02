@@ -6,6 +6,7 @@
 
 #include <Servo.h> 
 
+
 // ADJUST THESE VALUES SHOULD MICRO-SERVOS BE REPLACED.
 // These two arrays use the format "array_name[] = [limit_for_servo_1, limit_for_servo_2, ... , limit_for_servo_5]"
 
@@ -18,11 +19,14 @@ Servo grabber_servo_2;
 Servo grabber_servo_3;
 Servo camera_tilt_servo;
 Servo camera_rotate_servo;
+ 
 int ServoID = 1;
 int Value = 0;
 long CurrentTime;
 long ElapsedTime;
 long PreviousTime;
+bool laser = false;
+
 
 
 
@@ -67,8 +71,8 @@ void setup() {
   // NOTE: These must be PWM-capable pins, otherwise the servo's will not work as intended.
   // A pinout guide to the Arduino Nano is available at https://i.stack.imgur.com/W9Ril.png
   
-  camera_tilt_servo.attach(5);
-  camera_rotate_servo.attach(6);
+  camera_rotate_servo.attach(5);
+  camera_tilt_servo.attach(6);
   grabber_servo_1.attach(9);
   grabber_servo_2.attach(10);
   grabber_servo_3.attach(11);
@@ -79,6 +83,7 @@ void setup() {
   camera_tilt_servo.write(0);
   camera_rotate_servo.write(90);
   PreviousTime = millis();
+  pinMode(3, OUTPUT);
   // These last two lines show a debugging user the program has setup completely.
   Serial.setTimeout(5);
   
@@ -104,6 +109,7 @@ void loop() {
         
         ServoID = Serial.parseInt();
         Value = Serial.parseInt();
+        
         //Serial.println(ServoID);
         //Serial.println(Value);
         if (ServoID == int(1)) {
@@ -121,6 +127,19 @@ void loop() {
         } else if (ServoID == int(5)) {
             camera_rotate_servo.write(Value);
 
+        } else if (ServoID == int(0)) {
+            if(laser == true) {
+              digitalWrite(3,LOW); 
+              laser = false;
+              
+            } else {
+              digitalWrite(3,HIGH); 
+              laser = true;
+              
+            }
+
+              
+            
         }
     }
       
