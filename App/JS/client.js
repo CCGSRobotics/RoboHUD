@@ -37,7 +37,7 @@ async function moveGrabber() {
   for (var i = 0; i < children.length; i++) {
     var child = children[i]
     if (child.type == "checkbox" && child.checked) {
-      await sleep(250)
+      await sleep(300);
       clientSocket.send(`${child.value}i${grabberValue}`, 25565, '192.168.100.1');
     }
     // clientSocket.send(`${grabberValue}`, 25565, '192.168.100.1');
@@ -56,6 +56,7 @@ async function moveGrabber() {
 document.onkeydown = async function(e) {
   var key = e.key;
   if (key == "ArrowLeft") {
+    // sendWheelValue(11, -1024);
     clientSocket.send('11-1024', 9999, '192.168.100.1');
   } else if (key == "ArrowRight") {
     clientSocket.send('111024', 9999, '192.168.100.1');
@@ -242,6 +243,9 @@ async function writeDefaultValues() {
   }
   moveJointWithPercentage(9, 0);
   lastVals[9] = 0;
+
+  grabberValue = 0;
+  moveGrabber();
 }
 
 /**
