@@ -2,7 +2,7 @@ import serial
 import socketserver as SocketServer
 import time
 ''' NOTE: EDIT THIS LINE BELOW IF THE USB PORT ADDRESS CHANGED.'''
-arduino_port_address = "COM8" # Use "COM[NUMBER]"" for Windows | "/dev/ttyUSB0" for Linux/Mac
+arduino_port_address = "COM6" # Use "COM[NUMBER]"" for Windows | "/dev/ttyUSB0" for Linux/Mac
 
 serialLine = serial.Serial(arduino_port_address, baudrate=115200, timeout=5)
 
@@ -29,16 +29,23 @@ def moveCameras(positions):
     time.sleep(0.1)
     moveMicroServo(5, int(positions[1])+10)
     
+def moveGrabberIndv(positions):
+    moveMicroServo(int(positions[0]), int(positions[1]) + 10)
+    
+    
 
 
     
 print("Arduino Communication Line established. All systems are go!")
+
 #CODE BELOW IS TO RUN THIS CODE ON THE SERVER
 class UDPServerHandler(SocketServer.BaseRequestHandler):
     def handle(self):
         self.data = self.request[0].decode('utf-8').strip()
         if "," in self.data:
             moveCameras(self.data.split(","))
+        elif "i" in self.data:
+            moveGrabberIndv(self.data.split("i"))
         else:
             moveGrabber(int(self.data))
             
@@ -53,34 +60,19 @@ print("Server started!")
 server = SocketServer.UDPServer((HOST, PORT), UDPServerHandler)
 server = server.serve_forever()
 
-####
 
-sensor = ''
+####
 '''
+sensor = ''
+
 while True:
-    s = input('Position either camera (a,b) or grabber (a): ')
+    s = input('Position either camera (a,b) or grabber (a) or an individual claw (aib): ')
     if "," in s:
         moveCameras(s.split(','))
-    
-
+    elif "i" in s:
+        moveGrabberIndv(s.split('i'))
     else:
-
         servo_percentage_position = int(s)
-    
         moveGrabber(servo_percentage_position)
     
-
-    sensor = readData() # sensor = {'identifier': a Character, 'value': an Integer}
-    print(sensor)
-
-    # Convert to degrees C?
-    if sensor['identifier'] == 't':
-        sensor['value'] = round((57*(sensor['value']-20))/100,1)
 '''
- 
-
-
-
-
-
-  
