@@ -19,6 +19,10 @@ WristSlider.oninput = function() {
 }
 */
 
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms))
+}
+
 function updateGrabberState() {
   canMove = false;
   document.getElementById('grabberPositionDisplay').innerHTML = `Grabber position: ${Math.round((grabberValue/60)*100)}%`;
@@ -26,6 +30,18 @@ function updateGrabberState() {
   setTimeout(function() {
     canMove = true;
   }, 250);
+}
+
+async function moveGrabber() {
+  var children = document.getElementById('grabberParent').children;
+  for (var i = 0; i < children.length; i++) {
+    var child = children[i]
+    if (child.type == "checkbox" && child.checked) {
+      await sleep(250)
+      clientSocket.send(`${child.value}i${grabberValue}`, 25565, '192.168.100.1');
+    }
+    // clientSocket.send(`${grabberValue}`, 25565, '192.168.100.1');
+  }
 }
 
 // function moveGrabberSlider() {
@@ -40,24 +56,26 @@ function updateGrabberState() {
 document.onkeydown = async function(e) {
   var key = e.key;
   if (key == "ArrowLeft") {
-    clientSocket.send('11-100', 25565, '192.168.100.1');
+    clientSocket.send('11-1024', 9999, '192.168.100.1');
   } else if (key == "ArrowRight") {
-    clientSocket.send('11100', 25565, '192.168.100.1');
+    clientSocket.send('111024', 9999, '192.168.100.1');
   } else if (key == "ArrowDown" && grabberValue > 0 && canMove) {
     grabberValue -= grabberStep;
     updateGrabberState();
-    clientSocket.send(`${grabberValue}`, 25565, '192.168.100.1');
+    moveGrabber();
+    // clientSocket.send(`${grabberValue}`, 25565, '192.168.100.1');
   } else if (key == "ArrowUp" && grabberValue < 60 && canMove) {
     grabberValue += grabberStep;
     updateGrabberState();
-    clientSocket.send(`${grabberValue}`, 25565, '192.168.100.1');
+    moveGrabber();
+    // clientSocket.send(`${grabberValue}`, 25565, '192.168.100.1');
   }
 }
 
 document.onkeyup = async function(e) {
   var key = e.key;
   if (key == "ArrowLeft" || key == "ArrowRight") {
-    clientSocket.send('0', 25565, '192.168.100.1');
+    clientSocket.send('110', 9999, '192.168.100.1');
   }
 }
 
