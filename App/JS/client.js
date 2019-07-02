@@ -23,6 +23,8 @@ function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms))
 }
 
+var waiter = sleep(0)
+
 function updateGrabberState() {
   canMove = false;
   document.getElementById('grabberPositionDisplay').innerHTML = `Grabber position: ${Math.round((grabberValue/60)*100)}%`;
@@ -37,7 +39,8 @@ async function moveGrabber() {
   for (var i = 0; i < children.length; i++) {
     var child = children[i]
     if (child.type == "checkbox" && child.checked) {
-      await sleep(300);
+      await waiter;
+      waiter = sleep(300)
       clientSocket.send(`${child.value}i${grabberValue}`, 25565, '192.168.100.1');
     }
     // clientSocket.send(`${grabberValue}`, 25565, '192.168.100.1');
