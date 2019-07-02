@@ -11,7 +11,7 @@ function createWindow() {
   });
   win.loadFile('App/loading.html');
   setTimeout(function() {
-    win.loadFile('App/audio.html');
+    win.loadFile('App/charts.html');
   }, 3000)
   // win.loadURL('http://localhost:8080')
   win.webContents.openDevTools();
