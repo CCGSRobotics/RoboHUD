@@ -3,7 +3,7 @@ import socketserver as SocketServer
 import time
 from threading import Thread
 ''' NOTE: EDIT THIS LINE BELOW IF THE USB PORT ADDRESS CHANGED.'''
-arduino_port_address = "COM8" # Use "COM[NUMBER]"" for Windows | "/dev/ttyUSB0" for Linux/Mac
+arduino_port_address = "/dev/ttyUSB0" # Use "COM[NUMBER]"" for Windows | "/dev/ttyUSB0" for Linux/Mac
 
 serialLine = serial.Serial(arduino_port_address, baudrate=115200, timeout=5)
 
@@ -40,6 +40,7 @@ class UDPServerHandler(SocketServer.BaseRequestHandler):
     def handle(self):
         if self != None: 
             socket = self.request[1]
+            self.client_address = (self.client_address[0], 25565)
             socket.sendto(bytes(sensor['identifier'] + str(sensor['value']) + "\n", "utf-8"), self.client_address)
 
 
@@ -48,7 +49,7 @@ class UDPServerHandler(SocketServer.BaseRequestHandler):
 
         
 #if __name__ == "main":
-HOST, PORT = "127.0.0.1", 25565
+HOST, PORT = "", 25565
 SocketServer.UDPServer.allow_reuse_address = True
 
 
