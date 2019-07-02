@@ -21,6 +21,16 @@
           <h4>Grabber Speed</h4>
           <p id="grabberPositionDisplay">Grabber position: 0%</p>
           <!-- <input type="range" min="0" max="60" value="0" class="slider" id="grabberPosition" onchange="moveGrabberSlider();"> -->
+          <form id="grabberParent">
+            <input type="checkbox" name="Servo 1" value="1" checked>
+            <label for="1">Grabber Servo 1</label>
+            <br>
+            <input type="checkbox" name="Servo 2" value="2" checked>
+            <label for="2">Grabber Servo 2</label>
+            <br>
+            <input type="checkbox" name="Servo 3" value="3" checked>
+            <label for="3">Grabber Servo 3</label>
+          </form>
         </div>
         <div class="text-content">
           <label class="form-switch">
@@ -34,19 +44,19 @@
           <input type="checkbox" id="check2">
           <i></i>
         </label>
-    
+
         <label class="form-switch">
           Code Scanning
           <input type="checkbox" id="check3">
           <i></i>
         </label>
-    
+
         <label class="form-switch">
           Point Tracking
           <input type="checkbox" id="check4">
           <i></i>
         </label>
-    
+
         </div>
 
         <div class="slidecontainer">

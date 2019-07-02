@@ -30,6 +30,6 @@ var flipperJointLimits = [
 ]
 var b_button_state = false;
 var grabberMultipler = 0;
-var grabberStep = 2;
+var grabberStep = 5;
 var grabberValue = 0;
 var canMove = true;
