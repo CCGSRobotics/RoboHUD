@@ -15,7 +15,12 @@ def moveMicroServo(ID, Value):
     out =str(ID) + "s" + str(Value)
     serialLine.write(bytearray(out, 'utf8'))
 
-
+def laserToggle(toggle):
+    if toggle == "On":
+        out = "9"
+    elif toggle == "Off":
+        out = "0"
+    serialLine.write(bytearray(out, 'utf8'))
     
 def moveGrabber(percentage):
     moveMicroServo(1, percentage+10)
@@ -31,6 +36,8 @@ def moveCameras(positions):
     
 def moveGrabberIndv(positions):
     moveMicroServo(int(positions[0]), int(positions[1]) + 10)
+
+        
     
     
 
@@ -39,6 +46,7 @@ def moveGrabberIndv(positions):
 print("Arduino Communication Line established. All systems are go!")
 
 #CODE BELOW IS TO RUN THIS CODE ON THE SERVER
+
 class UDPServerHandler(SocketServer.BaseRequestHandler):
     def handle(self):
         self.data = self.request[0].decode('utf-8').strip()
@@ -46,6 +54,8 @@ class UDPServerHandler(SocketServer.BaseRequestHandler):
             moveCameras(self.data.split(","))
         elif "i" in self.data:
             moveGrabberIndv(self.data.split("i"))
+        elif "On" or "Off" in self.data:
+            laserToggle(str(self.data))
         else:
             moveGrabber(int(self.data))
             
@@ -62,17 +72,19 @@ server = server.serve_forever()
 
 
 ####
-'''
-sensor = ''
 
+sensor = ''
+'''
 while True:
-    s = input('Position either camera (a,b) or grabber (a) or an individual claw (aib): ')
+    s = input('Position either camera (a,b) or grabber (a) or an individual claw (aib) or (On or Off) to toggle laser: ')
     if "," in s:
         moveCameras(s.split(','))
+    elif "On" or "Off" in s:
+        laserToggle(s)
     elif "i" in s:
         moveGrabberIndv(s.split('i'))
     else:
         servo_percentage_position = int(s)
         moveGrabber(servo_percentage_position)
-    
 '''
+
