@@ -10,7 +10,7 @@ grabberServos = [1,2,3]
 cameraServos = [4,5]
 
 def moveMicroServo(ID, Value):
-    ''' Data is sent out through the Serial Communication line, using a preset format to allow the Arduino to interpret data correctly. '''
+    '''Data is sent out through the Serial Communication line, using a preset format to allow the Arduino to interpret data correctly. '''
     #out = "i" + str(ID) + "v" + str(Value)
     out =str(ID) + "s" + str(Value)
     serialLine.write(bytearray(out, 'utf8'))
@@ -18,9 +18,11 @@ def moveMicroServo(ID, Value):
 def laserToggle(toggle):
     if toggle == "On":
         out = "9"
+        serialLine.write(bytearray(out, 'utf8'))
     elif toggle == "Off":
         out = "0"
-    serialLine.write(bytearray(out, 'utf8'))
+        serialLine.write(bytearray(out, 'utf8'))
+    
     
 def moveGrabber(percentage):
     moveMicroServo(1, percentage+10)
@@ -54,14 +56,16 @@ class UDPServerHandler(SocketServer.BaseRequestHandler):
             moveCameras(self.data.split(","))
         elif "i" in self.data:
             moveGrabberIndv(self.data.split("i"))
-        elif "On" or "Off" in self.data:
+        elif "On"in self.data:
+            laserToggle(str(self.data))
+        elif "Off"in self.data:
             laserToggle(str(self.data))
         else:
             moveGrabber(int(self.data))
             
-            
+          
 #if __name__ == "main":
-HOST, PORT = "127.0.0.1", 25565
+HOST, PORT = "", 25565
 SocketServer.UDPServer.allow_reuse_address = True
 
 
@@ -79,7 +83,9 @@ while True:
     s = input('Position either camera (a,b) or grabber (a) or an individual claw (aib) or (On or Off) to toggle laser: ')
     if "," in s:
         moveCameras(s.split(','))
-    elif "On" or "Off" in s:
+    elif "On" in s:
+        laserToggle(s)
+    elif "Off" in s:
         laserToggle(s)
     elif "i" in s:
         moveGrabberIndv(s.split('i'))
