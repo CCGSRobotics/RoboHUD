@@ -122,25 +122,34 @@ void loop() {
             grabber_servo_3.write(Value);
 
         } else if (ServoID == int(4)) {
-            camera_tilt_servo.write(Value);
-
-        } else if (ServoID == int(5)) {
-            camera_rotate_servo.write(Value);
-
-        } else if (ServoID == int(0)) {
-            if(laser == true) {
-              digitalWrite(3,LOW); 
-              laser = false;
-              
+            if (Value < 2){
+              camera_tilt_servo.write(2);
+            } else if (Value > 70){
+              camera_tilt_servo.write(70); 
             } else {
-              digitalWrite(3,HIGH); 
-              laser = true;
-              
+              camera_tilt_servo.write(Value);
             }
+        } else if (ServoID == int(5)) {
+            if (Value < 10){
+              camera_rotate_servo.write(10);
+            } else if (Value > 170){
+              camera_rotate_servo.write(170); 
+            } else {
+              camera_rotate_servo.write(Value);
+            }
+        } else if (ServoID == int(0)) {
+            digitalWrite(3,LOW); 
+            laser = false;
+              
+        } else if (ServoID == int(9)) {
+            digitalWrite(3,HIGH); 
+            laser = true;
+              
+        }
 
               
             
-        }
+        
     }
       
     
@@ -165,11 +174,3 @@ void loop() {
     delay(1); 
 }
       
-
-    
-
-    
-       
-
-
-    
