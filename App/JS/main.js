@@ -25,11 +25,11 @@ var flipperJointLimits = [
   [1323,3372], // ID: 6  | Model: MX-28
   [1023,3072], // ID: 7  | Model: MX-28
   [1023,3072], // ID: 8  | Model: MX-28
-  [0,2560],    // ID: 9  | Model: MX-28
+  [200,2560],    // ID: 9  | Model: MX-28
   [250,800],    // ID: 10 | Model: AX-12
 ]
 var b_button_state = false;
 var grabberMultipler = 0;
-var grabberStep = 5;
+var grabberStep = 1;
 var grabberValue = 0;
 var canMove = true;
