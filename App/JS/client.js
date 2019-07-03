@@ -23,28 +23,40 @@ function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms))
 }
 
-var waiter = sleep(0)
+var waiter = 10
 
 function updateGrabberState() {
-  canMove = false;
   document.getElementById('grabberPositionDisplay').innerHTML = `Grabber position: ${Math.round((grabberValue/60)*100)}%`;
-  // document.getElementById('grabberPosition').value = grabberValue;
-  setTimeout(function() {
-    canMove = true;
-  }, 250);
 }
-
-async function moveGrabber() {
-  var children = document.getElementById('grabberParent').children;
-  for (var i = 0; i < children.length; i++) {
-    var child = children[i]
-    if (child.type == "checkbox" && child.checked) {
-      await waiter;
-      waiter = sleep(300)
-      clientSocket.send(`${child.value}i${grabberValue}`, 25565, '192.168.100.1');
+var grabberServos = [true, true, true]
+var grabberValues = [0, 0, 0]
+async function moveGrabber(multiplier) {
+  return new Promise(async function(resolve) {
+    console.log(`${grabberValue}, ${grabberStep}, ${multiplier}`)
+    var children = document.getElementById('grabberParent').children;
+    for (var i = 0; i < children.length; i++) {
+      var child = children[i]
+      if (child.type == "checkbox" && child.checked) {
+        grabberServos[parseInt(child.value) - 1] = true
+        grabberValue += (grabberStep * multiplier)
+      } else {
+        grabberServos[parseInt(child.value) - 1] = false
+      }
+      // clientSocket.send(`${grabberValue}`, 25565, '192.168.100.1');
     }
-    // clientSocket.send(`${grabberValue}`, 25565, '192.168.100.1');
-  }
+    if (grabberServos == [true, true, true]) {
+      await sleep(waiter)
+      clientSocket.send(`${grabberValue}`, 25565, '192.168.100.1')
+    }
+
+    for (var i = 0; i < 3; i++) {
+      if (grabberServos[i] == true) {
+        await sleep(waiter);
+        clientSocket.send(`${i+1}i${grabberValue}`, 25565, '192.168.100.1');
+      }
+    }
+    resolve;
+  })
 }
 
 // function moveGrabberSlider() {
@@ -63,15 +75,15 @@ document.onkeydown = async function(e) {
     clientSocket.send('111024', 9999, '192.168.100.1');
   } else if (key == "ArrowRight") {
     clientSocket.send('11-1024', 9999, '192.168.100.1');
-  } else if (key == "ArrowDown" && grabberValue > 0 && canMove) {
-    grabberValue -= grabberStep;
+  } else if (key == "ArrowDown" && grabberValue > 0) {
+    // grabberValue -= grabberStep;
     updateGrabberState();
-    moveGrabber();
+    await moveGrabber(-1);
     // clientSocket.send(`${grabberValue}`, 25565, '192.168.100.1');
-  } else if (key == "ArrowUp" && grabberValue < 60 && canMove) {
-    grabberValue += grabberStep;
+  } else if (key == "ArrowUp" && grabberValue < 60) {
+    // grabberValue += grabberStep;
     updateGrabberState();
-    moveGrabber();
+    await moveGrabber(1);
     // clientSocket.send(`${grabberValue}`, 25565, '192.168.100.1');
   }
 }
@@ -248,7 +260,7 @@ async function writeDefaultValues() {
   lastVals[9] = 0;
 
   grabberValue = 0;
-  moveGrabber();
+  moveGrabber(1);
 }
 
 /**
@@ -288,7 +300,7 @@ window.addEventListener('gamepadconnected', function(event) {
     const gamepad = navigator.getGamepads()[0];
     if (gamepad.buttons[9].value > 0) {
       writeDefaultValues();
-      multipliers = [[false, -1], [false, -1]];
+      multipliers = [[false, 1], [false, 1]];
     }
 
     pollGamepad(event.gamepad, 40, false);
@@ -308,8 +320,8 @@ window.addEventListener('gamepadconnected', function(event) {
     }
 
     if (gamepad.buttons[16].pressed) {
-      // restart() Current mechanicak relay isn't working
-      softwareResetServos();
+      restart();
+      //softwareResetServos();
     }
     if (gamepad.buttons[8].pressed && !b_button_state) {
       b_button_state = true;
