@@ -123,27 +123,27 @@ void loop() {
             
         } else if (ServoID == int(2)) {
             if (Value <= 0) {
-              grabber_servo_1.write(0);
+              grabber_servo_2.write(0);
             } else if (Value > 80){
-              grabber_servo_1.write(80);
+              grabber_servo_2.write(80);
             } else{
-              grabber_servo_1.write(Value);
+              grabber_servo_2.write(Value);
             }
         } else if (ServoID == int(3)) {
             if (Value <= 0) {
-              grabber_servo_1.write(0);
+              grabber_servo_3.write(0);
             } else if (Value > 80){
-              grabber_servo_1.write(80);
+              grabber_servo_3.write(80);
             } else{
-              grabber_servo_1.write(Value);
+              grabber_servo_3.write(Value);
             }
         } else if (ServoID == int(4)) {
-            if (Value <= 0) {
-              grabber_servo_1.write(0);
-            } else if (Value > 80){
-              grabber_servo_1.write(80);
-            } else{
-              grabber_servo_1.write(Value);
+            if (Value < 2){
+              camera_tilt_servo.write(2);
+            } else if (Value > 90){
+              camera_tilt_servo.write(90); 
+            } else {
+              camera_tilt_servo.write(Value);
             }
         } else if (ServoID == int(5)) {
             if (Value < 10){
@@ -183,7 +183,18 @@ void loop() {
         }
       }
     }
-
- 
+    
+   
+        
+        
     delay(1); 
 }
+      
+
+    
+
+    
+       
+
+
+    
