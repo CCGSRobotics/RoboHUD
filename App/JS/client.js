@@ -1,6 +1,8 @@
 for (let i = 0; i <= 20; i++) {
   lastVals.push(0);
 }
+
+lastVals[10] = 100
 /*
 var GrabberSlider = document.getElementById("grabberSpeed");
 var GrabberOutput = document.getElementById("grabberSpeedDisplay");
@@ -32,7 +34,6 @@ var grabberServos = [true, true, true]
 var grabberValues = [0, 0, 0]
 async function moveGrabber(multiplier) {
   return new Promise(async function(resolve) {
-    console.log(`${grabberValue}, ${grabberStep}, ${multiplier}`)
     var children = document.getElementById('grabberParent').children;
     for (var i = 0; i < children.length; i++) {
       var child = children[i]
@@ -128,11 +129,17 @@ function moveJointWithPercentage(ID, percentage) {
   if (ID == 9) {
     destination = (percentage * 2680) / 100;
   }
+  if (ID == 10) {
+    destination = (percentage * 476) / 100;
+  }
   // Ensures sent servo destination data fits within their limits.
   if(destination > flipperJointLimits[ID-5][1]) {destination = flipperJointLimits[ID-5][1];}
   if(destination < flipperJointLimits[ID-5][0]) {destination = flipperJointLimits[ID-5][0];}
-
-  sendWithCheck(`0${ID} ${destination} 200`, 9999, '192.168.100.1');
+  if (ID < 10) {
+    sendWithCheck(`0${ID} ${destination} 200`, 9999, '192.168.100.1');
+  } else {
+    sendWithCheck(`${ID} ${destination} 200`, 9999, '192.168.100.1');
+  }
 }
 
 function changeFlipperSelection() {
@@ -210,6 +217,28 @@ function moveArm(dynamixel, upButton, downButton) {
 }
 
 /**
+ * Moves the wrist joint of a servo if the corresponding button has been pressed
+ * @param {!number} dynamixel The ID of the dynamixel you wish to move
+ * @param {!number} upButton The index of the button for moving the arm up
+ * @param {!number} downButton The index of the button for moving the arm down
+ */
+function moveWrist(dynamixel, upButton, downButton) {
+  gamepad = navigator.getGamepads()[0];
+  if (gamepad.buttons[upButton].value > 0) {
+    if (lastVals[dynamixel] != lastVals[dynamixel]+1 && lastVals[dynamixel] < 100) {
+      moveJointWithPercentage(dynamixel, lastVals[dynamixel]+1);
+      lastVals[dynamixel] += 1;
+    }
+  } else if (gamepad.buttons[downButton].value > 0) {
+    if (lastVals[dynamixel] != lastVals[dynamixel] - 1 &&
+      lastVals[dynamixel] > 0) {
+      moveJointWithPercentage(dynamixel, lastVals[dynamixel] - 1);
+      lastVals[dynamixel] -= 1;
+    }
+  }
+}
+
+/**
  * Interprts an action on the controller to pass onto moveJointWithPercentage
  * @param {!number} dynamixel The ID of the dynamixel you wish to move
  * @param {!number} axis The index of the axis on the gamepad to get
@@ -231,7 +260,7 @@ function moveFlipper(dynamixel, axis) {
     }
   }
   else if(!flipperSelect && (dynamixel == 7 || dynamixel == 8)) {
-    var val = lastVals[dynamixel] + change;
+    var val = lastVals[dynamixel] - change;
     if(val < 0) {val = 0;}
     else if (val > 100) {val = 100;}
     if (val != lastVals[dynamixel]) {
@@ -281,7 +310,8 @@ async function pollGamepad(gamepad, sticks = false) {
   moveFlipper(7, 1);
   moveFlipper(6, 3);
   moveFlipper(8, 3);
-  moveArm(9, 3, 0);
+  moveArm(9, 3, 2);
+  moveWrist(10, 1, 0);
 }
 
 // client.connect(5000, '192.168.100.1', function() {
