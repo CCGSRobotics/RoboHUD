@@ -122,6 +122,7 @@ function softwareResetServos() {sendWithCheck("softwareResetServos", 9999, '192.
  */
 
 function moveJointWithPercentage(ID, percentage) {
+  lastVals[ID] = percentage;
   destination = 1023 + (percentage * 2048) / 100;
   if (ID == 5 || ID == 8) {
     destination = 3071 - (percentage*2048)/100;
@@ -225,13 +226,12 @@ function moveArm(dynamixel, upButton, downButton) {
 function moveWrist(dynamixel, upButton, downButton) {
   gamepad = navigator.getGamepads()[0];
   if (gamepad.buttons[upButton].value > 0) {
-    if (lastVals[dynamixel] != lastVals[dynamixel]+1 && lastVals[dynamixel] < 100) {
+    if (lastVals[dynamixel] < 100) {
       moveJointWithPercentage(dynamixel, lastVals[dynamixel]+1);
       lastVals[dynamixel] += 1;
     }
   } else if (gamepad.buttons[downButton].value > 0) {
-    if (lastVals[dynamixel] != lastVals[dynamixel] - 1 &&
-      lastVals[dynamixel] > 0) {
+    if (lastVals[dynamixel] > 0) {
       moveJointWithPercentage(dynamixel, lastVals[dynamixel] - 1);
       lastVals[dynamixel] -= 1;
     }
@@ -287,6 +287,9 @@ async function writeDefaultValues() {
   }
   moveJointWithPercentage(9, 0);
   lastVals[9] = 0;
+
+  moveJointWithPercentage(10, 100);
+  lastVals[10] = 100;
 
   grabberValue = 0;
   moveGrabber(1);
