@@ -21,6 +21,36 @@ WristSlider.oninput = function() {
 }
 */
 
+function lineToAngle(ctx, x1, y1, length, angle, colour) {
+
+    angle *= Math.PI / 180;
+
+    var x2 = x1 + length * Math.cos(angle),
+        y2 = y1 + length * Math.sin(angle);
+
+    ctx.beginPath();
+    ctx.strokeStyle = colour;
+    ctx.moveTo(x1, y1);
+    ctx.lineTo(x2, y2);
+    ctx.stroke();
+    ctx.closePath();
+
+    return {x: x2, y: y2};
+}
+
+function drawFlipperLines(ctx) {
+  lineToAngle(ctx, 100, 100, 50, 180 * (lastVals[6]/100) + 90, 'Green')
+  lineToAngle(ctx, 200, 100, 50, -180 * (lastVals[8]/100) + 90, 'Green')
+  lineToAngle(ctx, 100, 200, 50, 180 * (lastVals[5]/100) + 90, 'Red')
+  lineToAngle(ctx, 200, 200, 50, -180 * (lastVals[7]/100) + 90, 'Red')
+}
+
+var flipperCanvas = document.getElementById('flippers')
+var context = flipperCanvas.getContext('2d')
+
+drawFlipperLines(context)
+// lineToAngle(context, 50, 50, 25, 45)
+
 function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms))
 }
@@ -151,7 +181,7 @@ function moveJointWithPercentage(ID, percentage) {
   // Ensures sent servo destination data fits within their limits.
   if(destination > flipperJointLimits[ID-5][1]) {destination = flipperJointLimits[ID-5][1];}
   if(destination < flipperJointLimits[ID-5][0]) {destination = flipperJointLimits[ID-5][0];}
-  if (ID < 10 && ID != 9) {
+  if (ID < 9) {
     sendWithCheck(`0${ID} ${destination} 200`, 9999, '192.168.100.1');
   } else if (ID == 9) {
     sendWithCheck(`09 ${destination} 1024`, 9999, '192.168.100.1');
@@ -206,9 +236,9 @@ function moveWheel(dynamixel, axis, gamepad, sticks) {
     val *= multipliers[1][1];
   }
 
-  if (-150 <= val >= 150) {
-    val = 0;
-  }
+  // if (-150 <= val >= 150) {
+  //   val = 0;
+  // }
   sendWheelValue(dynamixel, val);
 }
 
@@ -312,7 +342,7 @@ async function writeDefaultValues() {
   moveGrabber(1);
 
   clientSocket.send('20,100', 25565, '192.168.100.1')
-  // lastCameraVals = [0, 100]
+  lastCameraVals = [20, 100]
 }
 
 /**
@@ -336,6 +366,11 @@ async function pollGamepad(gamepad, sticks = false) {
   moveArm(9, 3, 2);
   moveWrist(10, 1, 0);
   // moveCamera()
+  context.beginPath();
+  context.clearRect(0, 0, 100000000000, 100000000000000);
+  context.stroke();
+  context.closePath();
+  drawFlipperLines(context);
 }
 
 // client.connect(5000, '192.168.100.1', function() {
