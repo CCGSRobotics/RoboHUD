@@ -25,6 +25,21 @@ function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms))
 }
 
+var lastCameraVals = [0, 0]
+var cameraLimits = [90, 180]
+
+function moveCamera() {
+  var gamepad = navigator.getGamepads()[0];
+  if (gamepad.buttons[leftCameraButton].value > 0 && lastCameraVals[1] + cameraStep <= cameraLimits[1]) {
+    console.log('a')
+    clientSocket.send(`${lastCameraVals[0]},${lastVals[1] + cameraStep}`, 25565, '192.168.100.1');
+    lastVals[1] += cameraStep;
+  } else if (gamepad.buttons[rightCameraButton].value > 0 && lastCameraVals[1] - cameraStep >= 0) {
+    clientSocket.send(`${lastCameraVals[0]},${lastVals[1] - cameraStep}`, 25565, '192.168.100.1');
+    lastVals[1] -= cameraStep;
+  }
+}
+
 var waiter = 10
 
 function updateGrabberState() {
@@ -136,8 +151,10 @@ function moveJointWithPercentage(ID, percentage) {
   // Ensures sent servo destination data fits within their limits.
   if(destination > flipperJointLimits[ID-5][1]) {destination = flipperJointLimits[ID-5][1];}
   if(destination < flipperJointLimits[ID-5][0]) {destination = flipperJointLimits[ID-5][0];}
-  if (ID < 10) {
+  if (ID < 10 && ID != 9) {
     sendWithCheck(`0${ID} ${destination} 200`, 9999, '192.168.100.1');
+  } else if (ID == 9) {
+    sendWithCheck(`09 ${destination} 1024`, 9999, '192.168.100.1');
   } else {
     sendWithCheck(`${ID} ${destination} 200`, 9999, '192.168.100.1');
   }
@@ -293,6 +310,9 @@ async function writeDefaultValues() {
 
   grabberValue = 0;
   moveGrabber(1);
+
+  clientSocket.send('20,100', 25565, '192.168.100.1')
+  // lastCameraVals = [0, 100]
 }
 
 /**
@@ -315,6 +335,7 @@ async function pollGamepad(gamepad, sticks = false) {
   moveFlipper(8, 3);
   moveArm(9, 3, 2);
   moveWrist(10, 1, 0);
+  // moveCamera()
 }
 
 // client.connect(5000, '192.168.100.1', function() {
