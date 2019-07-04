@@ -29,7 +29,7 @@ server.on('message', function(message, remote) {
  }
  var value = parseInt(build)
  if (index == "carbon_dioxide") {
-   value = -1 * (value - 1023)
+   // value = -1 * (value - 1023)
  }
  sensors[index].currentValue = value
  // document.getElementById(index).innerHTML = `${build} PPM`

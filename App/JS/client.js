@@ -346,8 +346,10 @@ async function writeDefaultValues() {
   grabberValue = 0;
   moveGrabber(1);
 
-  clientSocket.send('20,100', 25565, '192.168.100.1')
-  lastCameraVals = [20, 100]
+  setTimeout(function() {
+    clientSocket.send('10,100', 25565, '192.168.100.1')
+    lastCameraVals = [10, 100]
+  }, 100)
 }
 
 /**
@@ -376,6 +378,20 @@ async function pollGamepad(gamepad, sticks = false) {
   context.stroke();
   context.closePath();
   drawFlipperLines(context);
+}
+
+function moveStraight() {
+  clientSocket.send('01300', 9999, '192.168.100.1')
+  clientSocket.send('03300', 9999, '192.168.100.1')
+  clientSocket.send('02-300', 9999, '192.168.100.1')
+  clientSocket.send('04-300', 9999, '192.168.100.1')
+}
+
+function stop() {
+  clientSocket.send('010', 9999, '192.168.100.1')
+  clientSocket.send('030', 9999, '192.168.100.1')
+  clientSocket.send('020', 9999, '192.168.100.1')
+  clientSocket.send('040', 9999, '192.168.100.1')
 }
 
 // client.connect(5000, '192.168.100.1', function() {
