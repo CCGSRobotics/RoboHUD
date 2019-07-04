@@ -196,8 +196,14 @@ function moveJointWithPercentage(ID, percentage) {
 }
 
 function changeFlipperSelection() {
-  if(flipperSelect) {flipperSelect = false;}
-  else {flipperSelect = true;}
+  if(flipperSelect) {
+    flipperDirection.innerHTML = `Flippers: back`
+    flipperSelect = false;
+  }
+  else {
+    flipperDirection.innerHTML = `Flippers: front`
+    flipperSelect = true;
+  }
 }
 
 /**
@@ -323,6 +329,10 @@ function moveFlipper(dynamixel, axis) {
 
 }
 
+var flipperDirection = document.getElementById('flipperDirection');
+var leftWheelDirection = document.getElementById('leftWheelsDirection');
+var rightWheelDirection = document.getElementById('rightWheelsDirection');
+
 /**
  * Writes the default values to the server
  */
@@ -345,6 +355,10 @@ async function writeDefaultValues() {
 
   grabberValue = 0;
   moveGrabber(1);
+
+  flipperDirection.innerHTML = 'Flippers: front';
+  leftWheelDirection.innerHTML = 'Left wheels: forwards';
+  rightWheelDirection.innerHTML = 'Right wheels: forwards'
 
   setTimeout(function() {
     clientSocket.send('10,100', 25565, '192.168.100.1')
@@ -372,6 +386,7 @@ async function pollGamepad(gamepad, sticks = false) {
   moveFlipper(8, 3);
   moveArm(9, 3, 2);
   moveWrist(10, 1, 0);
+
   // moveCamera()
   context.beginPath();
   context.clearRect(0, 0, 100000000000, 100000000000000);
@@ -402,7 +417,6 @@ function stop() {
 //   client.write(data);
 //   console.log(`Wrote '${data}' to server`);
 // }
-
 let gamepadInterval;
 writeDefaultValues();
 window.addEventListener('gamepadconnected', function(event) {
@@ -418,6 +432,11 @@ window.addEventListener('gamepadconnected', function(event) {
     if (gamepad.buttons[5].pressed && !multipliers[0][0]) {
       multipliers[0][1] *= -1;
       multipliers[0][0] = true;
+      if (multipliers[0][1] == 1) {
+        rightWheelDirection.innerHTML = `Right wheels: forwards`;
+      } else {
+        rightWheelDirection.innerHTML = `Right wheels: backwards`;
+      }
     } else if(!gamepad.buttons[5].pressed){
       multipliers[0][0] = false;
     }
@@ -425,8 +444,14 @@ window.addEventListener('gamepadconnected', function(event) {
     if (gamepad.buttons[4].pressed && !multipliers[1][0]) {
       multipliers[1][1] *= -1;
       multipliers[1][0] = true;
+      if (multipliers[1][1] == 1) {
+        leftWheelDirection.innerHTML = `Left wheels: forwards`;
+      } else {
+        leftWheelDirection.innerHTML = `Left wheels: backwards`;
+      }
     } else if(!gamepad.buttons[4].pressed) {
       multipliers[1][0] = false;
+      // leftWheelDirection.innerHTML = `Left wheels: backwards`;
     }
 
     if (gamepad.buttons[16].pressed) {
@@ -435,6 +460,7 @@ window.addEventListener('gamepadconnected', function(event) {
     }
     if (gamepad.buttons[8].pressed && !b_button_state) {
       b_button_state = true;
+
       changeFlipperSelection();
     }
     else if(!gamepad.buttons[8].pressed) {
