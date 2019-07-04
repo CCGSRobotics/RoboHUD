@@ -39,10 +39,15 @@ function lineToAngle(ctx, x1, y1, length, angle, colour) {
 }
 
 function drawFlipperLines(ctx) {
+  context.beginPath()
+  context.font = '30px sans-serif'
+  context.fillText('Up', 0, 175)
+  context.fillText('Down', 250, 175)
+  context.closePath()
   lineToAngle(ctx, 100, 100, 50, 180 * (lastVals[6]/100) + 90, 'Green')
   lineToAngle(ctx, 200, 100, 50, -180 * (lastVals[8]/100) + 90, 'Green')
-  lineToAngle(ctx, 100, 200, 50, 180 * (lastVals[5]/100) + 90, 'Red')
-  lineToAngle(ctx, 200, 200, 50, -180 * (lastVals[7]/100) + 90, 'Red')
+  lineToAngle(ctx, 100, 250, 50, 180 * (lastVals[5]/100) + 90, 'Red')
+  lineToAngle(ctx, 200, 250, 50, -180 * (lastVals[7]/100) + 90, 'Red')
 }
 
 var flipperCanvas = document.getElementById('flippers')
