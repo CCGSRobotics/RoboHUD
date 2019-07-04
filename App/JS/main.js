@@ -33,3 +33,4 @@ var grabberMultipler = 0;
 var grabberStep = 1;
 var grabberValue = 0;
 var canMove = true;
+var cameraStep = 2
