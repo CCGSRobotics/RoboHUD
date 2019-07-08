@@ -63,17 +63,17 @@ function sleep(ms) {
 var lastCameraVals = [0, 0]
 var cameraLimits = [90, 180]
 
-function moveCamera() {
-  var gamepad = navigator.getGamepads()[0];
-  if (gamepad.buttons[leftCameraButton].value > 0 && lastCameraVals[1] + cameraStep <= cameraLimits[1]) {
-    console.log('a')
-    clientSocket.send(`${lastCameraVals[0]},${lastVals[1] + cameraStep}`, 25565, '192.168.100.1');
-    lastVals[1] += cameraStep;
-  } else if (gamepad.buttons[rightCameraButton].value > 0 && lastCameraVals[1] - cameraStep >= 0) {
-    clientSocket.send(`${lastCameraVals[0]},${lastVals[1] - cameraStep}`, 25565, '192.168.100.1');
-    lastVals[1] -= cameraStep;
-  }
-}
+// function moveCamera() {
+//   var gamepad = navigator.getGamepads()[0];
+//   if (gamepad.buttons[leftCameraButton].value > 0 && lastCameraVals[1] + cameraStep <= cameraLimits[1]) {
+//     console.log('a')
+//     clientSocket.send(`${lastCameraVals[0]},${lastVals[1] + cameraStep}`, 25565, '10.0.0.10');
+//     lastVals[1] += cameraStep;
+//   } else if (gamepad.buttons[rightCameraButton].value > 0 && lastCameraVals[1] - cameraStep >= 0) {
+//     clientSocket.send(`${lastCameraVals[0]},${lastVals[1] - cameraStep}`, 25565, '10.0.0.10');
+//     lastVals[1] -= cameraStep;
+//   }
+// }
 
 var waiter = 10
 
@@ -93,17 +93,17 @@ async function moveGrabber(multiplier) {
       } else {
         grabberServos[parseInt(child.value) - 1] = false
       }
-      // clientSocket.send(`${grabberValue}`, 25565, '192.168.100.1');
+      // clientSocket.send(`${grabberValue}`, 25565, '10.0.0.10');
     }
     if (grabberServos == [true, true, true]) {
       await sleep(waiter)
-      clientSocket.send(`${grabberValue}`, 25565, '192.168.100.1')
+      clientSocket.send(`${grabberValue}`, 25565, '10.0.0.10')
     }
 
     for (var i = 0; i < 3; i++) {
       if (grabberServos[i] == true) {
         await sleep(waiter);
-        clientSocket.send(`${i+1}i${grabberValue}`, 25565, '192.168.100.1');
+        clientSocket.send(`${i+1}i${grabberValue}`, 25565, '10.0.0.10');
       }
     }
     resolve;
@@ -119,32 +119,32 @@ async function moveGrabber(multiplier) {
 //   }
 // }
 
-document.onkeydown = async function(e) {
-  var key = e.key;
-  if (key == "ArrowLeft") {
-    // sendWheelValue(11, -1024);
-    clientSocket.send('111024', 9999, '192.168.100.1');
-  } else if (key == "ArrowRight") {
-    clientSocket.send('11-1024', 9999, '192.168.100.1');
-  } else if (key == "ArrowDown" && grabberValue > 0) {
-    // grabberValue -= grabberStep;
-    updateGrabberState();
-    await moveGrabber(-1);
-    // clientSocket.send(`${grabberValue}`, 25565, '192.168.100.1');
-  } else if (key == "ArrowUp" && grabberValue < 60) {
-    // grabberValue += grabberStep;
-    updateGrabberState();
-    await moveGrabber(1);
-    // clientSocket.send(`${grabberValue}`, 25565, '192.168.100.1');
-  }
-}
+// document.onkeydown = async function(e) {
+//   var key = e.key;
+//   if (key == "ArrowLeft") {
+//     // sendWheelValue(11, -1024);
+//     clientSocket.send('111024', 9999, '10.0.0.10');
+//   } else if (key == "ArrowRight") {
+//     clientSocket.send('11-1024', 9999, '10.0.0.10');
+//   } else if (key == "ArrowDown" && grabberValue > 0) {
+//     // grabberValue -= grabberStep;
+//     updateGrabberState();
+//     await moveGrabber(-1);
+//     // clientSocket.send(`${grabberValue}`, 25565, '10.0.0.10');
+//   } else if (key == "ArrowUp" && grabberValue < 60) {
+//     // grabberValue += grabberStep;
+//     updateGrabberState();
+//     await moveGrabber(1);
+//     // clientSocket.send(`${grabberValue}`, 25565, '10.0.0.10');
+//   }
+// }
 
-document.onkeyup = async function(e) {
-  var key = e.key;
-  if (key == "ArrowLeft" || key == "ArrowRight") {
-    clientSocket.send('110', 9999, '192.168.100.1');
-  }
-}
+// document.onkeyup = async function(e) {
+//   var key = e.key;
+//   if (key == "ArrowLeft" || key == "ArrowRight") {
+//     clientSocket.send('110', 9999, '10.0.0.10');
+//   }
+// }
 
 function grabberDirection(G_M) {grabberMultipler = G_M;}
 
@@ -156,9 +156,9 @@ function sendWithCheck(message, port, ip) {
   }
 }
 // Tells the server to restart the dynamixels through the relay circuit.
-function restart() {sendWithCheck("restart", 9999, '192.168.100.1');}
+function restart() {sendWithCheck("restart", 9999, '10.0.0.10');}
 
-function softwareResetServos() {sendWithCheck("softwareResetServos", 9999, '192.168.100.1');}
+function softwareResetServos() {sendWithCheck("softwareResetServos", 9999, '10.0.0.10');}
 
 /**
  * Moves any dynamixel that has been assigned jointMode in terms of\
@@ -183,15 +183,22 @@ function moveJointWithPercentage(ID, percentage) {
   if (ID == 10) {
     destination = (percentage * 476) / 100;
   }
+  if (ID == 12) {
+    destination = (percentage * 1023) / 100
+  }
+  // console.log(flipperJointLimits[ID])
   // Ensures sent servo destination data fits within their limits.
-  if(destination > flipperJointLimits[ID-5][1]) {destination = flipperJointLimits[ID-5][1];}
-  if(destination < flipperJointLimits[ID-5][0]) {destination = flipperJointLimits[ID-5][0];}
+  if(destination > flipperJointLimits[ID][1]) {destination = flipperJointLimits[ID][1];}
+  if(destination < flipperJointLimits[ID][0]) {destination = flipperJointLimits[ID][0];}
   if (ID < 9) {
-    sendWithCheck(`0${ID} ${destination} 200`, 9999, '192.168.100.1');
+    sendWithCheck(`0${ID} ${destination} 200`, 9999, '10.0.0.10');
   } else if (ID == 9) {
-    sendWithCheck(`09 ${destination} 1024`, 9999, '192.168.100.1');
+    sendWithCheck(`09 ${destination} 1024`, 9999, '10.0.0.10');
+  } else if (ID == 12 || ID == 13) {
+      console.log(destination)
+      sendWithCheck(`${ID} ${destination} 100`, 9999, '127.0.0.1');
   } else {
-    sendWithCheck(`${ID} ${destination} 200`, 9999, '192.168.100.1');
+    sendWithCheck(`${ID} ${destination} 200`, 9999, '10.0.0.10');
   }
 }
 
@@ -214,7 +221,7 @@ function changeFlipperSelection() {
  */
 function sendWheelValue(dynamixel, val) {
   if (!(lastVals[dynamixel] == val)) {
-    sendWithCheck(`0${dynamixel}${val}`, 9999, '192.168.100.1');
+    sendWithCheck(`0${dynamixel}${val}`, 9999, '10.0.0.10');
     lastVals[dynamixel] = val;
   }
 }
@@ -333,6 +340,37 @@ var flipperDirection = document.getElementById('flipperDirection');
 var leftWheelDirection = document.getElementById('leftWheelsDirection');
 var rightWheelDirection = document.getElementById('rightWheelsDirection');
 
+function centerCamera() {
+  clientSocket.send('10 1023 200', 9999, '10.0.0.10')
+  lastVals[10] = 1023
+  clientSocket.send('12 512 200', 9999, '10.0.0.10')
+  lastVals[12] = 512
+  clientSocket.send('13 816 200', 9999, '10.0.0.10')
+  lastVals[13] = 816
+}
+
+function cameraLeft() {
+  clientSocket.send('12 0 200', 9999, '10.0.0.10')
+  lastVals[12] = 0
+}
+
+function cameraRight() {
+  clientSocket.send('12 1023 200', 9999, '10.0.0.10')
+  lastVals[12] = 1023
+}
+
+function panCamera(ID, leftButton, rightButton) {
+  var gamepad = navigator.getGamepads()[0];
+  if (gamepad.buttons[leftButton].value > 0 && lastVals[ID] + 5 <= flipperJointLimits[ID][1]) {
+    console.log(lastVals[ID] + 5)
+    moveJointWithPercentage(ID, lastVals[ID] + 5)
+    lastVals[ID] += 5
+  } else if (gamepad.buttons[rightButton].value > 0 && lastVals[ID] - 5 >= flipperJointLimits[ID][0]) {
+    moveJointWithPercentage(ID, lastVals[ID] - 5)
+    lastVals[ID] -= 5
+  }
+}
+
 /**
  * Writes the default values to the server
  */
@@ -353,6 +391,11 @@ async function writeDefaultValues() {
   moveJointWithPercentage(10, 100);
   lastVals[10] = 100;
 
+  centerCamera()
+
+  // moveJointWithPercentage(11, 50);
+  // lastVals[11] = 50;
+
   grabberValue = 0;
   moveGrabber(1);
 
@@ -361,8 +404,8 @@ async function writeDefaultValues() {
   rightWheelDirection.innerHTML = 'Right wheels: forwards'
 
   setTimeout(function() {
-    clientSocket.send('10,100', 25565, '192.168.100.1')
-    lastCameraVals = [10, 100]
+    clientSocket.send('165,100', 25565, '10.0.0.10')
+    lastCameraVals = [165, 100]
   }, 100)
 }
 
@@ -386,6 +429,8 @@ async function pollGamepad(gamepad, sticks = false) {
   moveFlipper(8, 3);
   moveArm(9, 3, 2);
   moveWrist(10, 1, 0);
+  panCamera(12, 14, 15)
+  // moveJointWithPercentage(11,50);
 
   // moveCamera()
   context.beginPath();
@@ -396,20 +441,19 @@ async function pollGamepad(gamepad, sticks = false) {
 }
 
 function moveStraight() {
-  clientSocket.send('01300', 9999, '192.168.100.1')
-  clientSocket.send('03300', 9999, '192.168.100.1')
-  clientSocket.send('02-300', 9999, '192.168.100.1')
-  clientSocket.send('04-300', 9999, '192.168.100.1')
+  clientSocket.send('011024', 9999, '10.0.0.10')
+  clientSocket.send('031024', 9999, '10.0.0.10')
+  clientSocket.send('02-1024', 9999, '10.0.0.10')
+  clientSocket.send('04-1024', 9999, '10.0.0.10')
 }
 
 function stop() {
-  clientSocket.send('010', 9999, '192.168.100.1')
-  clientSocket.send('030', 9999, '192.168.100.1')
-  clientSocket.send('020', 9999, '192.168.100.1')
-  clientSocket.send('040', 9999, '192.168.100.1')
+  clientSocket.send('010', 9999, '10.0.0.10')
+  clientSocket.send('030', 9999, '10.0.0.10')
+  clientSocket.send('020', 9999, '10.0.0.10')
+  clientSocket.send('040', 9999, '10.0.0.10')
 }
-
-// client.connect(5000, '192.168.100.1', function() {
+// client.connect(5000, '10.0.0.10', function() {
 //   console.log("Connected to server interface");
 // })
 //
@@ -418,6 +462,7 @@ function stop() {
 //   console.log(`Wrote '${data}' to server`);
 // }
 let gamepadInterval;
+console.log(lastVals)
 writeDefaultValues();
 window.addEventListener('gamepadconnected', function(event) {
   gamepadInterval = setInterval(() => {
@@ -440,6 +485,7 @@ window.addEventListener('gamepadconnected', function(event) {
     } else if(!gamepad.buttons[5].pressed){
       multipliers[0][0] = false;
     }
+    
 
     if (gamepad.buttons[4].pressed && !multipliers[1][0]) {
       multipliers[1][1] *= -1;
@@ -463,6 +509,17 @@ window.addEventListener('gamepadconnected', function(event) {
 
       changeFlipperSelection();
     }
+    // if (gamepad.buttons[15].pressed) {
+    //   lastVals[11] = lastVals[11] - 10
+
+    //   moveJointWithPercentage(11,lastVals[11]);
+    // }
+    // if (gamepad.buttons[14].pressed) {
+    //   lastVals[11] = lastVals[11] - 10
+
+    //   moveJointWithPercentage(11,lastVals[11]);
+    // }
+
     else if(!gamepad.buttons[8].pressed) {
       b_button_state = false;
     }
