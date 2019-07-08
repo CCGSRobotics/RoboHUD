@@ -1,5 +1,5 @@
 import RPi.GPIO as GPIO
-from time import *
+import time
 
 pin = 20
 
@@ -12,6 +12,7 @@ def restart():
     GPIOsetup()
     GPIO.output(pin,1)
     print("[Dynamixels]: OFF")
+    time.sleep(3)
     GPIO.output(pin,0)
     print("[Dynamixels]: ON")
     return

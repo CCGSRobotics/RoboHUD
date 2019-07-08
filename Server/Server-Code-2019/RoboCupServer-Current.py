@@ -21,7 +21,7 @@ def loopServoReset(setup):
 
 loopServoReset(True)
 
-lastValues = [0 for i in range(5)]
+lastValues = [0 for i in range(20)]
 
 
 class MyUCPHandler(SocketServer.BaseRequestHandler):
@@ -44,8 +44,7 @@ class MyUCPHandler(SocketServer.BaseRequestHandler):
                             if lastValues[ID] != int(i[2:]):
                                 moveWheel(ID, int(i[2:]))
                                 lastValues[ID] = int(i[2:])
-                        except e:
-                            print(e)
+                        except:
                             print('brokeWheel ',ID)
                     else:
                         pos, speed = map(int, [round(float(x)) for x in i.split()[1:]])

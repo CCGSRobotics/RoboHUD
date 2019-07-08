@@ -5,7 +5,7 @@ from dynamixel_sdk import *
 
 BAUDRATE = 1000000
 
-portHandler = PortHandler("/dev/ttyUSB0")
+portHandler = PortHandler("/dev/ttyUSB2")
 packetHandler = PacketHandler(1.0)
 
 if portHandler.openPort():
