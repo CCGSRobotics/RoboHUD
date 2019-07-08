@@ -19,6 +19,19 @@ function createWindow() {
   win.on('closed', () => {
     win = null;
   });
+  win2 = new BrowserWindow({
+    width: 1600,
+    height: 1200
+  });
+  win2.loadFile('App/loading.html');
+  setTimeout(function() {
+    win2.loadFile('App/charts.html');
+  }, 3000)
+  // win.loadURL('http://localhost:8080')
+
+  win2.on('closed', () => {
+    win2 = null;
+  });
 }
 
 app.on('ready', createWindow);

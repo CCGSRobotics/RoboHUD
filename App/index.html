@@ -9,14 +9,21 @@
     <div class="main">
         <h1 class="text" id="main-header">Dashboard - Robotics GUI</h1>
         <p id="marker"></p>
-        <img src="http://192.168.100.1:8080" width="auto" height="auto"></img>
-        <canvas id="flippers" width="640" height="360"></canvas>
-        <div class="slidecontainer">
-          <button type="button" name="move" onclick="moveStraight()">Move forward</button>
-          <button type="button" name="button" onclick="stop()">Stop</button>
+        <!-- <iframe src="http://localhost:5000" width="960" height="720" style="display:inline-block"></iframe> -->
+        <img src="http://10.0.0.10:8080" width="auto" height="auto"></img>
+        <canvas id="flippers" width="350" height="300" style="display:inline-block"></canvas>
+        <div style="display:inline-block">
           <p id="leftWheelsDirection">Left wheels: forwards</p>
           <p id="rightWheelsDirection">Right wheels: forwards</p>
           <p id="flipperDirection">Flippers: front</p>
+        </div>
+        <div class="slidecontainer">
+          <button type="button" name="lookLeft" onclick="cameraLeft()">Look left</button>
+          <button type="button" name="lookCenter" onclick="centerCamera()">Center the camera</button>
+          <button type="button" name="move" onclick="cameraRight()">Look right</button>
+
+          <button type="button" name="move" onclick="moveStraight()">Move forward</button>
+          <button type="button" name="button" onclick="stop()">Stop</button>
           <h4>Grabber Direction </h4>
           <p id="grabberPositionDisplay">Grabber position: 0%</p>
           <form id="grabberParent">

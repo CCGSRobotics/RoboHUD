@@ -20,14 +20,17 @@ var flipperSelect = true // true: front flippers | false: back flippers
 let gamepad;
 
 // Flipper limits are set inside the client, to avoid fake [Overload] Errors occuring on the server side.
-var flipperJointLimits = [
-  [1323,3372], // ID: 5  | Model: MX-28
-  [1323,3372], // ID: 6  | Model: MX-28
-  [1023,3072], // ID: 7  | Model: MX-28
-  [1023,3072], // ID: 8  | Model: MX-28
-  [200,2560],    // ID: 9  | Model: MX-28
-  [0,476],    // ID: 10 | Model: AX-12
-]
+var flipperJointLimits = {
+  5: [1323,3372], // ID: 5  | Model: MX-28
+  6: [1323,3372], // ID: 6  | Model: MX-28
+  7: [1023,3072], // ID: 7  | Model: MX-28
+  8: [1023,3072], // ID: 8  | Model: MX-28
+  9: [200,2560],    // ID: 9  | Model: MX-28
+  10: [512, 1024],    // ID: 10 | Model: AX-12
+  12: [0, 1023],  // ID: 12  | Model: XL-320
+  13: [205, 816]  // ID: 13  | Model: XL-320
+  // [0,1023],    // ID: 10 | Model: AX-12
+}
 var b_button_state = false;
 var grabberMultipler = 0;
 var grabberStep = 1;
