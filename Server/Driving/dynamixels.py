@@ -8,6 +8,18 @@ p1 = PacketHandler(1.0)
 # Protocol 2 packet handler:
 p2 = PacketHandler(2.0)
 
+if port_handler.openPort():
+  # print("Succeeded to open the port"
+  pass
+else:
+  print("Failed to open the port")
+
+if port_handler.setBaudRate(1000000):
+  # print("Succeeded to change the baudrate")
+  pass
+else:
+  print("Failed to change the baudrate")
+
 servo_types = {}
 connected_servos = []
 
@@ -63,4 +75,4 @@ def initialise():
               new = int(new)
             build[line[2]][first_line[item].strip()] = new
         control_table = {**control_table, **build}
-      servo_types[os.path.splitext(name)[0]] = Dynamixel(os.path.splitext(name)[0], 1, 1, control_table)
+      servo_types[os.path.splitext(name)[0]] = Dynamixel(os.path.splitext(name)[0], 5, 1, control_table)
