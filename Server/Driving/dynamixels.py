@@ -1,17 +1,53 @@
 import os
 from dynamixel_sdk import *
 
-servo_types = []
+
+port_handler = PortHandler('/dev/ttyUSB0')
+# Protocol 1 packet handler:
+p1 = PacketHandler(1.0)
+# Protocol 2 packet handler:
+p2 = PacketHandler(2.0)
+
+servo_types = {}
 connected_servos = []
 
 class Dynamixel:
-  def __init__(self, control_table):
+  def __init__(self, name, id, protocol, control_table):
+    self.name = name
+    self.id = id
+    self.protocol = protocol
     self.control_table = control_table
+
+  def query(self, item, detail):
+    return self.control_table[item][detail]
+
+  def writeValue(self, name, value):
+    if name in self.control_table:
+      if 'W' in self.query(name, 'Access'):
+        size = self.query(name, 'Size(Byte)')
+        if size == 1:
+          print(1)
+          if self.protocol == 1:
+            p1.write1ByteTxRx(port_handler, self.id, self.query(name, 'Address'), value)
+          else:
+            p2.write1ByteTxRx(port_handler, self.id, self.query(name, 'Address'), value)
+        elif size == 2:
+          print(2)
+          if self.protocol == 1:
+            p1.write2ByteTxRx(port_handler, self.id, self.query(name, 'Address'), value)
+          else:
+            p2.write2ByteTxRx(port_handler, self.id, self.query(name, 'Address'), value)
+        elif size == 4:
+          print(4)
+          if self.protocol == 1:
+            p1.write4ByteTxRx(port_handler, self.id, self.query(name, 'Address'), value)
+          else:
+            p2.write4ByteTxRx(port_handler, self.id, self.query(name, 'Address'), value)
 
 def initialise():
   for root, dirs, files in os.walk("./Servos/", topdown=False):
     for name in files:
-      print(os.path.join(root, name))
+      print(name)
       path = os.path.join(root, name)
       table = open(path, 'r').readlines()
       first_line = table[0].split(', ')
@@ -27,6 +63,4 @@ def initialise():
               new = int(new)
             build[line[2]][first_line[item].strip()] = new
         control_table = {**control_table, **build}
-      # print(control_table)
-      # print(control_table['Punch']['Address'])
-      servo_types.append(Dynamixel(control_table))
+      servo_types[os.path.splitext(name)[0]] = Dynamixel(os.path.splitext(name)[0], 1, 1, control_table)
