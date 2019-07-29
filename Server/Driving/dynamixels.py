@@ -56,6 +56,19 @@ class Dynamixel:
         print('Cannot write to read-only address!')
     else:
       print('Cannot find table value!')
+
+  def read_value(self, name):
+    if name in self.control_table:
+      if 'R' in self.query(name, 'Access'):
+        size = self.query(name, 'Size(Byte)')
+        if self.protocol == 1:
+          print(p1.read1ByteTxRx(port_handler, self.id, self.query(name, 'Address')))
+        else:
+          p2.read1ByteTxRx(port_handler, self.id, self.query(name, 'Address'))
+      else:
+        print('Cannot read at address!')
+    else:
+      print('Cannot find table value!')
   
   def reset_value(self, name):
     if name in self.control_table:
@@ -80,7 +93,7 @@ class Dynamixel:
   def restart(self):
     self.write_value('Torque Enable', 0)
     for i in self.control_table:
-      reset_value(i)
+      self.reset_value(i)
     self.is_wheel = False
     self.is_joint = False
 
@@ -103,6 +116,5 @@ def initialise_dynamixel(model, ID, protocol):
                 new = int(new)
               build[line[2]][first_line[item].strip()] = new
           control_table = {**control_table, **build}
-        servo_types[os.path.splitext(name)[0]] = Dynamixel(os.path.splitext(name)[0], ID, protocol, control_table)
-        return
+        return Dynamixel(os.path.splitext(name)[0], ID, protocol, control_table)
     print('Could not find matching control table!')
