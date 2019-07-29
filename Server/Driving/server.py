@@ -1,6 +1,10 @@
 import socketserver
 from dynamixels import *
 
+wheels = {}
+
+wheels[5] = initialise_dynamixel('ax-18a', 5, 1)
+
 class UDPHandler(socketserver.BaseRequestHandler):
   def handle(self):
     self.data = self.request[0].decode('utf-8').strip()
@@ -9,7 +13,8 @@ class UDPHandler(socketserver.BaseRequestHandler):
       if i.count('-') == 1:
         # Wheel
         ID, speed = map(int, i.split('-'))
-        print('Wheel ID {} moving at speed {}'.format(ID, speed))
+        if ID in wheels:
+          wheels[ID].write_value('Moving Speed', speed)
       elif i.count('-') == 2:
         # Joint
         ID, pos, speed = map(int, i.split('-'))
