@@ -36,12 +36,22 @@ class UDPHandler(socketserver.BaseRequestHandler):
       elif i.count('-') == 1:
         # Wheel
         ID, speed = map(int, i.split('-'))
-        if ID in servos:
+        if ID in servos and servos[ID].is_wheel:
           servos[ID].write_value('Moving Speed', speed)
+        elif ID not in servos:
+          print('There is no servo of ID {} initialised!'.format(ID))
+        else:
+          print('Servo {} is not a wheel!'.format(ID))
       elif i.count('-') == 2:
         # Joint
         ID, pos, speed = map(int, i.split('-'))
-        print('Joint ID {} moving to position {} at speed {}'.format(ID, pos, speed))
+        if ID in servos and servos[ID].is_joint:
+          servos[ID].write_value('Goal Position', pos)
+          servos[ID].write_value('Moving Speed', speed)
+        elif ID not in servos:
+          print('There is no servo of ID {} initialised!'.format(ID))
+        else:
+          print('Servo {} is not a joint!'.format(ID))
       else:
         print('Invalid command! {}'.format(i))
 
