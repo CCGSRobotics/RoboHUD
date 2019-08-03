@@ -174,7 +174,7 @@ def initialise_dynamixel(model, ID, protocol):
     as the ID and protocol specified in its arguments
   """
 
-  for root, dirs, files in os.walk("./Servos/", topdown=False):
+  for root, dirs, files in os.walk("Driving/Servos/", topdown=False):
     for name in files:
       if os.path.splitext(name)[0] == model:
         path = os.path.join(root, name)
