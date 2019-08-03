@@ -16,21 +16,21 @@ class UDPHandler(socketserver.BaseRequestHandler):
         # WARNING: This code is VERY experimental and will crash if
         # The wrong input is given
 
-        cmd = re.match("\((init|delete|modify|mode)\)", i).group(1)
+        items = i.split('-')
+        cmd = re.match("\((init|delete|modify|mode)\)", items[0]).group(1)
         if cmd == "init":
-          ID, protocol = map(int, re.findall("-.+-.$", i)[0].split('-')[1:])
+          ID, protocol = map(int, items[1:])
           servos[ID] = initialise_dynamixel('ax-18a', ID, protocol)
         elif cmd == "mode":
-          ID, mode = map(str, re.findall("-.+-.+$", i)[0].split('-')[1:])
+          ID, mode = map(str, items[1:])
           ID = int(ID)
           if ID in servos:
             if mode == 'wheel':
-              print('wheel')
               servos[ID].wheel_mode()
             elif mode == 'joint':
               servos[ID].joint_mode()
         elif cmd == 'delete':
-          ID = int(re.findall('-.+$', i)[0][1:])
+          ID = int(items[1])
           if ID in servos:
             servos.pop(ID)
       elif i.count('-') == 1:
