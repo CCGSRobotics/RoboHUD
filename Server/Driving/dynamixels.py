@@ -2,7 +2,7 @@ import os
 from dynamixel_sdk import *
 
 
-port_handler = PortHandler('/dev/ttyUSB0')
+port_handler = PortHandler('/dev/ttyUSB1')
 # Protocol 1 packet handler:
 p1 = PacketHandler(1.0)
 # Protocol 2 packet handler:
@@ -106,7 +106,7 @@ class Dynamixel:
       if 'R' in self.query(name, 'Access'):
         size = self.query(name, 'Size(Byte)')
         if self.protocol == 1:
-          return p1.read1ByteTxRx(port_handler, self.ID, self.query(name, 'Address'))
+          return p1.read1ByteTxRx(port_handler, self.ID, self.query(name, 'Address'))[0]
         else:
           return p2.read1ByteTxRx(port_handler, self.ID, self.query(name, 'Address'))
       else:
@@ -174,7 +174,7 @@ def initialise_dynamixel(model, ID, protocol):
     as the ID and protocol specified in its arguments
   """
 
-  for root, dirs, files in os.walk("Driving/Servos/", topdown=False):
+  for root, dirs, files in os.walk("Servos/", topdown=False):
     for name in files:
       if os.path.splitext(name)[0] == model:
         path = os.path.join(root, name)

@@ -4,20 +4,20 @@ from dynamixels import *
 
 servos = {}
 
-# wheels[5] = initialise_dynamixel('ax-18a', 5, 1)
+# servos[12] = initialise_dynamixel('xl320', 12, 2)
 
 class UDPHandler(socketserver.BaseRequestHandler):
   def handle(self):
     self.data = self.request[0].decode('utf-8').strip()
     new = self.data.split('\n')
     for i in new:
-      if len(re.findall("\((init|delete|modify|mode)\)-.+", i)) == 1:
+      if len(re.findall("\((init|delete|modify|mode|read)\)-.+", i)) == 1:
         # Fancy regular expression to check if server is sending other commands
         # WARNING: This code is VERY experimental and will crash if
         # The wrong input is given
 
         items = i.split('-')
-        cmd = re.match("\((init|delete|modify|mode)\)", items[0]).group(1)
+        cmd = re.match("\((init|delete|modify|mode|read)\)", items[0]).group(1)
         if cmd == "init":
           ID, protocol = map(int, items[1:])
           servos[ID] = initialise_dynamixel('ax-18a', ID, protocol)
@@ -27,6 +27,11 @@ class UDPHandler(socketserver.BaseRequestHandler):
           value = int(value)
           if ID in servos:
             servos[ID].write_value(item, value)
+        elif cmd == "read":
+          ID, item = map(str, items[1:])
+          ID = int(ID)
+          if ID in servos:
+            print(servos[ID].read_value(item))
         elif cmd == "mode":
           ID, mode = map(str, items[1:])
           ID = int(ID)
