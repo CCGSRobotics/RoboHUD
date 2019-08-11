@@ -19,8 +19,9 @@ class UDPHandler(socketserver.BaseRequestHandler):
         items = i.split('-')
         cmd = re.match(regex, items[0]).group(1)
         if cmd == "init":
-          ID, protocol = map(int, items[1:])
-          servos[ID] = initialise_dynamixel('ax-18a', ID, protocol)
+          model = items[1]
+          ID, protocol = map(int, items[2:])
+          servos[ID] = initialise_dynamixel(model, ID, protocol)
         elif cmd == "modify":
           ID, item, value = map(str, items[1:])
           ID = int(ID)
