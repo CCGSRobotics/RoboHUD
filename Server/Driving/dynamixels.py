@@ -71,8 +71,10 @@ class Dynamixel:
     Returns:
       The data found at row (item) and column (detail)
     """
-
-    return self.control_table[item][detail]
+    try:
+      return self.control_table[item][detail]
+    except KeyError:
+      print('Could not find a matching address!')
 
   def write_value(self, name, value):
     """
