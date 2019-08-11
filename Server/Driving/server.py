@@ -1,9 +1,9 @@
 import socketserver
 import re
-from dynamixels import *
+from dynamixels import Dynamixel, initialise_dynamixel
 
 servos = {}
-
+regex = r"\((init|delete|modify|mode|read)\)"
 # servos[12] = initialise_dynamixel('xl320', 12, 2)
 
 class UDPHandler(socketserver.BaseRequestHandler):
@@ -11,13 +11,13 @@ class UDPHandler(socketserver.BaseRequestHandler):
     self.data = self.request[0].decode('utf-8').strip()
     new = self.data.split('\n')
     for i in new:
-      if len(re.findall("\((init|delete|modify|mode|read)\)-.+", i)) == 1:
+      if len(re.findall(regex, i)) == 1:
         # Fancy regular expression to check if server is sending other commands
         # WARNING: This code is VERY experimental and will crash if
         # The wrong input is given
 
         items = i.split('-')
-        cmd = re.match("\((init|delete|modify|mode|read)\)", items[0]).group(1)
+        cmd = re.match(regex, items[0]).group(1)
         if cmd == "init":
           ID, protocol = map(int, items[1:])
           servos[ID] = initialise_dynamixel('ax-18a', ID, protocol)

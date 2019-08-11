@@ -1,5 +1,5 @@
 import os
-from dynamixel_sdk import *
+from dynamixel_sdk import PortHandler, PacketHandler
 
 port_handler = None
 
@@ -191,7 +191,7 @@ def initialise_dynamixel(model, ID, protocol):
     as the ID and protocol specified in its arguments
   """
 
-  for root, dirs, files in os.walk("Servos/", topdown=False):
+  for root, _, files in os.walk("Servos/", topdown=False):
     for name in files:
       if os.path.splitext(name)[0] == model:
         path = os.path.join(root, name)
