@@ -88,21 +88,26 @@ class Dynamixel:
     if name in self.control_table:
       if 'W' in self.query(name, 'Access'):
         size = self.query(name, 'Size(Byte)')
-        if size == 1:
-          if self.protocol == 1:
-            p1.write1ByteTxRx(port_handler, self.ID, self.query(name, 'Address'), value)
-          else:
-            p2.write1ByteTxRx(port_handler, self.ID, self.query(name, 'Address'), value)
-        elif size == 2:
-          if self.protocol == 1:
-            p1.write2ByteTxRx(port_handler, self.ID, self.query(name, 'Address'), value)
-          else:
-            p2.write2ByteTxRx(port_handler, self.ID, self.query(name, 'Address'), value)
-        elif size == 4:
-          if self.protocol == 1:
-            p1.write4ByteTxRx(port_handler, self.ID, self.query(name, 'Address'), value)
-          else:
-            p2.write4ByteTxRx(port_handler, self.ID, self.query(name, 'Address'), value)
+        try:
+          if size == 1:
+            if self.protocol == 1:
+              p1.write1ByteTxRx(port_handler, self.ID, self.query(name, 'Address'), value)
+            else:
+              p2.write1ByteTxRx(port_handler, self.ID, self.query(name, 'Address'), value)
+          elif size == 2:
+            if self.protocol == 1:
+              p1.write2ByteTxRx(port_handler, self.ID, self.query(name, 'Address'), value)
+            else:
+              p2.write2ByteTxRx(port_handler, self.ID, self.query(name, 'Address'), value)
+          elif size == 4:
+            if self.protocol == 1:
+              p1.write4ByteTxRx(port_handler, self.ID, self.query(name, 'Address'), value)
+            else:
+              p2.write4ByteTxRx(port_handler, self.ID, self.query(name, 'Address'), value)
+        except Exception as err:
+          print('An error occured when writing to Dynamixel {}'.format(self.ID))
+          print('Make sure the U2D2 is connected properly!')
+          print('Debug info:\n', err)
       else:
         print('Cannot write to read-only address!')
     else:
