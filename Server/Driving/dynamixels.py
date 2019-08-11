@@ -1,8 +1,23 @@
 import os
 from dynamixel_sdk import *
 
+port_handler = None
 
-port_handler = PortHandler('/dev/ttyUSB1')
+# Try to connect to the U2D2
+for i in range(2):
+  path = '/dev/ttyUSB{}'.format(i)
+  if os.path.exists(path):
+    port_handler = PortHandler(path)
+    print('Initialised U2D2 at {}'.format(path))
+    break
+  else:
+    print('Could not initialise U2D2 at {}'.format(path))
+
+# Could not find a USB device in range
+if port_handler == None:
+  print('Could not initialise U2D2! Maybe increase port range?')
+  exit()
+
 # Protocol 1 packet handler:
 p1 = PacketHandler(1.0)
 # Protocol 2 packet handler:
