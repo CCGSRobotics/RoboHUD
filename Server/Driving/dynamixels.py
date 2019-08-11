@@ -128,11 +128,16 @@ class Dynamixel:
 
     if name in self.control_table:
       if 'R' in self.query(name, 'Access'):
-        size = self.query(name, 'Size(Byte)')
-        if self.protocol == 1:
-          return p1.read1ByteTxRx(port_handler, self.ID, self.query(name, 'Address'))[0]
-        else:
-          return p2.read1ByteTxRx(port_handler, self.ID, self.query(name, 'Address'))
+        try:
+          size = self.query(name, 'Size(Byte)')
+          if self.protocol == 1:
+            return str(p1.read1ByteTxRx(port_handler, self.ID, self.query(name, 'Address'))[0])
+          else:
+            return str(p2.read1ByteTxRx(port_handler, self.ID, self.query(name, 'Address')))
+        except Exception as err:
+          print('An error occured when reading from Dynamixel {}'.format(self.ID))
+          print('Make sure the U2D2 is connected properly!')
+          print('Debug info:\n', err)
       else:
         print('Cannot read at address!')
     else:

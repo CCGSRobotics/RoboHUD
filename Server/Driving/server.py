@@ -1,6 +1,9 @@
 import socketserver
+import socket
 import re
 from dynamixels import Dynamixel, initialise_dynamixel
+
+sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
 servos = {}
 regex = r"\((init|delete|modify|mode|read)\)"
@@ -33,7 +36,9 @@ class UDPHandler(socketserver.BaseRequestHandler):
           ID, item = map(str, items[1:])
           ID = int(ID)
           if ID in servos:
-            print(servos[ID].read_value(item))
+            msg = "{}:{}".format(item, servos[ID].read_value(item))
+            msg = bytes(msg, 'utf-8')
+            sock.sendto(msg, (str(self.client_address[0]), 5003))
         elif cmd == "mode":
           ID, mode = map(str, items[1:])
           ID = int(ID)
