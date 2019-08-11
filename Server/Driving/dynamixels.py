@@ -59,6 +59,8 @@ class Dynamixel:
     self.ID = ID
     self.protocol = protocol
     self.control_table = control_table
+    self.is_joint = True
+    self.is_wheel = False
 
   def query(self, item, detail):
     """

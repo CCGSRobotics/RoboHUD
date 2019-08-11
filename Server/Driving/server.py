@@ -22,6 +22,7 @@ class UDPHandler(socketserver.BaseRequestHandler):
           model = items[1]
           ID, protocol = map(int, items[2:])
           servos[ID] = initialise_dynamixel(model, ID, protocol)
+          servos[ID].joint_mode()
         elif cmd == "modify":
           ID, item, value = map(str, items[1:])
           ID = int(ID)
