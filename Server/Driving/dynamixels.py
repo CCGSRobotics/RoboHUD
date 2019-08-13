@@ -98,28 +98,20 @@ class Dynamixel:
         if name in self.control_table:
             if 'W' in self.query(name, 'Access'):
                 size = self.query(name, 'Size(Byte)')
+                if self.protocol == 1:
+                    protocol_handler = PROTOCOL_ONE
+                else:
+                    protocol_handler = PROTOCOL_TWO
                 try:
                     if size == 1:
-                        if self.protocol == 1:
-                            PROTOCOL_ONE.write1ByteTxRx(PORT_HANDLER, self.dynamixel_id,\
-                                 self.query(name, 'Address'), value)
-                        else:
-                            PROTOCOL_TWO.write1ByteTxRx(PORT_HANDLER, self.dynamixel_id,\
-                                 self.query(name, 'Address'), value)
+                        protocol_handler.write1ByteTxRx(PORT_HANDLER, self.dynamixel_id,\
+                                self.query(name, 'Address'), value)
                     elif size == 2:
-                        if self.protocol == 1:
-                            PROTOCOL_ONE.write2ByteTxRx(PORT_HANDLER, self.dynamixel_id,\
-                                 self.query(name, 'Address'), value)
-                        else:
-                            PROTOCOL_TWO.write2ByteTxRx(PORT_HANDLER, self.dynamixel_id,\
-                                 self.query(name, 'Address'), value)
+                        protocol_handler.write2ByteTxRx(PORT_HANDLER, self.dynamixel_id,\
+                                self.query(name, 'Address'), value)
                     elif size == 4:
-                        if self.protocol == 1:
-                            PROTOCOL_ONE.write4ByteTxRx(PORT_HANDLER, self.dynamixel_id,\
-                                 self.query(name, 'Address'), value)
-                        else:
-                            PROTOCOL_TWO.write4ByteTxRx(PORT_HANDLER, self.dynamixel_id,\
-                                 self.query(name, 'Address'), value)
+                        protocol_handler.write4ByteTxRx(PORT_HANDLER, self.dynamixel_id,\
+                                self.query(name, 'Address'), value)
                 except Exception as err:
                     print('An error occured when writing to Dynamixel {}'.format(self.dynamixel_id))
                     print('Make sure the U2D2 is connected properly!')
