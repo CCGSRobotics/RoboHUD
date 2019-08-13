@@ -114,7 +114,8 @@ class Dynamixel:
                         protocol_handler.write4ByteTxRx(PORT_HANDLER, self.dynamixel_id,\
                                 self.query(name, 'Address'), value)
                 except TERMIOS_ERROR as err:
-                    print('An error occured when reading from Dynamixel {}'.format(self.dynamixel_id))
+                    print('An error occured when reading from Dynamixel {}'\
+                        .format(self.dynamixel_id))
                     print('Make sure the U2D2 is connected properly!')
                     print('Debug info:\n', err)
             else:
