@@ -7,6 +7,7 @@ Contains:
     - A class (Dynamixel) with functions to interface with the DynamixelSDK
 """
 import os
+from termios import error as TERMIOS_ERROR
 from dynamixel_sdk import PortHandler, PacketHandler
 
 PORT_HANDLER = None
@@ -112,8 +113,8 @@ class Dynamixel:
                     elif size == 4:
                         protocol_handler.write4ByteTxRx(PORT_HANDLER, self.dynamixel_id,\
                                 self.query(name, 'Address'), value)
-                except Exception as err:
-                    print('An error occured when writing to Dynamixel {}'.format(self.dynamixel_id))
+                except TERMIOS_ERROR as err:
+                    print('An error occured when reading from Dynamixel {}'.format(self.dynamixel_id))
                     print('Make sure the U2D2 is connected properly!')
                     print('Debug info:\n', err)
             else:
@@ -140,7 +141,7 @@ class Dynamixel:
                              self.query(name, 'Address'))[0])
                     return str(PROTOCOL_TWO.read1ByteTxRx(PORT_HANDLER, self.dynamixel_id,\
                             self.query(name, 'Address')))
-                except Exception as err:
+                except TERMIOS_ERROR as err:
                     print('An error occured when reading from Dynamixel {}'\
                         .format(self.dynamixel_id))
                     print('Make sure the U2D2 is connected properly!')
