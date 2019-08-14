@@ -1,16 +1,11 @@
 {
-  "name": "Server-Code",
+  "name": "robohud-server",
   "version": "1.0.0",
-  "description": "",
-  "main": "server.js",
+  "description": "The server side of the CCGS Robotics RoboHUD stack",
+  "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "rm -rf logs/; node test.js",
-    "clear-logs": "rm -rf logs/"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "",
-  "license": "ISC",
-  "dependencies": {
-    "scribe-js": "^2.0.4"
-  }
+  "author": "Angus Finch",
+  "license": "ISC"
 }
