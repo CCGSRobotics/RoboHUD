@@ -1,5 +1,6 @@
 [![Build Status](https://travis-ci.com/CCGSRobotics/RoboHUD.svg?branch=master)](https://travis-ci.com/CCGSRobotics/RoboHUD)
 ![docs](https://readthedocs.org/projects/robohud-docs/badge/?version=latest)
+![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/CCGSRobotics/RoboHUD)
 # RoboHUD GUI
 
 Documented thoroughly at https://robohud-docs.readthedocs.io [WIP]
