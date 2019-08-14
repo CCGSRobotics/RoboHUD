@@ -12,16 +12,17 @@ const commands = {
 
 let children = {};
 
-function addListeners(index) {
-  children[index].stdout.on('data', (data) => {
-    console.log(`${index} stdout: ${data}`);
-    server.send(`${index} stdout: ${data}`, 5002, client);
-  });
+function handleListeners(data, index, name) {
+  console.log(`${index} ${name}: ${data}`);
+  server.send(`${index} ${name}: ${data}`, 5002, client);
+}
 
-  children[index].stderr.on('data', (data) => {
-    console.error(`${index} stderr: ${data}`);
-    server.send(`${index} stderr: ${data}`, 5002, client);
-  });
+function addListeners(index) {
+  const outputs = [children[index].stdout, children[index].stderr];
+  for (let i = 0; i < outputs.length; i++) {
+    outputs[i].on('data', (data) =>
+    handleListeners(data, index, 'stdout'));
+  }
 
   children[index].on('close', (code) => {
     console.log(`Process '${index}' exited with code ${code}`);
@@ -41,6 +42,7 @@ server.on('message', (msg, rinfo) => {
   if (commands.hasOwnProperty(msg)) {
     children[msg] = spawn(commands[msg][0], commands[msg][1]);
     addListeners(msg);
+    console.log(`Started function: ${msg}`)
   }
 });
 
