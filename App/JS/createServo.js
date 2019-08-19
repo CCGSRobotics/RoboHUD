@@ -1,7 +1,8 @@
 const rp = require('request-promise');
 const cheerio = require('cheerio');
 const cheerioTableparser = require('cheerio-tableparser');
-const fs = require('fs');
+const net = require('net');
+const client = new net.Socket();
 
 /**
  * Parses all elements in a given Dynamixel table and converts them to CSV
@@ -52,9 +53,13 @@ function getFile() {
         if (linkPieces[linkPieces.length - 1] == '') {
           linkPieces.pop(linkPieces.length - 1);
         }
+        const filename = linkPieces[linkPieces.length - 1];
+        client.connect(5004, '127.0.0.1', function() {
+          client.write(`${filename}\n${fileData}`);
+          client.destroy();
+        })
         console.log('Done!');
         console.log(fileData);
-        // const filename = linkPieces[linkPieces.length - 1];
         // fs.writeFile(`./${filename}.csv`, fileData, function(err) {
         //   if (err) {
         //     return console.error('Failed to write file! Do you have access?');
@@ -67,8 +72,6 @@ function getFile() {
         console.error('An error has occured!');
         console.error('Check that you have an active internet connection');
         console.error('Additionally, check that you are able to access sites');
-        console.log(link)
         console.error(err);
       });
-
 }
