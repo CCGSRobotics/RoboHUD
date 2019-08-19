@@ -29,7 +29,11 @@ function parseDynamixelTable(table, includeHeader) {
 
 function getFile() {
   const link = document.getElementById('url').value;
-  rp(link)
+  const re = /^https?:\/\/emanual\.robotis\.com\/docs\/en\/dxl\/[a-z0-9]+\/[a-z0-9]+-?[a-z0-9]+/
+  const res = link.match(re)
+  if (res !== null && res !== undefined) {
+    console.log(`Extracted URL as ${res[0]}`);
+    rp(link)
       .then(function(html) {
         console.log('Successfully downloaded the site!');
         /*
@@ -53,25 +57,25 @@ function getFile() {
         if (linkPieces[linkPieces.length - 1] == '') {
           linkPieces.pop(linkPieces.length - 1);
         }
+
         const filename = linkPieces[linkPieces.length - 1];
+        client.on('error', function(err) {
+          console.error('Unable to connect to the fileserver!' + '\n' + 
+          'Ensure that the robot is powered and active.');
+        })
         client.connect(5004, '127.0.0.1', function() {
           client.write(`${filename}\n${fileData}`);
           client.destroy();
         })
         console.log('Done!');
-        console.log(fileData);
-        // fs.writeFile(`./${filename}.csv`, fileData, function(err) {
-        //   if (err) {
-        //     return console.error('Failed to write file! Do you have access?');
-        //   }
-  
-        //   console.log(`Saved the file as ${filename}.csv`);
-        // });
       })
       .catch(function(err) {
         console.error('An error has occured!');
         console.error('Check that you have an active internet connection');
         console.error('Additionally, check that you are able to access sites');
         console.error(err);
-      });
+    });
+  } else {
+    console.error('It seems that your URL is invalid!');
+  }
 }
