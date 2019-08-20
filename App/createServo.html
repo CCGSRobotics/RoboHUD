@@ -5,11 +5,14 @@
   <title>Create a new servo type</title>
 </head>
 <script type="text/javascript" src="JS/createServo.js"></script>
+<link rel="stylesheet" href="CSS/createServo.css">
 <body>
   <p id="invalid_url" style="display: none">Invalid URL!</p>
-  <form onsubmit="getFile()">
-    <input type="text" id="url"></input>
-    <button type="submit">Go!</button>
-  </form>
+  <div class="container">
+    <form onsubmit="getFile()">
+      <input type="text" id="url"></input>
+      <button type="submit" id="submit">Go!</button>
+    </form>
+  </div>
 </body>
 </html>
