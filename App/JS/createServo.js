@@ -1,3 +1,4 @@
+const fs = require('fs');
 const rp = require('request-promise');
 const cheerio = require('cheerio');
 const cheerioTableparser = require('cheerio-tableparser');
@@ -88,16 +89,23 @@ function generateCSV(html, indexes) {
         ' Now scraping the data...');
         fileData = generateCSV(html, [1, 2]);
         console.log('Downloaded table!');
-
+        
         const linkPieces = link.split('/');
         if (linkPieces[linkPieces.length - 1] == '') {
           linkPieces.pop(linkPieces.length - 1);
         }
-        filename = linkPieces[linkPieces.length - 1];
+        filename = linkPieces[linkPieces.length - 1].replace('-', '');
+
+        fs.writeFile(`App/JS/Resources/Servos/${filename}.csv`, fileData, function(err) {
+          if (err) {
+            console.error('Failed to write file! Do you have access?');
+          }
+          console.log(`Saved the file as ${filename}.csv`);
+        });
 
         uploadButton = document.getElementById('upload')
         uploadButton.innerHTML =
-          `Upload <strong>${filename.replace('-', '')}.csv</strong>`;
+          `Upload <strong>${filename}.csv</strong>`;
         uploadButton.style.display = null;
       })
       .catch(function(err) {
