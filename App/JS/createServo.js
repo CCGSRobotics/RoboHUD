@@ -27,7 +27,7 @@ function parseDynamixelHeader(table) {
  * @param {Object} table The table returned when executing parsetable
  * @param {Boolean} includeHeader If the CSV should include headings - use
  * false if this is not the top item in the table
- * @return {String} A string of CSV data with the control table
+ * @returns {String} A string of CSV data with the control table
  */
 function parseDynamixelTable(table) {
   let build = '';
@@ -45,6 +45,28 @@ function parseDynamixelTable(table) {
   return build;
 }
 
+function generateCSV(html, indexes) {
+  if (indexes == null || indexes == undefined || indexes.length == 0) {
+    console.error('Invalid argument!' + 
+    'Ensure that the argument "indexes" is valid!');
+    return '';
+  }
+
+  let fileData = '';
+  const $ = cheerio.load(html);
+  cheerioTableparser($);
+  const cheerioTable = $('table');
+
+  fileData += parseDynamixelHeader(cheerioTable.eq(
+    indexes[0]).parsetable(true, true, true));
+  for (var i = 0; i < indexes.length; i++) {
+    fileData += parseDynamixelTable(cheerioTable.eq(
+      indexes[i]).parsetable(true, true, true));
+  }
+
+  return fileData;
+}
+
 function getFile() {
   const url = document.getElementById('url').value;
   const re = /^https?:\/\/emanual\.robotis\.com\/docs\/en\/dxl\/[a-z0-9]+\/[a-z0-9]+-?[a-z0-9]+/
@@ -54,31 +76,17 @@ function getFile() {
     console.log(`Extracted URL as ${link}`);
     rp(link)
       .then(function(html) {
-        console.log('Successfully downloaded the site!');
-        /*
-        What the Table looks like
-        +---------+--------------+--------+
-        | Address | Size (Bytes) | Name   |
-        +---------+--------------+--------+
-        | Integer | Integer      | String |
-        +---------+--------------+--------+
-        And so on
-        */
-        console.log('Scraping the table data...');
-        const $ = cheerio.load(html);
-        cheerioTableparser($);
-        const EEPROMtable = $('table').eq(1).parsetable(true, true, true);
-        const RAMtable = $('table').eq(2).parsetable(true, true, true);
-        let fileData = '';
-        fileData += parseDynamixelHeader(EEPROMtable);
-        fileData += parseDynamixelTable(EEPROMtable);
-        fileData += parseDynamixelTable(RAMtable);
+        console.log('Successfully downloaded the site!' +
+        ' Now scraping the data...');
+        const fileData = generateCSV(html, [1, 2]);
+
         const linkPieces = link.split('/');
         if (linkPieces[linkPieces.length - 1] == '') {
           linkPieces.pop(linkPieces.length - 1);
         }
 
         const filename = linkPieces[linkPieces.length - 1];
+
         client.on('error', function(err) {
           console.error('Unable to connect to the fileserver!' + '\n' + 
           'Ensure that the robot is powered and active.');
@@ -87,6 +95,7 @@ function getFile() {
           client.write(`${filename}\n${fileData}`);
           client.destroy();
         })
+
         console.log('Done!');
       })
       .catch(function(err) {
