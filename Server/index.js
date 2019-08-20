@@ -7,6 +7,10 @@ const commands = {
   'Driving': [
     'python3',
     ['-u', './Driving/server.py']
+  ],
+  'Fileserver': [
+    'node',
+    ['./fileServer.js']
   ]
 }
 
