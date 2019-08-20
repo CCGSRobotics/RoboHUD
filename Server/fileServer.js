@@ -1,6 +1,6 @@
 const fs = require('fs');
 const net = require('net');
-let server = net.createServer()
+const server = net.createServer();
 
 server.on('connection', function(socket) {
   socket.on('data', function(data) {
@@ -15,7 +15,7 @@ server.on('connection', function(socket) {
       }
       console.log(`Saved the file as ${filename}.csv`);
     });
-  })
-})
+  });
+});
 
 server.listen(5004, '');
