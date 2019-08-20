@@ -5,15 +5,33 @@ const net = require('net');
 const client = new net.Socket();
 
 /**
+ * Parses the header of a given table
+ * @param {Array} table 
+ * @returns {String} The header of the specified table
+ */
+function parseDynamixelHeader(table) {
+  let build = '';
+  for (let col = 0; col < table.length; col++) {
+    build += table[col][0];
+    if (col < table.length - 1) {
+      build += ', ';
+    } else {
+      build += '\n';
+    }
+  }
+  return build;
+}
+
+/**
  * Parses all elements in a given Dynamixel table and converts them to CSV
  * @param {Object} table The table returned when executing parsetable
  * @param {Boolean} includeHeader If the CSV should include headings - use
  * false if this is not the top item in the table
  * @return {String} A string of CSV data with the control table
  */
-function parseDynamixelTable(table, includeHeader) {
+function parseDynamixelTable(table) {
   let build = '';
-  for (let i = includeHeader? 0 : 1; i < table[0].length; i++) {
+  for (let i = 1; i < table[0].length; i++) {
     for (let x = 0; x < table.length; x++) {
       build += table[x][i];
       if (x < table.length - 1) {
@@ -28,11 +46,12 @@ function parseDynamixelTable(table, includeHeader) {
 }
 
 function getFile() {
-  const link = document.getElementById('url').value;
+  const url = document.getElementById('url').value;
   const re = /^https?:\/\/emanual\.robotis\.com\/docs\/en\/dxl\/[a-z0-9]+\/[a-z0-9]+-?[a-z0-9]+/
-  const res = link.match(re)
+  const res = url.match(re)
   if (res !== null && res !== undefined) {
-    console.log(`Extracted URL as ${res[0]}`);
+    const link = res[0];
+    console.log(`Extracted URL as ${link}`);
     rp(link)
       .then(function(html) {
         console.log('Successfully downloaded the site!');
@@ -51,8 +70,9 @@ function getFile() {
         const EEPROMtable = $('table').eq(1).parsetable(true, true, true);
         const RAMtable = $('table').eq(2).parsetable(true, true, true);
         let fileData = '';
-        fileData += parseDynamixelTable(EEPROMtable, true);
-        fileData += parseDynamixelTable(RAMtable, false);
+        fileData += parseDynamixelHeader(EEPROMtable);
+        fileData += parseDynamixelTable(EEPROMtable);
+        fileData += parseDynamixelTable(RAMtable);
         const linkPieces = link.split('/');
         if (linkPieces[linkPieces.length - 1] == '') {
           linkPieces.pop(linkPieces.length - 1);
