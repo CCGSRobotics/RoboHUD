@@ -9,10 +9,11 @@
 <body>
   <p id="invalid_url" style="display: none">Invalid URL!</p>
   <div class="container">
-    <form onsubmit="getFile()">
+    <form>
       <input type="text" id="url"></input>
-      <button type="submit" id="submit">Go!</button>
     </form>
+    <button id="download" onclick="getFile()">Download the file!</button>
+    <button id="upload" onclick="uploadFile()" style="display: none"></button>
   </div>
 </body>
 </html>
