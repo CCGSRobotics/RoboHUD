@@ -99,10 +99,11 @@ function getFile() {
         console.log('Done!');
       })
       .catch(function(err) {
-        console.error('An error has occured!');
-        console.error('Check that you have an active internet connection');
-        console.error('Additionally, check that you are able to access sites');
-        console.error(err);
+        console.error('An error has occured!' + '\n' +
+        'Check that you have an active internet connection' + '\n' +
+        'Additionally, check that you are able to access sites' + '\n' +
+        'This may be due to you being connected to the robot' + '\n' +
+        `Recieved error: \n${err}`);
     });
   } else {
     console.error('It seems that your URL is invalid!');
