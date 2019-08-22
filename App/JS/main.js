@@ -1,5 +1,6 @@
 const dgram = require('dgram');
 const socket = new dgram.createSocket('udp4');
+const fs = require('fs');
 
 // Note: this should be made part of the settings later
 const defaultPort = 5001;
@@ -28,4 +29,53 @@ function sendData(data, port = defaultPort, ip = defaultIP) {
   }
 }
 
+/**
+ * A class representing a single Dynamixel servo
+ */
+class Dynamixel {
+  /**
+   *
+   * @param {String} model The model name of the Dynamixel
+   * @param {Number} id The ID of the Dynamixel
+   * @param {Number} protocol The protocol used, either 1 or 2
+   */
+  constructor(model, id, protocol) {
+    this.model = model;
+    this.id = id;
+    this.protocol = protocol;
+
+    const path = `./App/JS/Resources/Servos/${model}.csv`;
+    fs.readFile(path, (err, data) => {
+      if (err) {
+        if (err.code === 'ENOENT') {
+          console.error(`The file at path ${path} does not exist!`);
+          return;
+        }
+
+        throw err;
+      }
+
+      this.controlTable = {};
+
+      const fileData = data.toString().split('\n');
+      const headings = fileData[0].split(', ');
+
+      for (let line = 1; line < fileData.length; line++) {
+        const columns = fileData[line].split(', ');
+        const index = columns[2];
+        this.controlTable[index] = {};
+        console.log(columns);
+
+        for (let col = 0; col < columns.length; col++) {
+          if (col !== 2) {
+            console.log(columns[col]);
+            this.controlTable[index][headings[col]] = columns[col];
+          }
+        }
+      }
+    });
+  }
+}
+
 module.exports.sendData = sendData;
+module.exports.Dynamixel = Dynamixel;
