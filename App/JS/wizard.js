@@ -1,1 +1,1 @@
-const { sendData } = require('./JS/main.js')
+const { sendData, Dynamixel } = require('./JS/main.js');
