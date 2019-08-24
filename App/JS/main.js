@@ -57,7 +57,9 @@ class Dynamixel {
 
       this.controlTable = {};
 
-      const fileData = data.toString().split('\n');
+      const fileData = data.toString().split('\n').filter(function(element) {
+        return element !== '';
+      });
       this.controlTableFile = fileData;
       const headings = fileData[0].split(', ');
 
@@ -65,11 +67,9 @@ class Dynamixel {
         const columns = fileData[line].split(', ');
         const index = columns[2];
         this.controlTable[index] = {};
-        console.log(columns);
 
         for (let col = 0; col < columns.length; col++) {
           if (col !== 2) {
-            console.log(columns[col]);
             this.controlTable[index][headings[col]] = columns[col];
           }
         }

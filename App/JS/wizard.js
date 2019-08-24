@@ -1,5 +1,9 @@
 const { sendData, Dynamixel } = require('./JS/main.js');
 
+function createModifier(item) {
+  console.log(item);
+}
+
 function createRow(items, colTag) {
   let parent = document.createElement('tr');
 
@@ -26,6 +30,8 @@ function createTable(servo) {
   table.appendChild(createRow(headings, 'th'));
 
   for (let line = 1; line < csv.length; line++) {
-    table.appendChild(createRow(csv[line].split(', '), 'td'));
+    let row = createRow(csv[line].split(', '), 'td');
+    console.log(csv[line].split(', '))
+    table.appendChild(row);
   }
 }
