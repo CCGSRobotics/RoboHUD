@@ -58,6 +58,7 @@ class Dynamixel {
       this.controlTable = {};
 
       const fileData = data.toString().split('\n');
+      this.controlTableFile = fileData;
       const headings = fileData[0].split(', ');
 
       for (let line = 1; line < fileData.length; line++) {
