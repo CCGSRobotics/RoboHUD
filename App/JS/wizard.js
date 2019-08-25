@@ -1,7 +1,26 @@
 const { sendData, Dynamixel } = require('./JS/main.js');
 
-function createModifier(item) {
-  console.log(item);
+function createModifier(name, id, data) {
+  if (data['Access'].includes('W')) {
+    const input = document.createElement('input');
+
+    input.type = 'number';
+    input.value = data['InitialValue'];
+    input.addEventListener('change', function(event) {
+      sendData(`(modify)-${id}-${name}-${event.target.value}`);
+    })
+    
+    if (data.hasOwnProperty('Min')) {
+      input.min = data['Min'];
+    }
+    if (data.hasOwnProperty('Max')) {
+      input.max = data['Max'];
+    }
+
+    return input;
+  }
+
+  return null;
 }
 
 function createRow(items, colTag) {
@@ -31,7 +50,14 @@ function createTable(servo) {
 
   for (let line = 1; line < csv.length; line++) {
     let row = createRow(csv[line].split(', '), 'td');
-    console.log(csv[line].split(', '))
+
+    const name = csv[line].split(', ')[2]
+    const data = servo.controlTable[name];
+    const modifier = createModifier(name, servo.id, data);
+    if (modifier !== null) {
+      row.appendChild(modifier);
+    }
+
     table.appendChild(row);
   }
 }
