@@ -141,7 +141,7 @@ class Dynamixel:
                         return str(PROTOCOL_ONE.read1ByteTxRx(PORT_HANDLER, self.dynamixel_id,\
                              self.query(name, 'Address'))[0])
                     return str(PROTOCOL_TWO.read1ByteTxRx(PORT_HANDLER, self.dynamixel_id,\
-                            self.query(name, 'Address')))
+                            self.query(name, 'Address'))[0])
                 except TERMIOS_ERROR as err:
                     print('An error occured when reading from Dynamixel {}'\
                         .format(self.dynamixel_id))
