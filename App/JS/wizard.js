@@ -101,3 +101,15 @@ function initialiseTable(servo) {
     sendData(`(read)-${servo.id}-Present Position`);
   }, 100)
 }
+
+function openTable() {
+  const model = document.getElementById('model').value;
+  const id = document.getElementById('id').value;
+  const protocol = document.getElementById('protocol').value;
+
+  const dyn = new Dynamixel(model, id, protocol);
+  setTimeout(function() {
+    initialiseTable(dyn);
+    document.getElementById('select').style.display = 'none';
+  }, 50)
+}
