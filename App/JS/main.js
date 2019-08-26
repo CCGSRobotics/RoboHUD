@@ -74,7 +74,45 @@ class Dynamixel {
           }
         }
       }
+
+      sendData(`(init)-${model}-${id}-${protocol}`);
+      this.mode = 'joint';
     });
+  }
+
+  /**
+   * Sets the dynamixel to the specified mode
+   * @param {String} mode The mode to set to, either wheel or joint
+   */
+  setMode(mode) {
+    sendData(`(mode)-${this.id}-${mode}`);
+    this.mode = mode;
+  }
+
+  /**
+   * Moves the servo to the specified position at a certain speed.
+   *  If the servo is a wheel, position is ignored and the servo
+   *   moves at the specified speed
+   * @param {Number} percentage The percentage of maximum speed
+   * @param {Number} position The target position of the servo
+   */
+  move(percentage = 0, position = 9999) {
+    let value = 1023;
+
+    if (percentage < 0) {
+      value *= -1 * (percentage / 100);
+      value += 1024;
+    } else {
+      value *= (percentage / 100);
+    }
+
+    value = Math.round(value);
+
+    if (this.mode == 'joint') {
+      sendData(`${this.id}-${position}-${value}`);
+    } else {
+      sendData(`${this.id}-${value}`);
+    }
   }
 }
 
