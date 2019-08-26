@@ -1,4 +1,14 @@
-eslint:
-  enabled: true
-  config:
-    config: Scripts/.eslintrc.json
+version: "2"
+plugins:
+  eslint:
+    enabled: true
+    config:
+      config: Scripts/.eslintrc.json
+  bandit:
+    enabled: true
+  cppcheck:
+    enabled: true
+  csslint:
+    enabled: true
+  git.legal:
+    enabled: true
