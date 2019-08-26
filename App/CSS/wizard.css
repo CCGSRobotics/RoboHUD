@@ -1,0 +1,13 @@
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+td, th, table {
+  border: 1px solid black;
+}
+
+table {
+  border-collapse: collapse;
+}

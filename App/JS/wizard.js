@@ -41,7 +41,6 @@ function createRow(items, colTag) {
   let item;
   for (let col = 0; col < items.length; col++) {
     item = document.createElement(colTag);
-    item.style.border = '1px solid black';
     item.innerHTML = items[col];
     parent.appendChild(item);
   }
@@ -53,8 +52,6 @@ function createTable(servo) {
   const csv = servo.controlTableFile;
   
   let table = document.getElementById('control_table');
-  table.style.border = '1px solid black';
-  table.style.borderCollapse = 'collapse';
   let headings = csv[0].split(', ');
   headings.push('Current Value');
   headings.push('Modify');
@@ -100,7 +97,7 @@ function initialiseTable(servo) {
 
   server.bind(5003);
 
-  // setInterval(function() {
-  //   sendData(`(read)-${servo.id}-Present Position`);
-  // }, 50)
+  setInterval(function() {
+    sendData(`(read)-${servo.id}-Present Position`);
+  }, 100)
 }
