@@ -1,4 +1,4 @@
-const { sendData, Dynamixel } = require('./JS/main.js');
+const {sendData, Dynamixel} = require('./JS/main.js');
 const dgram = require('dgram');
 const server = dgram.createSocket('udp4');
 
@@ -12,6 +12,13 @@ server.on('listening', () => {
   console.log(`server listening ${address.address}:${address.port}`);
 });
 
+/**
+ * Creates a number input field for a given row if the address is writable
+ * @param {String} name The name of the row in the control table
+ * @param {Number} id The ID of the servo
+ * @param {Object} data The control table row for the data being modified
+ * @return {Node} The corresponding input element
+ */
 function createModifier(name, id, data) {
   if (data['Access'].includes('W')) {
     const input = document.createElement('input');
@@ -20,8 +27,8 @@ function createModifier(name, id, data) {
     input.value = data['InitialValue'];
     input.addEventListener('change', function(event) {
       sendData(`(modify)-${id}-${name}-${event.target.value}`);
-    })
-    
+    });
+
     if (data.hasOwnProperty('Min')) {
       input.min = data['Min'];
     }
@@ -35,8 +42,14 @@ function createModifier(name, id, data) {
   return null;
 }
 
+/**
+ * Creates a row populated with the given columns
+ * @param {Array} items The items in the row
+ * @param {String} colTag The tag type of each column's element
+ * @return {Node} The corresponding row
+ */
 function createRow(items, colTag) {
-  let parent = document.createElement('tr');
+  const parent = document.createElement('tr');
 
   let item;
   for (let col = 0; col < items.length; col++) {
@@ -48,20 +61,24 @@ function createRow(items, colTag) {
   return parent;
 }
 
+/**
+ * Creates an HTML table for the control table of a given servo
+ * @param {Dynamixel} servo The {@link Dynamixel} servo to be displayed
+ */
 function createTable(servo) {
   const csv = servo.controlTableFile;
-  
-  let table = document.getElementById('control_table');
-  let headings = csv[0].split(', ');
+
+  const table = document.getElementById('control_table');
+  const headings = csv[0].split(', ');
   headings.push('Current Value');
   headings.push('Modify');
 
   table.appendChild(createRow(headings, 'th'));
 
   for (let line = 1; line < csv.length; line++) {
-    let row = createRow(csv[line].split(', '), 'td');
-    
-    const name = csv[line].split(', ')[2]
+    const row = createRow(csv[line].split(', '), 'td');
+
+    const name = csv[line].split(', ')[2];
     const data = servo.controlTable[name];
 
     const value = document.createElement('td');
@@ -78,8 +95,12 @@ function createTable(servo) {
   }
 }
 
+/**
+ * Initialises a given servo and displays its control table
+ * @param {Dynamixel} servo The {@link Dynamixel} servo to read/write from
+ */
 function initialiseTable(servo) {
-  sendData(`(init)-${servo.model}-${servo.id}-${servo.protocol}`)
+  sendData(`(init)-${servo.model}-${servo.id}-${servo.protocol}`);
   createTable(servo);
 
   server.on('message', (msg, rinfo) => {
@@ -90,7 +111,7 @@ function initialiseTable(servo) {
     // console.log(name, value)
     const element = document.getElementById(`${name} Value`);
     if (element == null || element == undefined) {
-      console.log(name)
+      console.log(name);
     }
     element.innerHTML = value;
   });
@@ -99,9 +120,12 @@ function initialiseTable(servo) {
 
   setInterval(function() {
     sendData(`(read)-${servo.id}-Present Position`);
-  }, 100)
+  }, 100);
 }
 
+/**
+ * Creates and initialises a {@link Dynamixel} servo using input from HTML
+ */
 function openTable() {
   const model = document.getElementById('model').value;
   const id = document.getElementById('id').value;
@@ -111,5 +135,5 @@ function openTable() {
   setTimeout(function() {
     initialiseTable(dyn);
     document.getElementById('select').style.display = 'none';
-  }, 50)
+  }, 50);
 }
