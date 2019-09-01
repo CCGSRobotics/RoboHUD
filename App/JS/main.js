@@ -1,4 +1,7 @@
 const dgram = require('dgram');
+// ESLint does not like that dgram is lowercase, but there is nothg that can
+// be done about it, so the line must be ignored
+// eslint-disable-next-line new-cap
 const socket = new dgram.createSocket('udp4');
 const fs = require('fs');
 
@@ -116,5 +119,61 @@ class Dynamixel {
   }
 }
 
+/**
+ * @class Robot
+ * @classdesc A class representing a whole robot
+ */
+class Robot {
+  /**
+   *
+   * @param {Object} servos A list of every servo in the robot with
+   * their associated objects and configuration
+   */
+  constructor(servos) {
+    this.servos = {};
+    this.groups = {};
+    this.options = {};
+
+    for (const index in servos) {
+      if (typeof(index) === 'number') {
+        const servo = servos[index];
+        console.log(servo);
+        const dyn = servo['object'];
+        const id = dyn.id;
+        this.servos[id] = dyn;
+
+        if (servo.hasOwnProperty('group')) {
+          if (this.groups.hasOwnProperty(servo['group'])) {
+            this.groups[servo['group']].push(id);
+          } else {
+            this.groups[servo['group']] = [id];
+          }
+        }
+      }
+    }
+  }
+
+  /**
+   * Moves all servos in a group to the specified values
+   * @param {String} group The group of servos to move
+   * @param {Number} [percentage = 0] The percentage of maximum speed to move at
+   * @param {Number} [position = 9999] The target position
+   */
+  moveGroup(group, percentage = 0, position = 9999) {
+    if (!this.groups.hasOwnProperty(group)) {
+      console.error('Invalid group!');
+      return;
+    }
+
+    for (const item in this.groups[group]) {
+      if (typeof(item) === 'number') {
+        const index = this.groups[group][item];
+        this.servos[index].move(percentage, position);
+      }
+    }
+  }
+}
+
 module.exports.sendData = sendData;
 module.exports.Dynamixel = Dynamixel;
+module.exports.Robot = Robot;
