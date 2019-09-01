@@ -135,9 +135,8 @@ class Robot {
     this.options = {};
 
     for (const index in servos) {
-      if (typeof(index) === 'number') {
+      if (typeof(index) === 'number' || typeof(index) == 'string') {
         const servo = servos[index];
-        console.log(servo);
         const dyn = servo['object'];
         const id = dyn.id;
         this.servos[id] = dyn;
@@ -149,6 +148,9 @@ class Robot {
             this.groups[servo['group']] = [id];
           }
         }
+      } else {
+        console.error('The type of each index should be Number or String, ' +
+        `but got ${typeof(index)} (${index})`);
       }
     }
   }
@@ -166,9 +168,12 @@ class Robot {
     }
 
     for (const item in this.groups[group]) {
-      if (typeof(item) === 'number') {
+      if (typeof(item) === 'number' || typeof(item) == 'string') {
         const index = this.groups[group][item];
         this.servos[index].move(percentage, position);
+      } else {
+        console.error('The type of each item should be Number or String, ' +
+        `but got ${typeof(item)} (${item})`);
       }
     }
   }
