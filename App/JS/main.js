@@ -1,5 +1,5 @@
 const dgram = require('dgram');
-// ESLint does not like that dgram is lowercase, but there is nothg that can
+// ESLint does not like that dgram is lowercase, but there is nothing that can
 // be done about it, so the line must be ignored
 // eslint-disable-next-line new-cap
 const socket = new dgram.createSocket('udp4');
@@ -99,7 +99,7 @@ class Dynamixel {
    * @param {Number} percentage The percentage of maximum speed
    * @param {Number} position The target position of the servo
    */
-  move(percentage = 0, position = 9999) {
+  move(percentage = 50, position = 0) {
     let value = 1023;
 
     if (percentage < 0) {
@@ -158,10 +158,10 @@ class Robot {
   /**
    * Moves all servos in a group to the specified values
    * @param {String} group The group of servos to move
-   * @param {Number} [percentage = 0] The percentage of maximum speed to move at
-   * @param {Number} [position = 9999] The target position
+   * @param {Number} [percentage = 50] The percentage of maximum speed to move at
+   * @param {Number} [position = 0] The target position
    */
-  moveGroup(group, percentage = 0, position = 9999) {
+  moveGroup(group, percentage = 50, position = 0) {
     if (!this.groups.hasOwnProperty(group)) {
       console.error('Invalid group!');
       return;
@@ -170,7 +170,11 @@ class Robot {
     for (const item in this.groups[group]) {
       if (typeof(item) === 'number' || typeof(item) == 'string') {
         const index = this.groups[group][item];
-        this.servos[index].move(percentage, position);
+        if (typeof(index) == 'string') {
+          this.moveGroup(index, percentage, position)
+        } else {
+          this.servos[index].move(percentage, position); 
+        }
       } else {
         console.error('The type of each item should be Number or String, ' +
         `but got ${typeof(item)} (${item})`);
