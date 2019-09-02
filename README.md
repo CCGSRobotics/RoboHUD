@@ -3,7 +3,7 @@
 ![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/CCGSRobotics/RoboHUD)
 # RoboHUD GUI
 
-Documented thoroughly at https://robohud-docs.readthedocs.io [WIP]
+Documented thoroughly at https://robohud.readthedocs.io [WIP]
 
 The RoboHUD software is a program designed by the CCGS King's Legacy robotics team in order to have a simple GUI for the drivers of the robot that can be customised completely through a JSON file.
 
