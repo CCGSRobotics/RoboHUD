@@ -2,18 +2,7 @@ long CurrentTime;
 long ElapsedTime;
 long PreviousTime;
 
-//add new sensors here and change to false or true depending on whether it is being used or not
-char CO2_state = true;
-char temperature_state = false;
 
-// The sensor objects are then created, set-up and added to the list of sensors.
-// Add to list if a new sensor is added, with an assigned letter
-Sensor co2_sensor("CO2 Sensor", 1, CO2_state, 'c');
-Sensor temperature_sensor("Temperature Sensor", 2, temperature_state, 't');
-
-// list of sensors here
-Sensor sensor_list[] = {co2_sensor, temperature_sensor};
-int sensor_count = 2;
 
 
 // A "Sensor" object allows the arduino to run much more effeciently.
@@ -29,6 +18,19 @@ class Sensor {
       }
       
 };
+
+//add new sensors here and change to false or true depending on whether it is being used or not
+char CO2_state = true;
+char temperature_state = false;
+
+// The sensor objects are then created, set-up and added to the list of sensors.
+// Add to list if a new sensor is added, with an assigned letter
+Sensor co2_sensor("CO2 Sensor", 1, CO2_state, 'c');
+Sensor temperature_sensor("Temperature Sensor", 2, temperature_state, 't');
+
+// list of sensors here
+Sensor sensor_list[] = {co2_sensor, temperature_sensor};
+int sensor_count = 2;
 
 
 void setup() {
@@ -72,3 +74,12 @@ void loop() {
         
     delay(1); 
 }
+
+//void updateSensors(){
+  //std::vector<int> sensor_list[];
+  //for (int i = 0; i <= sensor_count; i++) {
+      //sensor_list.push_back("NewSensor");  
+  //}
+  
+//}
+
