@@ -1,0 +1,36 @@
+Address, Size(Byte), Data Name, Description, Access, InitialValue
+0, 2, Model Number, Model Number, R, 29
+2, 1, Firmware Version, Firmware Version, R, -
+3, 1, ID, DYNAMIXEL ID, RW, 1
+4, 1, Baud Rate, Communication Speed, RW, 34
+5, 1, Return Delay Time, Response Delay Time, RW, 250
+6, 2, CW Angle Limit, Clockwise Angle Limit, RW, 0
+8, 2, CCW Angle Limit, Counter-Clockwise Angle Limit, RW, 4095
+11, 1, Temperature Limit, Maximum Internal Temperature Limit, RW, 80
+12, 1, Min Voltage Limit, Minimum Input Voltage Limit, RW, 60
+13, 1, Max Voltage Limit, Maximum Input Voltage Limit, RW, 160
+14, 2, Max Torque, Maximun Torque, RW, 1023
+16, 1, Status Return Level, Select Types of Status Return, RW, 2
+17, 1, Alarm LED, LED for Alarm, RW, 36
+18, 1, Shutdown, Shutdown Error Information, RW, 36
+20, 2, Multi Turn Offset, Adjust Position with Offset, RW, 0
+22, 1, Resolution Divider, Divider for Position Resolution, RW, 1
+24, 1, Torque Enable, Motor Torque On/Off, RW, 0
+25, 1, LED, Status LED On/Off, RW, 0
+26, 1, D Gain, Derivative Gain, RW, 0
+27, 1, I Gain, Integral Gain, RW, 0
+28, 1, P Gain, Proportional Gain, RW, 32
+30, 2, Goal Position, Desired Position, RW, -
+32, 2, Moving Speed, Moving Speed(Moving Velocity), RW, -
+34, 2, Torque Limit, Torque Limit(Goal Torque), RW, ADD 14&15
+36, 2, Present Position, Present Position, R, -
+38, 2, Present Speed, Present Speed, R, -
+40, 2, Present Load, Present Load, R, -
+42, 1, Present Voltage, Present Voltage, R, -
+43, 1, Present Temperature, Present Temperature, R, -
+44, 1, Registered, If Instruction is registered, R, 0
+46, 1, Moving, Movement Status, R, 0
+47, 1, Lock, Locking EEPROM, RW, 0
+48, 2, Punch, Minimum Current Threshold, RW, 0
+50, 2, Realtime Tick, Count Time in millisecond, R, 0
+73, 1, Goal Acceleration, Goal Acceleration, RW, 0

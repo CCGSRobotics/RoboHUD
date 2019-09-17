@@ -70,6 +70,9 @@ class Dynamixel {
         const columns = fileData[line].split(', ');
         const index = columns[2];
         this.controlTable[index] = {};
+        if (headings.includes('InitialValue')) {
+          this.controlTable[index].Value = columns[headings.indexOf('InitialValue')];
+        }
 
         for (let col = 0; col < columns.length; col++) {
           if (col !== 2) {
@@ -81,6 +84,9 @@ class Dynamixel {
       sendData(`(init)-${model}-${id}-${protocol}`);
       this.mode = 'joint';
     });
+
+    this.minPos = 0;
+    this.maxPos = 1023;
   }
 
   /**
@@ -97,7 +103,7 @@ class Dynamixel {
    *  If the servo is a wheel, position is ignored and the servo
    *   moves at the specified speed
    * @param {Number} percentage The percentage of maximum speed
-   * @param {Number} position The target position of the servo
+   * @param {Number} position The percentage of the servo position
    */
   move(percentage = 50, position = 0) {
     let value = 1023;
@@ -110,7 +116,17 @@ class Dynamixel {
     }
 
     value = Math.round(value);
+    
+    position = Math.round(position / 100 * this.maxPos);
 
+    if (position < this.minPos) {
+      position = this.minPos;
+    }
+
+    if (position > this.maxPos) {
+      position = this.maxPos;
+    }
+    
     if (this.mode == 'joint') {
       sendData(`${this.id}-${position}-${value}`);
     } else {
@@ -148,18 +164,55 @@ class Robot {
             this.groups[servo['group']] = [id];
           }
         }
+
+        this.addConstraint('minPos', servo, id);
+        this.addConstraint('maxPos', servo, id);
       } else {
         console.error('The type of each index should be Number or String, ' +
         `but got ${typeof(index)} (${index})`);
       }
+    }
+
+    this.server = dgram.createSocket('udp4');
+
+    this.server.on('error', (err) => {
+      console.log(`Server error:\n${err.stack}`);
+      this.server.close();
+    });
+
+    this.server.on('listening', () => {
+      const address = this.server.address();
+      console.log(`Server listening at ${address.address}:${address.port}`);
+    });
+
+    this.server.on('message', (msg, rinfo) => {
+      msg = String(msg).split(':');
+      const id = parseInt(msg[0]);
+      const name = msg[1];
+      const value = parseInt(msg[2]);
+
+      if (this.servos.hasOwnProperty(id)) {
+        this.servos[id].controlTable[name].Value = value;
+      } else {
+        console.log(msg)
+        console.log(id, name, value)
+      }
+    });
+
+    this.server.bind(5003);
+  }
+
+  addConstraint(index, servo, id) {
+    if (servo.hasOwnProperty(index)) {
+      this.servos[id][index] = servo[index] - 1;
     }
   }
 
   /**
    * Moves all servos in a group to the specified values
    * @param {String} group The group of servos to move
-   * @param {Number} [percentage = 50] The percentage of maximum speed to move at
-   * @param {Number} [position = 0] The target position
+   * @param {Number} [percentage = 50] The percentage speed to move at
+   * @param {Number} [position = 0] The percentage position to move to
    */
   moveGroup(group, percentage = 50, position = 0) {
     if (!this.groups.hasOwnProperty(group)) {
@@ -171,9 +224,9 @@ class Robot {
       if (typeof(item) === 'number' || typeof(item) == 'string') {
         const index = this.groups[group][item];
         if (typeof(index) == 'string') {
-          this.moveGroup(index, percentage, position)
+          this.moveGroup(index, percentage, position);
         } else {
-          this.servos[index].move(percentage, position); 
+          this.servos[index].move(percentage, position);
         }
       } else {
         console.error('The type of each item should be Number or String, ' +
