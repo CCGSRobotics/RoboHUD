@@ -42,7 +42,7 @@ function parseDynamixelTable(table) {
   let build = '';
   for (let i = 1; i < table[0].length; i++) {
     for (let x = 0; x < table.length; x++) {
-      build += table[x][i];
+      build += table[x][i].replace(',', '');
       if (x < table.length - 1) {
         build += ', ';
       }

@@ -42,7 +42,7 @@ class UDPHandler(socketserver.BaseRequestHandler):
             dynamixel_id, item = map(str, items[1:])
             dynamixel_id = int(dynamixel_id)
             if dynamixel_id in SERVOS:
-                msg = "{}:{}".format(item, SERVOS[dynamixel_id].read_value(item))
+                msg = "{}:{}:{}".format(dynamixel_id, item, SERVOS[dynamixel_id].read_value(item))
                 msg = bytes(msg, 'utf-8')
                 SOCK.sendto(msg, (str(self.client_address[0]), 5003))
         elif cmd == "mode":
