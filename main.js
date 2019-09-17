@@ -12,6 +12,7 @@ function createWindow() {
   win = new BrowserWindow({
     width: 1600,
     height: 1200,
+    icon: 'Assets/icon.png',
   });
   win.loadFile('App/wizard.html');
   win.webContents.openDevTools();
