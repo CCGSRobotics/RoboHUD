@@ -102,6 +102,12 @@ const template = [
         },
       },
       {
+        label: 'Create New Robot',
+        click() {
+          win.loadFile('App/robot.html');
+        },
+      },
+      {
         label: 'Create New Servo',
         click() {
           win.loadFile('App/createServo.html');

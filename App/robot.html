@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Robot Creation</title>
+  <style>
+    td, th, table {
+      border: 1px solid black;
+    }
+
+    table {
+      border-collapse: collapse;
+    }
+  </style>
+</head>
+<body>
+  <table id="parent">
+    <tr>
+      <th>ID</th>
+      <th>Model</th>
+      <th>Protocol</th>
+      <th>Mode</th>
+      <th>Min</th>
+      <th>Max</th>
+      <th>Groups</th>
+      <th><button onclick="addRow()">+</button></th>
+      <th><button onclick="removeLastRow(2)">-</button></th>
+      <th><button onclick="resetLastRow()">↺</button></th>
+    </tr>
+  </table>
+</body>
+<script src="JS/robot.js"></script>
+</html>

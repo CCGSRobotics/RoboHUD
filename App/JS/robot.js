@@ -1,0 +1,139 @@
+const fs = require('fs');
+
+/**
+ * Creates a number input inside a <td>
+ * @param {String} id The ID of the input element
+ * @param {Number} min The minimum item in the range
+ * @param {Number} max The maximum item in the range
+ * @param {Number} value The initial value of the range
+ * @return {Node} A <td> element containing the <range> element
+ */
+function createRange(id, min, max, value) {
+  const parent = document.createElement('td');
+  const range = document.createElement('input');
+  range.setAttribute('type', 'number');
+  range.setAttribute('id', id);
+  range.setAttribute('min', min);
+  range.setAttribute('max', max);
+  range.setAttribute('value', value);
+
+  parent.appendChild(range);
+  return parent;
+}
+
+/**
+ * Creates a select box inside a <td>, with an item for every downloaded servo
+ * @param {Number} index The index of the row in the table (1-indexed)
+ * @return {Node} A <td> element containing the <select> element
+ */
+function createModel(index) {
+  const model = document.createElement('td');
+  const select = document.createElement('select');
+  select.setAttribute('id', `model-${index}`);
+  const servos = [];
+
+  fs.readdirSync('./App/JS/Resources/Servos/').forEach((file) => {
+    if (!servos.includes(file)) {
+      servos.push(file);
+    }
+  });
+
+  for (let i = 0; i < servos.length; ++i) {
+    const option = document.createElement('option');
+    option.setAttribute('value', servos[i]);
+    option.innerHTML = servos[i].split('.')[0];
+
+    select.appendChild(option);
+  }
+
+  model.appendChild(select);
+  return model;
+}
+
+/**
+ * Creates a <td> item with a radio button for every item in the array
+ * @param {String} name The "name" group the options are assigned to
+ * @param {Array} ids An array of IDs, one element for each radio button
+ * @param {Array} values An array of values, one element for each radio button
+ * @return {Node} A <td> element containing the radio buttons
+ */
+function createRadios(name, ids, values) {
+  const parent = document.createElement('td');
+  for (let i = 0; i < ids.length; ++i) {
+    const item = document.createElement('input');
+    item.setAttribute('type', 'radio');
+    item.setAttribute('id', ids[i]);
+    item.setAttribute('value', values[i]);
+    item.setAttribute('name', name);
+
+    const label = document.createElement('label');
+    label.setAttribute('for', ids[i]);
+    label.innerHTML = values[i];
+
+    parent.appendChild(item);
+    parent.appendChild(label);
+  }
+
+  return parent;
+}
+
+/**
+ * Creates an array of <td> elements that represent a row in the table
+ * @param {Number} index The index of the row in the table (1-indexed)
+ * @return {Array} An array of Nodes, each being a <td> element
+ */
+function createElements(index) {
+  const elements = [];
+  elements.push(createRange(`id-${index}`, 1, 250, 1));
+  elements.push(createModel(index));
+  const radios = createRadios('protocol', [`protocol1-${index}`,
+    `protocol2-${index}`], [1, 2]);
+  elements.push(radios);
+  const modes = createRadios('mode', [`wheel-${index}`,
+    `joint-${index}`], ['Wheel', 'Joint']);
+  elements.push(modes);
+  elements.push(createRange(`min-${index}`, 0, 1024, 0));
+  elements.push(createRange(`max-${index}`, 0, 1024, 1024));
+
+  return elements;
+}
+
+/**
+ * Adds a new row to the robot's servo table
+ */
+function addRow() {
+  const parent = document.getElementById('parent');
+  const row = document.createElement('tr');
+  const index = parent.childElementCount;
+  const children = createElements(index);
+
+  for (let i = 0; i < children.length; ++i) {
+    row.appendChild(children[i]);
+  }
+
+  parent.appendChild(row);
+}
+
+/**
+ * Removes the last row of the robot's servo table
+ * @param {Number} minRows The minimum number of rows that must remain
+ */
+function removeLastRow(minRows) {
+  const parent = document.getElementById('parent');
+  if (parent.childElementCount > minRows) {
+    parent.removeChild(parent.lastChild);
+  }
+}
+
+/**
+ * Resets the last row of robot's servo table
+ */
+function resetLastRow() { // eslint-disable-line no-unused-vars
+  const parent = document.getElementById('parent');
+  if (parent.childElementCount >= 2) {
+    removeLastRow(1);
+    addRow();
+  }
+}
+
+addRow();
