@@ -84,18 +84,44 @@ function createRadios(name, ids, values) {
  */
 function createElements(index) {
   const elements = [];
-  elements.push(createRange(`id-${index}`, 1, 250, 1));
+  elements.push(createRange(`id-${index}`, 1, 250, index));
   elements.push(createModel(index));
-  const radios = createRadios('protocol', [`protocol1-${index}`,
+  const radios = createRadios(`protocol-${index}`, [`protocol1-${index}`,
     `protocol2-${index}`], [1, 2]);
   elements.push(radios);
-  const modes = createRadios('mode', [`wheel-${index}`,
+  const modes = createRadios(`mode-${index}`, [`wheel-${index}`,
     `joint-${index}`], ['Wheel', 'Joint']);
   elements.push(modes);
   elements.push(createRange(`min-${index}`, 0, 1024, 0));
   elements.push(createRange(`max-${index}`, 0, 1024, 1024));
 
   return elements;
+}
+
+/**
+ * Sets the values of the inputs in the min and max column
+ * @param {Number} index The index of the row in the table (1-indexed)
+ * @param {Number} min The new value of the input in the min column
+ * @param {Number} max The new value of the input in the max column
+ */
+function setRangeValues(index, min, max) {
+  document.getElementById(`min-${index}`).value = min;
+  document.getElementById(`max-${index}`).value = max;
+}
+
+/**
+ * Updates the mode selection based on the values of the min and max inputs
+ * @param {Number} index The index of the row in the table (1-indexed)
+ */
+function onValueChange(index) {
+  const min = document.getElementById(`min-${index}`);
+  const max = document.getElementById(`max-${index}`);
+
+  if (min.value == 0 && max.value == 0) {
+    document.getElementById(`wheel-${index}`).checked = true;
+  } else {
+    document.getElementById(`joint-${index}`).checked = true;
+  }
 }
 
 /**
@@ -112,6 +138,24 @@ function addRow() {
   }
 
   parent.appendChild(row);
+  document.getElementById(`protocol1-${index}`).checked = true;
+  document.getElementById(`joint-${index}`).checked = true;
+
+  document.getElementById(`joint-${index}`).onchange = function() {
+    setRangeValues(index, 0, 1024);
+  };
+
+  document.getElementById(`wheel-${index}`).onchange = function() {
+    setRangeValues(index, 0, 0);
+  };
+
+  document.getElementById(`min-${index}`).onchange = function() {
+    onValueChange(index);
+  };
+
+  document.getElementById(`max-${index}`).onchange = function() {
+    onValueChange(index);
+  };
 }
 
 /**
