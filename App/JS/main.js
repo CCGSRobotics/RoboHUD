@@ -152,20 +152,22 @@ class Robot {
     for (const index in servos) {
       if (typeof(index) === 'number' || typeof(index) == 'string') {
         const servo = servos[index];
-        const dyn = servo['object'];
-        const id = dyn.id;
+        const id = servo.id;
+        const groups = [];
+        const dyn = new Dynamixel(servo.model, id, servo.protocol);
+        dyn.setMode(servo.mode);
+        dyn.minPos = servo.minPos;
+        dyn.maxPos = servo.maxPos;
+
         this.servos[id] = dyn;
 
-        if (servo.hasOwnProperty('group')) {
-          if (this.groups.hasOwnProperty(servo['group'])) {
-            this.groups[servo['group']].push(id);
+        for (let i = 0; i < groups.length; ++i) {
+          if (this.groups.hasOwnProperty(groups[i])) {
+            this.groups[groups[i]].push(id);
           } else {
-            this.groups[servo['group']] = [id];
+            this.groups[groups[i]] = [id];
           }
         }
-
-        this.addConstraint('minPos', servo, id);
-        this.addConstraint('maxPos', servo, id);
       } else {
         console.error('The type of each index should be Number or String, ' +
         `but got ${typeof(index)} (${index})`);
@@ -199,12 +201,6 @@ class Robot {
     });
 
     this.server.bind(5003);
-  }
-
-  addConstraint(index, servo, id) {
-    if (servo.hasOwnProperty(index)) {
-      this.servos[id][index] = servo[index];
-    }
   }
 
   /**

@@ -1,5 +1,4 @@
 const fs = require('fs');
-const {Dynamixel, Robot} = require('./JS/main.js');
 
 /**
  * Creates a number input inside a <td>
@@ -185,31 +184,55 @@ function resetLastRow() { // eslint-disable-line no-unused-vars
 
 /**
  * Creates a new robot from the user input
- * @return {Robot} A robot class representing the specified servos
+ * @return {Object} An object representing the configuration for each servo
  */
-function createRobot() { // eslint-disable-line no-unused-vars
+function createRobot() {
   const count = document.getElementById('parent').childElementCount;
   const servos = {};
   for (let i = 1; i < count; i++) {
     const model = document.getElementById(`model-${i}`).value;
-    const id = document.getElementById(`id-${i}`).value;
+    const id = parseInt(document.getElementById(`id-${i}`).value);
     let protocol = 1;
 
     if (document.getElementById(`protocol2-${i}`).checked) {
       protocol = 2;
     }
 
-    servos[id] = {};
-    servos[id]['object'] = new Dynamixel(model, id, protocol);
-    servos[id]['object'].minPos = document.getElementById(`min-${i}`).value;
-    servos[id]['object'].maxPos = document.getElementById(`max-${i}`).value;
+    const servo = {};
+    servo.model = model;
+    servo.id = id;
+    servo.protocol = protocol;
+    servo.minPos = parseInt(document.getElementById(`min-${i}`).value);
+    servo.maxPos = parseInt(document.getElementById(`max-${i}`).value);
 
     if (document.getElementById(`wheel-${i}`).checked) {
-      servos[id]['object'].setMode('wheel');
+      servo.mode = 'wheel';
+    } else {
+      servo.mode = 'joint';
     }
+    servo.groups = [];
+
+    servos[id] = servo;
   }
 
-  return new Robot(servos);
+  return servos;
+}
+
+/**
+ * Saves the output of createRobot() to a JSON file
+ */
+function saveRobot() { // eslint-disable-line no-unused-vars
+  const name = document.getElementById('name').value;
+  const config = JSON.stringify(createRobot());
+
+  fs.writeFile(`./App/JS/Resources/Robots/${name}.json`, config, function(err) {
+    if (err) {
+      console.error('Failed to write file! Do you have access?');
+      console.error(err);
+    } else {
+      console.log(`Saved the file as ${name}.json`);
+    }
+  });
 }
 
 addRow();
