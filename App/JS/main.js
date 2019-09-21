@@ -46,6 +46,9 @@ class Dynamixel {
     this.model = model;
     this.id = id;
     this.protocol = protocol;
+    this.mode = 'joint';
+    this.minPos = 0;
+    this.maxPos = 1023;
 
     const path = `./App/JS/Resources/Servos/${model}.csv`;
     fs.readFile(path, (err, data) => {
@@ -82,11 +85,7 @@ class Dynamixel {
       }
 
       sendData(`(init)-${model}-${id}-${protocol}`);
-      this.mode = 'joint';
     });
-
-    this.minPos = 0;
-    this.maxPos = 1023;
   }
 
   /**
@@ -116,7 +115,7 @@ class Dynamixel {
     }
 
     value = Math.round(value);
-    
+
     position = Math.round(position / 100 * this.maxPos);
 
     if (position < this.minPos) {
@@ -126,7 +125,7 @@ class Dynamixel {
     if (position > this.maxPos) {
       position = this.maxPos;
     }
-    
+
     if (this.mode == 'joint') {
       sendData(`${this.id}-${position}-${value}`);
     } else {
@@ -194,8 +193,8 @@ class Robot {
       if (this.servos.hasOwnProperty(id)) {
         this.servos[id].controlTable[name].Value = value;
       } else {
-        console.log(msg)
-        console.log(id, name, value)
+        console.log(msg);
+        console.log(id, name, value);
       }
     });
 
@@ -204,7 +203,7 @@ class Robot {
 
   addConstraint(index, servo, id) {
     if (servo.hasOwnProperty(index)) {
-      this.servos[id][index] = servo[index] - 1;
+      this.servos[id][index] = servo[index];
     }
   }
 

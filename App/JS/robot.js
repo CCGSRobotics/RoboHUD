@@ -1,4 +1,5 @@
 const fs = require('fs');
+const {Dynamixel, Robot} = require('./JS/main.js');
 
 /**
  * Creates a number input inside a <td>
@@ -40,7 +41,7 @@ function createModel(index) {
 
   for (let i = 0; i < servos.length; ++i) {
     const option = document.createElement('option');
-    option.setAttribute('value', servos[i]);
+    option.setAttribute('value', servos[i].split('.')[0]);
     option.innerHTML = servos[i].split('.')[0];
 
     select.appendChild(option);
@@ -59,6 +60,7 @@ function createModel(index) {
  */
 function createRadios(name, ids, values) {
   const parent = document.createElement('td');
+  parent.setAttribute('id', name);
   for (let i = 0; i < ids.length; ++i) {
     const item = document.createElement('input');
     item.setAttribute('type', 'radio');
@@ -131,6 +133,7 @@ function addRow() {
   const parent = document.getElementById('parent');
   const row = document.createElement('tr');
   const index = parent.childElementCount;
+  row.setAttribute('id', index);
   const children = createElements(index);
 
   for (let i = 0; i < children.length; ++i) {
@@ -178,6 +181,35 @@ function resetLastRow() { // eslint-disable-line no-unused-vars
     removeLastRow(1);
     addRow();
   }
+}
+
+/**
+ * Creates a new robot from the user input
+ * @return {Robot} A robot class representing the specified servos
+ */
+function createRobot() { // eslint-disable-line no-unused-vars
+  const count = document.getElementById('parent').childElementCount;
+  const servos = {};
+  for (let i = 1; i < count; i++) {
+    const model = document.getElementById(`model-${i}`).value;
+    const id = document.getElementById(`id-${i}`).value;
+    let protocol = 1;
+
+    if (document.getElementById(`protocol2-${i}`).checked) {
+      protocol = 2;
+    }
+
+    servos[id] = {};
+    servos[id]['object'] = new Dynamixel(model, id, protocol);
+    servos[id]['object'].minPos = document.getElementById(`min-${i}`).value;
+    servos[id]['object'].maxPos = document.getElementById(`max-${i}`).value;
+
+    if (document.getElementById(`wheel-${i}`).checked) {
+      servos[id]['object'].setMode('wheel');
+    }
+  }
+
+  return new Robot(servos);
 }
 
 addRow();
