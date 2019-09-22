@@ -144,35 +144,47 @@ class Robot {
    * @param {Object} servos A list of every servo in the robot with
    * their associated objects and configuration
    */
-  constructor(servos) {
-    this.servos = {};
-    this.groups = {};
-    this.options = {};
-
-    for (const index in servos) {
-      if (typeof(index) === 'number' || typeof(index) == 'string') {
-        const servo = servos[index];
-        const id = servo.id;
-        const groups = [];
-        const dyn = new Dynamixel(servo.model, id, servo.protocol);
-        dyn.setMode(servo.mode);
-        dyn.minPos = servo.minPos;
-        dyn.maxPos = servo.maxPos;
-
-        this.servos[id] = dyn;
-
-        for (let i = 0; i < groups.length; ++i) {
-          if (this.groups.hasOwnProperty(groups[i])) {
-            this.groups[groups[i]].push(id);
-          } else {
-            this.groups[groups[i]] = [id];
-          }
+  constructor(name) {
+    const path = `./App/JS/Resources/Robots/${name}.json`;
+    fs.readFile(path, (err, data) => {
+      if (err) {
+        if (err.code === 'ENOENT') {
+          console.error(`The file at path ${path} does not exist!`);
+          return;
         }
-      } else {
-        console.error('The type of each index should be Number or String, ' +
-        `but got ${typeof(index)} (${index})`);
+
+        throw err;
       }
-    }
+      const servos = JSON.parse(data);
+      this.servos = {};
+      this.groups = {};
+      this.options = {};
+
+      for (const index in servos) {
+        if (typeof(index) === 'number' || typeof(index) == 'string') {
+          const servo = servos[index];
+          const id = servo.id;
+          const groups = [];
+          const dyn = new Dynamixel(servo.model, id, servo.protocol);
+          dyn.setMode(servo.mode);
+          dyn.minPos = servo.minPos;
+          dyn.maxPos = servo.maxPos;
+
+          this.servos[id] = dyn;
+
+          for (let i = 0; i < groups.length; ++i) {
+            if (this.groups.hasOwnProperty(groups[i])) {
+              this.groups[groups[i]].push(id);
+            } else {
+              this.groups[groups[i]] = [id];
+            }
+          }
+        } else {
+          console.error('The type of each index should be Number or String, ' +
+          `but got ${typeof(index)} (${index})`);
+        }
+      }
+    });
 
     this.server = dgram.createSocket('udp4');
 
