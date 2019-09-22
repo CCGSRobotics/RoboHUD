@@ -140,8 +140,26 @@ function addRow() {
   }
 
   parent.appendChild(row);
-  document.getElementById(`protocol1-${index}`).checked = true;
-  document.getElementById(`joint-${index}`).checked = true;
+
+  if (index > 1) {
+    const model = document.getElementById(`model-${index - 1}`).value;
+    document.getElementById(`model-${index}`).value = model;
+
+    if (document.getElementById(`protocol1-${index - 1}`).checked) {
+      document.getElementById(`protocol1-${index}`).checked = true;
+    } else {
+      document.getElementById(`protocol2-${index}`).checked = true;
+    }
+
+    if (document.getElementById(`wheel-${index - 1}`).checked) {
+      document.getElementById(`wheel-${index}`).checked = true;
+    } else {
+      document.getElementById(`joint-${index}`).checked = true;
+    }
+  } else {
+    document.getElementById(`protocol1-${index}`).checked = true;
+    document.getElementById(`joint-${index}`).checked = true;
+  }
 
   document.getElementById(`joint-${index}`).onchange = function() {
     setRangeValues(index, 0, 1024);
