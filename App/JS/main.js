@@ -164,7 +164,7 @@ class Robot {
         if (typeof(index) === 'number' || typeof(index) == 'string') {
           const servo = servos[index];
           const id = servo.id;
-          const groups = [];
+          const groups = servo.groups;
           const dyn = new Dynamixel(servo.model, id, servo.protocol);
           dyn.setMode(servo.mode);
           dyn.minPos = servo.minPos;

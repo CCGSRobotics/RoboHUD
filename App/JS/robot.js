@@ -78,6 +78,81 @@ function createRadios(name, ids, values) {
   return parent;
 }
 
+function getGroups(index) {
+  const parent = document.getElementById(`groups-${index}`);
+  const nodes = parent.childNodes;
+  const groups = [];
+
+  for (let i = 0; i < nodes.length - 1; ++i) {
+    groups.push(nodes[i].id.split('-')[0])
+  }
+  return groups;
+}
+
+function removeGroup(index, group) {
+  document.getElementById(`${group}-${index}`).remove();
+}
+
+function createSingleGroup(index, group) {
+  const parent = document.createElement('span');
+  parent.class = group;
+  parent.id = `${group}-${index}`;
+
+  const label = document.createElement('label');
+  label.innerHTML = group;
+  parent.appendChild(label);
+
+  const button = document.createElement('button');
+  button.setAttribute('onclick', `removeGroup(${index}, "${group}")`);
+  button.innerHTML = '✖';
+  parent.appendChild(button);
+
+  const td = document.getElementById(`groups-${index}`);
+  td.insertBefore(parent, document.getElementById(`groupinput-${index}`));
+}
+
+function addGroup(event) {
+  if (event.code == 'Comma') { // It would be nice to make this customisable
+    const active = document.activeElement;
+    if (active.nodeName == 'INPUT' && active.type == 'text') {
+      const parts = active.id.split('-');
+      const type = parts[0];
+      const index = parts[1];
+
+      if (type == 'groupinput') {
+        if (!getGroups(index).includes(active.value)) {
+          createSingleGroup(index, active.value);
+          setTimeout(function() {
+            active.value = '';
+          }, 1);
+        }
+      }
+    }
+  }
+}
+
+function focusGroup(element) {
+  const index = element.id.split('-')[1];
+  document.addEventListener('keypress', addGroup);
+}
+
+function unfocusGroup(element) {
+  const index = element.id.split('-')[1];
+  document.removeEventListener('keypress', addGroup);
+}
+
+function createGroup(index) {
+  const parent = document.createElement('td');
+  parent.setAttribute('id', `groups-${index}`);
+  const input = document.createElement('input');
+  input.setAttribute('id', `groupinput-${index}`);
+  input.setAttribute('onfocusin', 'focusGroup(this)');
+  input.setAttribute('onfocusout', 'unfocusGroup(this)');
+
+  parent.appendChild(input);
+  return parent;
+}
+
 /**
  * Creates an array of <td> elements that represent a row in the table
  * @param {Number} index The index of the row in the table (1-indexed)
@@ -95,6 +170,7 @@ function createElements(index) {
   elements.push(modes);
   elements.push(createRange(`min-${index}`, 0, 1024, 0));
   elements.push(createRange(`max-${index}`, 0, 1024, 1024));
+  elements.push(createGroup(index));
 
   return elements;
 }
@@ -228,7 +304,7 @@ function createRobot() {
     } else {
       servo.mode = 'joint';
     }
-    servo.groups = [];
+    servo.groups = getGroups(i);
 
     servos[id] = servo;
   }
