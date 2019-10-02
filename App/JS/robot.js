@@ -130,20 +130,31 @@ function createSingleGroup(index, group) {
  * Adds a new group if there is not one already
  * @param {Object} event The keydown event
  */
-function addGroup(event) {
-  if (event.code == 'Comma') { // It would be nice to make this customisable
-    const active = document.activeElement;
-    if (active.nodeName == 'INPUT' && active.type == 'text') {
-      const parts = active.id.split('-');
-      const type = parts[0];
-      const index = parts[1];
+function callKey(event) {
+  const active = document.activeElement;
+  if (active.nodeName == 'INPUT' && active.type == 'text') {
+    const parts = active.id.split('-');
+    const type = parts[0];
+    const index = parts[1];
 
-      if (type == 'groupinput') {
-        if (!getGroups(index).includes(active.value)) {
+    if (type == 'groupinput') {
+      const groups = getGroups(index);
+      if (event.key == ',' || event.key == ' ' || event.key == 'Enter') {
+        if (!groups.includes(active.value) && active.value != '') {
           createSingleGroup(index, active.value);
           setTimeout(function() {
             active.value = '';
           }, 1);
+        }
+      } else if (event.key == 'Backspace') {
+        if (groups.length > 0) {
+          if (active.value == '' || event.ctrlKey) {
+            const last = groups[groups.length - 1]
+            removeGroup(index, last);
+            setTimeout(function() {
+              active.value = last;
+            }, 1);
+          }
         }
       }
     }
@@ -151,17 +162,17 @@ function addGroup(event) {
 }
 
 /**
- * Adds the addGroup function as a keypress listener
+ * Adds the callKey function as a keydown listener
  */
 function focusGroup() { // eslint-disable-line no-unused-vars
-  document.addEventListener('keypress', addGroup);
+  document.addEventListener('keydown', callKey);
 }
 
 /**
- * Removes the addGroup function as a keypress listener
+ * Removes the callKey function as a keydown listener
  */
 function unfocusGroup() { // eslint-disable-line no-unused-vars
-  document.removeEventListener('keypress', addGroup);
+  document.removeEventListener('keydown', callKey);
 }
 
 /**
