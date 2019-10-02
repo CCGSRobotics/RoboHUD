@@ -78,21 +78,36 @@ function createRadios(name, ids, values) {
   return parent;
 }
 
+/**
+ * Returns the list of groups for a servo at the specified index
+ * @param {Number} index The index of the row
+ * @return {Array} The list of groups
+ */
 function getGroups(index) {
   const parent = document.getElementById(`groups-${index}`);
   const nodes = parent.childNodes;
   const groups = [];
 
   for (let i = 0; i < nodes.length - 1; ++i) {
-    groups.push(nodes[i].id.split('-')[0])
+    groups.push(nodes[i].id.split('-')[0]);
   }
   return groups;
 }
 
-function removeGroup(index, group) {
+/**
+ * Removes a group in a specified row
+ * @param {Number} index The index of the row
+ * @param {String} group The group to remove
+ */
+function removeGroup(index, group) { // eslint-disable-line no-unused-vars
   document.getElementById(`${group}-${index}`).remove();
 }
 
+/**
+ * Creates a group in a specified row
+ * @param {Number} index The index of the row
+ * @param {String} group The name of the group
+ */
 function createSingleGroup(index, group) {
   const parent = document.createElement('span');
   parent.class = group;
@@ -111,6 +126,10 @@ function createSingleGroup(index, group) {
   td.insertBefore(parent, document.getElementById(`groupinput-${index}`));
 }
 
+/**
+ * Adds a new group if there is not one already
+ * @param {Object} event The keydown event
+ */
 function addGroup(event) {
   if (event.code == 'Comma') { // It would be nice to make this customisable
     const active = document.activeElement;
@@ -131,23 +150,32 @@ function addGroup(event) {
   }
 }
 
-function focusGroup(element) {
-  const index = element.id.split('-')[1];
+/**
+ * Adds the addGroup function as a keypress listener
+ */
+function focusGroup() { // eslint-disable-line no-unused-vars
   document.addEventListener('keypress', addGroup);
 }
 
-function unfocusGroup(element) {
-  const index = element.id.split('-')[1];
+/**
+ * Removes the addGroup function as a keypress listener
+ */
+function unfocusGroup() { // eslint-disable-line no-unused-vars
   document.removeEventListener('keypress', addGroup);
 }
 
+/**
+ * Creates a group input in the given row
+ * @param {Number} index The index of the row in the table (1-indexed)
+ * @return {Node} A <td> element containing an <input> element
+ */
 function createGroup(index) {
   const parent = document.createElement('td');
   parent.setAttribute('id', `groups-${index}`);
   const input = document.createElement('input');
   input.setAttribute('id', `groupinput-${index}`);
-  input.setAttribute('onfocusin', 'focusGroup(this)');
-  input.setAttribute('onfocusout', 'unfocusGroup(this)');
+  input.setAttribute('onfocusin', 'focusGroup()');
+  input.setAttribute('onfocusout', 'unfocusGroup()');
 
   parent.appendChild(input);
   return parent;
