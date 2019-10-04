@@ -22,6 +22,22 @@ function createRange(id, min, max, value) {
 }
 
 /**
+ * Returns all of the files in the given path
+ * @param {String} path The path to the directory
+ * @return {Array} An array containing all of the files
+ */
+function readDir(path) {
+  const files = [];
+  fs.readdirSync(path).forEach((file) => {
+    if (!files.includes(file)) {
+      files.push(file);
+    }
+  });
+
+  return files;
+}
+
+/**
  * Creates a select box inside a <td>, with an item for every downloaded servo
  * @param {Number} index The index of the row in the table (1-indexed)
  * @return {Node} A <td> element containing the <select> element
@@ -30,13 +46,7 @@ function createModel(index) {
   const model = document.createElement('td');
   const select = document.createElement('select');
   select.setAttribute('id', `model-${index}`);
-  const servos = [];
-
-  fs.readdirSync('./App/JS/Resources/Servos/').forEach((file) => {
-    if (!servos.includes(file)) {
-      servos.push(file);
-    }
-  });
+  const servos = readDir('./App/JS/Resources/Servos');
 
   for (let i = 0; i < servos.length; ++i) {
     const option = document.createElement('option');
@@ -149,7 +159,7 @@ function callKey(event) {
       } else if (event.key == 'Backspace') {
         if (groups.length > 0) {
           if (active.value == '' || event.ctrlKey) {
-            const last = groups[groups.length - 1]
+            const last = groups[groups.length - 1];
             removeGroup(index, last);
             setTimeout(function() {
               active.value = last;
@@ -241,6 +251,40 @@ function onValueChange(index) {
 }
 
 /**
+ * Updates a row with the given parameters
+ * @param {Number} index 
+ * @param {Number} id 
+ * @param {String} model 
+ * @param {Number} protocol 
+ * @param {String} mode 
+ * @param {Number} min 
+ * @param {Number} max 
+ * @param {Array} groups 
+ */
+function updateRow(index, id, model, protocol, mode, min, max, groups) {
+  document.getElementById(`id-${index}`).value = id;
+  document.getElementById(`model-${index}`).value = model;
+  
+  if (protocol == 1) {
+    document.getElementById(`protocol1-${index}`).checked = true;
+  } else {
+    document.getElementById(`protocol2-${index}`).checked = true;
+  }
+
+  if (mode == 'wheel') {
+    document.getElementById(`wheel-${index}`).checked = true;
+  } else {
+    document.getElementById(`joint-${index}`).checked = true;
+  }
+
+  setRangeValues(index, min, max);
+
+  for (let i = 0; i < groups.length; ++i) {
+    createSingleGroup(index, groups[i]);
+  }
+}
+
+/**
  * Adds a new row to the robot's servo table
  */
 function addRow() {
@@ -255,26 +299,30 @@ function addRow() {
   }
 
   parent.appendChild(row);
+  
+  let mode = 'joint';
+  let protocol = 2;
+  let model;
+  let groups = [];
 
   if (index > 1) {
-    const model = document.getElementById(`model-${index - 1}`).value;
-    document.getElementById(`model-${index}`).value = model;
+    model = document.getElementById(`model-${index - 1}`).value;
 
     if (document.getElementById(`protocol1-${index - 1}`).checked) {
-      document.getElementById(`protocol1-${index}`).checked = true;
-    } else {
-      document.getElementById(`protocol2-${index}`).checked = true;
+      protocol = 1;
     }
 
     if (document.getElementById(`wheel-${index - 1}`).checked) {
-      document.getElementById(`wheel-${index}`).checked = true;
-    } else {
-      document.getElementById(`joint-${index}`).checked = true;
+      mode = 'wheel';
     }
+
+    groups = getGroups(index);
   } else {
-    document.getElementById(`protocol1-${index}`).checked = true;
-    document.getElementById(`joint-${index}`).checked = true;
+    protocol = 1;
+    model = readDir('./App/JS/Resources/Servos/')[0].split('.')[0];
   }
+
+  updateRow(index, index, model, protocol, mode, 0, 1024, groups);
 
   document.getElementById(`joint-${index}`).onchange = function() {
     setRangeValues(index, 0, 1024);
@@ -355,8 +403,11 @@ function createRobot() {
  * Saves the output of createRobot() to a JSON file
  */
 function saveRobot() { // eslint-disable-line no-unused-vars
-  const name = document.getElementById('name').value;
   const config = JSON.stringify(createRobot());
+  let name = document.getElementById('robot-select').value;
+  if (name == '') {
+    name = document.getElementById('name').value;
+  }
 
   fs.writeFile(`./App/JS/Resources/Robots/${name}.json`, config, function(err) {
     if (err) {
@@ -364,8 +415,85 @@ function saveRobot() { // eslint-disable-line no-unused-vars
       console.error(err);
     } else {
       console.log(`Saved the file as ${name}.json`);
+      const select = document.getElementById('robot-select');
+      select.appendChild(createOption(name));
+      select.value = name;
     }
   });
 }
 
+/**
+ * Removes all rows in the table, except the header
+ * @param {Boolean} newRow Whether or not to add a new row
+ */
+function removeAllRows(newRow) {
+  const children = document.getElementById('parent').childElementCount;
+  for (let i = 0; i < children; ++i) {
+    setTimeout(() => {
+      removeLastRow(1);
+    }, 0.1);
+  }
+
+  if (newRow) {
+    setTimeout(() => {
+      addRow();
+    }, children * 0.1 + 0.5);
+  }
+}
+
+/**
+ * Loads a robot for the user to edit
+ * @param {String} name The name of the robot
+ */
+function loadRobot(name) {
+  if (name == '') {
+    removeAllRows(true);
+    document.getElementById('name').style.visibility = 'visible';
+  } else {
+    removeAllRows(false);
+    document.getElementById('name').style.visibility = 'hidden';
+    fs.readFile(`App/JS/Resources/Robots/${name}.json`, (err, data) => {
+      const robot = JSON.parse(data);
+      let i = 0;
+      for (const index in robot) {
+        if (typeof(index) == 'number' || typeof(index) == 'string') {
+          const servo = robot[index];
+          addRow();
+          updateRow(++i, index, servo.model, servo.protocol, servo.mode, servo.minPos, servo.maxPos, servo.groups);
+        }
+      }
+    });
+  }
+}
+
+/**
+ * Creates an option for a <select> box
+ * @param {String} value The value of the option element
+ * @return {Node} An <option> element with the specified value
+ */
+function createOption(value) {
+  const option = document.createElement('option');
+  option.setAttribute('value', value);
+  option.innerHTML = value;
+
+  return option;
+}
+
 addRow();
+
+const parent = document.getElementById('robot-select');
+const robots = readDir('./App/JS/Resources/Robots');
+
+for (let i = 0; i < robots.length; ++i) {
+  const robot = robots[i].split('.')[0];
+  parent.appendChild(createOption(robot));
+}
+
+parent.appendChild(createOption(''));
+
+if (robots.length > 0) {
+  const robot = robots[0].split('.')[0];
+  parent.value = robot;
+  loadRobot(robot);
+}
+parent.setAttribute('onchange', 'loadRobot(this.value)');

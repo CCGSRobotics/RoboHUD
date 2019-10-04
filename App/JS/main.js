@@ -141,8 +141,7 @@ class Dynamixel {
 class Robot {
   /**
    *
-   * @param {Object} servos A list of every servo in the robot with
-   * their associated objects and configuration
+   * @param {Object} name The name of the configuration file
    */
   constructor(name) {
     const path = `./App/JS/Resources/Robots/${name}.json`;
