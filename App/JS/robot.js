@@ -1,4 +1,14 @@
 const fs = require('fs');
+const robotPath = './App/JS/Resources/Robots';
+if (!fs.existsSync(robotPath)) {
+  fs.mkdir(robotPath, (err) => {
+    if (err) {
+      console.error(`Error making directory: ${err}`);
+    } else {
+      console.log(`Created new directory at ${robotPath}`);
+    }
+  });
+}
 
 /**
  * Creates a number input inside a <td>
@@ -426,6 +436,31 @@ function saveRobot() { // eslint-disable-line no-unused-vars
 }
 
 /**
+ * Deletes the selected robot
+ */
+function deleteRobot() { // eslint-disable-line no-unused-vars
+  const parent = document.getElementById('robot-select');
+  const name = parent.value;
+
+  fs.unlink(`${robotPath}/${name}.json`, (err) => {
+    if (err) {
+      console.error(`Error removing file: ${err}`);
+    } else {
+      console.log(`Removed robot ${name}`);
+    }
+  });
+
+  for (let i = 0; i < parent.length; ++i) {
+    if (parent.options[i].value == name) {
+      parent.remove(i);
+      break;
+    }
+  }
+
+  loadRobot('');
+}
+
+/**
  * Removes all rows in the table, except the header
  * @param {Boolean} newRow Whether or not to add a new row
  */
@@ -449,12 +484,16 @@ function removeAllRows(newRow) {
  * @param {String} name The name of the robot
  */
 function loadRobot(name) {
+  document.getElementById('name').value = '';
+  document.getElementById('robot-select').value = name;
   if (name == '') {
     removeAllRows(true);
     document.getElementById('name').style.display = 'inline';
+    document.getElementById('delete').style.display = 'none';
   } else {
     removeAllRows(false);
     document.getElementById('name').style.display = 'none';
+    document.getElementById('delete').style.display = 'inline';
     fs.readFile(`App/JS/Resources/Robots/${name}.json`, (err, data) => {
       const robot = JSON.parse(data);
       let i = 0;
@@ -486,7 +525,7 @@ function createOption(value) {
 addRow();
 
 const parent = document.getElementById('robot-select');
-const robots = readDir('./App/JS/Resources/Robots');
+const robots = readDir(robotPath);
 
 for (let i = 0; i < robots.length; ++i) {
   const robot = robots[i].split('.')[0];
