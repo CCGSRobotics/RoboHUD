@@ -252,19 +252,19 @@ function onValueChange(index) {
 
 /**
  * Updates a row with the given parameters
- * @param {Number} index 
- * @param {Number} id 
- * @param {String} model 
- * @param {Number} protocol 
- * @param {String} mode 
- * @param {Number} min 
- * @param {Number} max 
- * @param {Array} groups 
+ * @param {Number} index
+ * @param {Number} id
+ * @param {String} model
+ * @param {Number} protocol
+ * @param {String} mode
+ * @param {Number} min
+ * @param {Number} max
+ * @param {Array} groups
  */
 function updateRow(index, id, model, protocol, mode, min, max, groups) {
   document.getElementById(`id-${index}`).value = id;
   document.getElementById(`model-${index}`).value = model;
-  
+
   if (protocol == 1) {
     document.getElementById(`protocol1-${index}`).checked = true;
   } else {
@@ -299,7 +299,7 @@ function addRow() {
   }
 
   parent.appendChild(row);
-  
+
   let mode = 'joint';
   let protocol = 2;
   let model;
@@ -416,8 +416,11 @@ function saveRobot() { // eslint-disable-line no-unused-vars
     } else {
       console.log(`Saved the file as ${name}.json`);
       const select = document.getElementById('robot-select');
+      select.removeChild(select.lastChild);
       select.appendChild(createOption(name));
+      select.appendChild(createOption(''));
       select.value = name;
+      loadRobot(name);
     }
   });
 }
@@ -448,10 +451,10 @@ function removeAllRows(newRow) {
 function loadRobot(name) {
   if (name == '') {
     removeAllRows(true);
-    document.getElementById('name').style.visibility = 'visible';
+    document.getElementById('name').style.display = 'inline';
   } else {
     removeAllRows(false);
-    document.getElementById('name').style.visibility = 'hidden';
+    document.getElementById('name').style.display = 'none';
     fs.readFile(`App/JS/Resources/Robots/${name}.json`, (err, data) => {
       const robot = JSON.parse(data);
       let i = 0;
@@ -459,7 +462,8 @@ function loadRobot(name) {
         if (typeof(index) == 'number' || typeof(index) == 'string') {
           const servo = robot[index];
           addRow();
-          updateRow(++i, index, servo.model, servo.protocol, servo.mode, servo.minPos, servo.maxPos, servo.groups);
+          updateRow(++i, index, servo.model, servo.protocol, servo.mode,
+              servo.minPos, servo.maxPos, servo.groups);
         }
       }
     });
