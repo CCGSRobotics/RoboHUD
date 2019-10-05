@@ -46,6 +46,9 @@ class Dynamixel {
     this.model = model;
     this.id = id;
     this.protocol = protocol;
+    this.mode = 'joint';
+    this.minPos = 0;
+    this.maxPos = 1023;
 
     const path = `./App/JS/Resources/Servos/${model}.csv`;
     fs.readFile(path, (err, data) => {
@@ -82,11 +85,7 @@ class Dynamixel {
       }
 
       sendData(`(init)-${model}-${id}-${protocol}`);
-      this.mode = 'joint';
     });
-
-    this.minPos = 0;
-    this.maxPos = 1023;
   }
 
   /**
@@ -116,7 +115,7 @@ class Dynamixel {
     }
 
     value = Math.round(value);
-    
+
     position = Math.round(position / 100 * this.maxPos);
 
     if (position < this.minPos) {
@@ -126,7 +125,7 @@ class Dynamixel {
     if (position > this.maxPos) {
       position = this.maxPos;
     }
-    
+
     if (this.mode == 'joint') {
       sendData(`${this.id}-${position}-${value}`);
     } else {
@@ -142,36 +141,49 @@ class Dynamixel {
 class Robot {
   /**
    *
-   * @param {Object} servos A list of every servo in the robot with
-   * their associated objects and configuration
+   * @param {Object} name The name of the configuration file
    */
-  constructor(servos) {
-    this.servos = {};
-    this.groups = {};
-    this.options = {};
-
-    for (const index in servos) {
-      if (typeof(index) === 'number' || typeof(index) == 'string') {
-        const servo = servos[index];
-        const dyn = servo['object'];
-        const id = dyn.id;
-        this.servos[id] = dyn;
-
-        if (servo.hasOwnProperty('group')) {
-          if (this.groups.hasOwnProperty(servo['group'])) {
-            this.groups[servo['group']].push(id);
-          } else {
-            this.groups[servo['group']] = [id];
-          }
+  constructor(name) {
+    const path = `./App/JS/Resources/Robots/${name}.json`;
+    fs.readFile(path, (err, data) => {
+      if (err) {
+        if (err.code === 'ENOENT') {
+          console.error(`The file at path ${path} does not exist!`);
+          return;
         }
 
-        this.addConstraint('minPos', servo, id);
-        this.addConstraint('maxPos', servo, id);
-      } else {
-        console.error('The type of each index should be Number or String, ' +
-        `but got ${typeof(index)} (${index})`);
+        throw err;
       }
-    }
+      const servos = JSON.parse(data);
+      this.servos = {};
+      this.groups = {};
+      this.options = {};
+
+      for (const index in servos) {
+        if (typeof(index) === 'number' || typeof(index) == 'string') {
+          const servo = servos[index];
+          const id = servo.id;
+          const groups = servo.groups;
+          const dyn = new Dynamixel(servo.model, id, servo.protocol);
+          dyn.setMode(servo.mode);
+          dyn.minPos = servo.minPos;
+          dyn.maxPos = servo.maxPos;
+
+          this.servos[id] = dyn;
+
+          for (let i = 0; i < groups.length; ++i) {
+            if (this.groups.hasOwnProperty(groups[i])) {
+              this.groups[groups[i]].push(id);
+            } else {
+              this.groups[groups[i]] = [id];
+            }
+          }
+        } else {
+          console.error('The type of each index should be Number or String, ' +
+          `but got ${typeof(index)} (${index})`);
+        }
+      }
+    });
 
     this.server = dgram.createSocket('udp4');
 
@@ -194,18 +206,12 @@ class Robot {
       if (this.servos.hasOwnProperty(id)) {
         this.servos[id].controlTable[name].Value = value;
       } else {
-        console.log(msg)
-        console.log(id, name, value)
+        console.log(msg);
+        console.log(id, name, value);
       }
     });
 
     this.server.bind(5003);
-  }
-
-  addConstraint(index, servo, id) {
-    if (servo.hasOwnProperty(index)) {
-      this.servos[id][index] = servo[index] - 1;
-    }
   }
 
   /**
