@@ -83,10 +83,87 @@ function generateCSV(html, indexes) {
 }
 
 /**
+ * Creates a table to edit the min & max values of items in the control table
+ */
+function createServoTable() {
+  const rows = fileData.split('\n');
+  let hasMin = false;
+  let hasMax = false;
+  let minIndex = 0;
+  let maxIndex = 0;
+  let nameIndex = 2;
+
+  const headings = rows[0].split(', ');
+  for (let i = 0; i < headings.length; ++i) {
+    const heading = headings[i].toLowerCase();
+    if (heading == 'data name') {
+      nameIndex = i;
+    }
+
+    if (heading == 'min') {
+      hasMin = true;
+      minIndex = i;
+    } else if (heading == 'max') {
+      hasMax = true;
+      maxIndex = i;
+    }
+  }
+
+  const parent = document.getElementById('parent');
+
+  for (let i = 1; i < rows.length - 1; ++i) {
+    const columns = rows[i].split(', ');
+    const title = document.createElement('td');
+    const dataName = columns[nameIndex];
+    title.innerHTML = dataName;
+
+    const row = document.createElement('tr');
+    row.setAttribute('id', `${columns[2]}-row`);
+    row.appendChild(title);
+
+    for (let x = 0; x < 2; ++x) {
+      const td = document.createElement('td');
+      const input = document.createElement('input');
+      input.setAttribute('type', 'number');
+      input.setAttribute('id', `${dataName}-${x == 0? 'min' : 'max'}`);
+      td.appendChild(input);
+      row.appendChild(td);
+    }
+
+    const hide = document.createElement('button');
+    hide.innerHTML = '✖';
+    hide.onclick = function() {
+      document.getElementById(`${dataName}-row`).style.display = 'none';
+    };
+
+    row.appendChild(hide);
+    parent.appendChild(row);
+  }
+
+  if (hasMin && hasMax) {
+    for (let i = 1; i < rows.length - 1; ++i) {
+      const min = rows[i].split(', ')[minIndex];
+      const max = rows[i].split(', ')[maxIndex];
+      const name = rows[i].split(', ')[nameIndex];
+
+      if (!isNaN(min)) {
+        document.getElementById(`${name}-min`).value = min;
+      }
+
+      if (!isNaN(max)) {
+        document.getElementById(`${name}-max`).value = max;
+      }
+    }
+  }
+
+  parent.style.display = 'inline';
+}
+
+/**
  * Downloads and converts the link to a CSV, saving it to Resources/Servos and
  *  storing it in the variable fileData
  */
-function getFile() {
+function getFile() { // eslint-disable-line no-unused-vars
   const url = document.getElementById('url').value;
   const re = /^https?:\/\/emanual\.robotis\.com\/docs\/en\/dxl\/[a-z0-9]+\/[a-z0-9]+-?[a-z0-9]+/;
   const res = url.match(re);
@@ -118,6 +195,8 @@ function getFile() {
           uploadButton.innerHTML =
           `Upload <strong>${filename}.csv</strong>`;
           uploadButton.style.display = null;
+
+          createServoTable();
         })
         .catch(function(err) {
           console.error('An error has occured!' + '\n' +
@@ -134,7 +213,7 @@ function getFile() {
 /**
  * Uploads the data stored in fileData through TCP to a listening fileserver
  */
-function uploadFile() {
+function uploadFile() { // eslint-disable-line no-unused-vars
   if (fileData == null || fileData == undefined || fileData == '') {
     console.error('There is no downloaded file!');
     return;

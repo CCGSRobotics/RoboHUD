@@ -5,15 +5,29 @@
   <title>Create a new servo type</title>
 </head>
 <script type="text/javascript" src="JS/createServo.js"></script>
-<link rel="stylesheet" href="CSS/createServo.css">
+<style>
+  td, th {
+    border: 1px solid black;
+  }
+
+  table {
+    border-collapse: collapse;
+  }
+</style>
 <body>
   <p id="invalid_url" style="display: none">Invalid URL!</p>
-  <div class="container">
-    <form>
-      <input type="text" id="url"></input>
-    </form>
-    <button id="download" onclick="getFile()">Download the file!</button>
-    <button id="upload" onclick="uploadFile()" style="display: none"></button>
-  </div>
+  <form>
+    <input type="text" id="url"></input>
+  </form>
+  <button id="download" onclick="getFile()">Download the file!</button>
+  <button id="upload" onclick="uploadFile()" style="display: none"></button>
+  <br>
+  <table id="parent" style="display: none; ">
+    <tr>
+      <th>Value</th>
+      <th>Min</th>
+      <th>Max</th>
+    </tr>
+  </table>
 </body>
 </html>
