@@ -56,4 +56,6 @@ To install both parts of the GUI, run:
 `curl -o- -L https://raw.githubusercontent.com/CCGSRobotics/RoboHUD/master/Scripts/install.sh | sh -ss -- -h HOSTNAME`
 
 ## Using the script without curl
-As mentioned previously, the script is located in the Scripts/ directory, for use when the GUI is already downloaded (as demonstrated in [Installing the server](#installing-the-server)).
+As mentioned previously, the script is located in the [Scripts](Scripts/) directory, for use when the GUI is already downloaded (as demonstrated in [Installing the server](#installing-the-server)).
+
+Screenshots are soon to come! :)
