@@ -40,18 +40,22 @@ function parseDynamixelHeader(table) {
  * @return {String} A string of CSV data with the control table
  */
 function parseDynamixelTable(table) {
-  let build = '';
-  for (let i = 1; i < table[0].length; i++) {
-    for (let x = 0; x < table.length; x++) {
-      build += table[x][i].replace(',', '');
-      if (x < table.length - 1) {
-        build += ', ';
-      }
+  const blacklist = ['...', '…', '---'];
+  const grid = [];
+  const rows = [];
+
+  for (let row = 1; row < table[0].length; ++row) {
+    grid.push([]);
+    for (let col = 0; col < table.length; ++col) {
+      grid[row - 1].push(table[col][row].replace(',', ''));
     }
-    if (i < table[0].length) {
-      build += '\n';
+    if (grid[row - 1].every((val) => !blacklist.includes(val))) {
+      rows.push(grid[row - 1].join(', '));
+    } else {
+      console.log(`Removed row:\n${grid[row - 1]}`);
     }
   }
+  const build = rows.join('\n') + '\n';
   return build;
 }
 
