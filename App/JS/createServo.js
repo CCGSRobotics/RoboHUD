@@ -6,6 +6,7 @@ const net = require('net');
 let link = '';
 let fileData = '';
 let filename = '';
+let autosave;
 
 const client = new net.Socket();
 client.on('error', function(err) {
@@ -82,6 +83,26 @@ function generateCSV(html, indexes) {
   return fileData;
 }
 
+/**
+ * Resets the min & max inputs to their "defaultValue" attributes
+ * @param {Node} elem The button element that triggered the function
+ */
+function resetRow(elem) { // eslint-disable-line no-unused-vars
+  const parentId = elem.parentNode.id;
+  const name = parentId.slice(0, parentId.length - 4);
+  const min = document.getElementById(`${name}-min`);
+  const max = document.getElementById(`${name}-max`);
+
+  if (!isNaN(min.value)) {
+    min.value = min.defaultValue;
+  }
+  if (!isNaN(max.value)) {
+    max.value = max.defaultValue;
+  }
+  // Trigger the autosave
+  max.onchange();
+}
+
 let hasMin = false;
 let hasMax = false;
 let minIndex = 0;
@@ -127,6 +148,12 @@ function createServoTable() {
       const input = document.createElement('input');
       input.setAttribute('type', 'number');
       input.setAttribute('id', `${dataName}-${x == 0? 'min' : 'max'}`);
+      clearTimeout(autosave);
+      input.onchange = () => {
+        autosave = setTimeout(() => {
+          saveFile();
+        }, 3000); // This should be customisable
+      };
       td.appendChild(input);
       row.appendChild(td);
     }
@@ -137,6 +164,11 @@ function createServoTable() {
       document.getElementById(`${dataName}-row`).style.display = 'none';
     };
 
+    const reset = document.createElement('button');
+    reset.innerHTML = '↺';
+    reset.setAttribute('onclick', 'resetRow(this)');
+
+    row.appendChild(reset);
     row.appendChild(hide);
     parent.appendChild(row);
   }
@@ -148,11 +180,15 @@ function createServoTable() {
       const name = rows[i].split(', ')[nameIndex];
 
       if (!isNaN(min)) {
-        document.getElementById(`${name}-min`).value = min;
+        const minInput = document.getElementById(`${name}-min`);
+        minInput.value = min;
+        minInput.defaultValue = min;
       }
 
       if (!isNaN(max)) {
-        document.getElementById(`${name}-max`).value = max;
+        const maxInput = document.getElementById(`${name}-max`);
+        maxInput.value = max;
+        maxInput.defaultValue = max;
       }
     }
   }
