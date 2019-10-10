@@ -105,8 +105,10 @@ function resetRow(elem) { // eslint-disable-line no-unused-vars
 
 let hasMin = false;
 let hasMax = false;
+let hasRange = false;
 let minIndex = 0;
 let maxIndex = 0;
+let rangeIndex = 0;
 let nameIndex = 2;
 
 /**
@@ -121,13 +123,15 @@ function createServoTable() {
     if (heading == 'data name') {
       nameIndex = i;
     }
-
     if (heading == 'min') {
       hasMin = true;
       minIndex = i;
     } else if (heading == 'max') {
       hasMax = true;
       maxIndex = i;
+    } else if (heading == 'range') {
+      hasRange = true;
+      rangeIndex = i;
     }
   }
 
@@ -140,7 +144,7 @@ function createServoTable() {
     title.innerHTML = dataName;
 
     const row = document.createElement('tr');
-    row.setAttribute('id', `${columns[2]}-row`);
+    row.setAttribute('id', `${columns[nameIndex]}-row`);
     row.appendChild(title);
 
     for (let x = 0; x < 2; ++x) {
@@ -171,6 +175,26 @@ function createServoTable() {
     row.appendChild(reset);
     row.appendChild(hide);
     parent.appendChild(row);
+  }
+
+  if (hasRange && !(hasMin && hasMax)) {
+    rows[0] += ', Min, Max';
+    for (let i = 1; i < rows.length - 1; ++i) {
+      const row = rows[i].split(', ');
+      const range = row[rangeIndex];
+      row.push(range);
+      if (range !== '-' && range !== '...') {
+        const ranges = range.split(' ~ ');
+        row.push(ranges.join(', '));
+      } else {
+        row.push('-, -');
+      }
+      rows[i] = row.join(', ');
+    }
+    hasMin = true;
+    hasMax = true;
+    minIndex = rows[0].split(', ').length - 1;
+    maxIndex = minIndex + 1;
   }
 
   if (hasMin && hasMax) {
@@ -243,7 +267,7 @@ function getFile() { // eslint-disable-line no-unused-vars
   const url = document.getElementById('url').value;
   const re = new RegExp(''
   + /^https?:\/\/emanual\.robotis\.com\/docs\/en\/dxl\//.source
-  + /[a-z0-9]+\/[a-z0-9]+-?[a-z0-9]+/.source
+  + /[a-z0-9_-]+\/[a-z0-9_-]+-?[a-z0-9_-]+/.source
   );
   const res = url.match(re);
   if (res !== null && res !== undefined) {
