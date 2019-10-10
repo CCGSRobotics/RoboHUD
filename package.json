@@ -9,7 +9,6 @@
   "private": false,
   "build": {
     "appId": "com.ccgsrobotics.robohud",
-    "publish": "never",
     "files": [
       "**/*",
       "!Server/"
