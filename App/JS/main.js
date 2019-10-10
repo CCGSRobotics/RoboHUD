@@ -74,7 +74,8 @@ class Dynamixel {
         const index = columns[2];
         this.controlTable[index] = {};
         if (headings.includes('InitialValue')) {
-          this.controlTable[index].Value = columns[headings.indexOf('InitialValue')];
+          this.controlTable[index].Value =
+          columns[headings.indexOf('InitialValue')];
         }
 
         for (let col = 0; col < columns.length; col++) {

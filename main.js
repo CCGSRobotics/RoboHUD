@@ -14,7 +14,7 @@ function createWindow() {
     height: 1200,
     icon: 'Assets/icon.png',
     webPreferences: {
-      nodeIntegration: true
+      nodeIntegration: true,
     },
   });
   win.loadFile('App/wizard.html');
