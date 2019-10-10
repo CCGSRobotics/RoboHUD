@@ -73,7 +73,7 @@ typings/
 .serverless
 
 #Build directory
-Build/
+dist/
 
 # Pycache
 Server/Driving/__pycache__/
