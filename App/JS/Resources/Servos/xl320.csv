@@ -28,5 +28,3 @@ Address, Size(Byte), Data Name, Description, Access, InitialValue, Min, Max
 46, 1, Present Temperature, Present Temperature, R, -, -, -
 47, 1, Registered, If Instruction is registered, R, 0, -, -
 49, 1, Moving, Movement Status, R, 0, -, -
-50, 1, Hardware Error Status, Hardware Error Status, R, 0, -, -
-51, 2, Punch, Minimum Current Threshold, RW, 32, 0, 1023
