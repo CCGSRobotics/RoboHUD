@@ -67,7 +67,7 @@ function generateCSV(html, indexes) {
     return '';
   }
 
-  let fileData = '';
+  fileData = '';
   const $ = cheerio.load(html);
   cheerioTableparser($);
   const cheerioTable = $('table');
@@ -82,16 +82,17 @@ function generateCSV(html, indexes) {
   return fileData;
 }
 
+let hasMin = false;
+let hasMax = false;
+let minIndex = 0;
+let maxIndex = 0;
+let nameIndex = 2;
+
 /**
  * Creates a table to edit the min & max values of items in the control table
  */
 function createServoTable() {
   const rows = fileData.split('\n');
-  let hasMin = false;
-  let hasMax = false;
-  let minIndex = 0;
-  let maxIndex = 0;
-  let nameIndex = 2;
 
   const headings = rows[0].split(', ');
   for (let i = 0; i < headings.length; ++i) {
@@ -160,12 +161,54 @@ function createServoTable() {
 }
 
 /**
+ * Saves the current fileData using modifications from the input table
+ */
+function saveFile() {
+  const rows = fileData.split('\n');
+  const headings = rows.shift();
+  const grid = [];
+
+  for (let i = 0; i < rows.length - 1; ++i) {
+    const row = rows[i].split(', ');
+    const name = row[nameIndex];
+    const element = document.getElementById(`${name}-row`);
+    if (element.style.display !== 'none') {
+      const min = document.getElementById(`${name}-min`).value;
+      const max = document.getElementById(`${name}-max`).value;
+
+      if (!isNaN(min) && min !== '') {
+        row[minIndex] = min;
+      }
+      if (!isNaN(max) && max !== '') {
+        row[maxIndex] = max;
+      }
+    }
+
+    grid.push(row.join(', '));
+  }
+
+  fileData = headings + '\n';
+  fileData += grid.join('\n');
+
+  fs.writeFile(`App/JS/Resources/Servos/${filename}.csv`,
+      fileData, function(err) {
+        if (err) {
+          console.error('Failed to write file! Do you have access?');
+        }
+        console.log(`Saved the file as ${filename}.csv`);
+      });
+}
+
+/**
  * Downloads and converts the link to a CSV, saving it to Resources/Servos and
  *  storing it in the variable fileData
  */
 function getFile() { // eslint-disable-line no-unused-vars
   const url = document.getElementById('url').value;
-  const re = /^https?:\/\/emanual\.robotis\.com\/docs\/en\/dxl\/[a-z0-9]+\/[a-z0-9]+-?[a-z0-9]+/;
+  const re = new RegExp(''
+  + /^https?:\/\/emanual\.robotis\.com\/docs\/en\/dxl\//.source
+  + /[a-z0-9]+\/[a-z0-9]+-?[a-z0-9]+/.source
+  );
   const res = url.match(re);
   if (res !== null && res !== undefined) {
     link = res[0];
@@ -183,20 +226,16 @@ function getFile() { // eslint-disable-line no-unused-vars
           }
           filename = linkPieces[linkPieces.length - 1].replace('-', '');
 
-          fs.writeFile(`App/JS/Resources/Servos/${filename}.csv`,
-              fileData, function(err) {
-                if (err) {
-                  console.error('Failed to write file! Do you have access?');
-                }
-                console.log(`Saved the file as ${filename}.csv`);
-              });
-
-          uploadButton = document.getElementById('upload');
+          const uploadButton = document.getElementById('upload');
           uploadButton.innerHTML =
           `Upload <strong>${filename}.csv</strong>`;
-          uploadButton.style.display = null;
+          uploadButton.style.display = 'inline';
+          const saveButton = document.getElementById('save');
+          saveButton.style.display = 'inline';
+          saveButton.setAttribute('onclick', `saveFile()`);
 
           createServoTable();
+          saveFile();
         })
         .catch(function(err) {
           console.error('An error has occured!' + '\n' +
