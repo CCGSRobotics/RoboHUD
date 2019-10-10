@@ -1,5 +1,5 @@
 {
-  "name": "RoboHUD",
+  "name": "robohud",
   "version": "1.0.0",
   "description": "A GUI stack developed by CCGS Robotics",
   "main": "main.js",
@@ -7,12 +7,27 @@
   "author": "Angus Finch <developer.finchie@gmail.com>",
   "license": "Apache",
   "private": false,
+  "build": {
+    "appId": "com.ccgsrobotics.robohud",
+    "files": [
+      "**/*",
+      "!Server/"
+    ]
+  },
+  "scripts": {
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder"
+  },
+  "postinstall": "electron-builder install-app-deps",
   "dependencies": {
     "cheerio": "^1.0.0-rc.3",
     "cheerio-tableparser": "^1.0.1",
-    "electron": "^6.0.2",
     "eslint": "^6.5.1",
     "eslint-config-google": "^0.13.0",
     "request-promise": "^4.2.4"
+  },
+  "devDependencies": {
+    "electron": "^6.0.12",
+    "electron-builder": "^21.2.0"
   }
 }
