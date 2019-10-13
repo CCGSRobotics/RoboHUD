@@ -85,3 +85,8 @@ function removeDataAfter(chart, after, animation) {
     }
   }
 }
+
+module.exports.addChart = addChart;
+module.exports.addDataset = addDataset;
+module.exports.addData = addData;
+module.exports.removeDataAfter = removeDataAfter;
