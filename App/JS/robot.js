@@ -116,7 +116,7 @@ function getGroups(index) {
  * @param {Number} index The index of the row
  * @param {String} group The group to remove
  */
-function removeGroup(index, group) { // eslint-disable-line no-unused-vars
+function removeGroup(index, group) {
   document.getElementById(`${group}-${index}`).remove();
 }
 
@@ -150,29 +150,37 @@ function createSingleGroup(index, group) {
  * @param {Node} active The active element
  */
 function appendKey(groups, index, active) {
-  if (!groups.includes(active.value) && active.value !== '') {
-    createSingleGroup(index, active.value);
-    setTimeout(function() {
-      active.value = '';
-    }, 1);
+  const id = active.id;
+  const value = active.value;
+  if (!groups.includes(value) && value !== '') {
+    new Promise((resolve, reject) => {
+      createSingleGroup(index, value);
+      resolve();
+    }).then(() => {
+      document.getElementById(id).value = '';
+    });
   }
 }
 
 /**
  * Checks to see if the group should be deleted
- * @param {Array} groups The groups already present in the row
+ * @param {Object} event The keydown event
  * @param {Node} active The  active element
  * @param {Number} index The index of the row in the table (1-indexed)
- * @param {Boolean} ctrlKey If the 'control' key is also being pressed
  */
-function deleteKey(groups, active, index, ctrlKey) {
+function deleteKey(event, active, index) {
+  const groups = getGroups(index);
   if (groups.length > 0) {
-    if (active.value == '' || ctrlKey) {
+    if (active.value == '' || event.ctrlKey) {
+      event.preventDefault();
       const last = groups[groups.length - 1];
-      removeGroup(index, last);
-      setTimeout(function() {
+
+      new Promise((resolve, reject) => {
+        removeGroup(index, last);
+        resolve();
+      }).then(() => {
         active.value = last;
-      }, 1);
+      });
     }
   }
 }
@@ -188,9 +196,10 @@ function callKey(event) {
   type == 'groupinput') {
     const groups = getGroups(index);
     if ([',', ' ', 'Enter'].includes(event.key)) {
+      event.preventDefault();
       appendKey(groups, index, active);
     } else if (event.key == 'Backspace') {
-      deleteKey(groups, active, event.ctrlKey);
+      deleteKey(event, active, index);
     }
   }
 }
@@ -522,22 +531,31 @@ function deleteRobot() { // eslint-disable-line no-unused-vars
 /**
  * Removes all rows in the table, except the header
  * @param {Boolean} newRow Whether or not to add a new row
+ * @return {Promise} A promise that is resolved when all rows are removed
  */
 function removeAllRows(newRow) {
   const children = document.getElementById('parent').childElementCount;
-  for (let i = 0; i < children; ++i) {
-    setTimeout(() => {
+  return new Promise((resolve, reject) => {
+    for (let i = 0; i < children; ++i) {
       removeLastRow(1);
-    }, 0.1);
-  }
+    }
 
-  if (newRow) {
-    setTimeout(() => {
+    if (newRow) {
       addRow();
-    }, children * 0.1 + 0.5);
-  }
+    }
+    resolve();
+  });
 }
 
+/**
+ * Switches the visibility of the robot name input & delete button
+ * @param {String} nameDisplay The display setting for the name input
+ * @param {String} deleteDisplay The display setting for the delete button
+ */
+function switchInputVisibility(nameDisplay, deleteDisplay) {
+  document.getElementById('name').style.display = nameDisplay;
+  document.getElementById('delete').style.display = deleteDisplay;
+}
 /**
  * Loads a robot for the user to edit
  * @param {String} name The name of the robot
@@ -547,25 +565,24 @@ function loadRobot(name) {
   document.getElementById('robot-select').value = name;
   if (name == '') {
     removeAllRows(true);
-    document.getElementById('name').style.display = 'inline';
-    document.getElementById('delete').style.display = 'none';
+    switchInputVisibility('inline', 'none');
   } else {
-    removeAllRows(false);
-    document.getElementById('name').style.display = 'none';
-    document.getElementById('delete').style.display = 'inline';
-    fs.readFile(`App/JS/Resources/Robots/${name}.json`, (err, data) => {
-      const robot = JSON.parse(data);
-      let i = 0;
-      for (const index in robot) {
-        if (typeof(index) == 'number' || typeof(index) == 'string') {
-          const config = robot[index];
-          config.range = [config.minPos, config.maxPos];
-          delete config.minPos;
-          delete config.maxPos;
-          addRow();
-          updateRow(++i, config);
+    switchInputVisibility('none', 'inline');
+    removeAllRows(false).then(() => {
+      fs.readFile(`App/JS/Resources/Robots/${name}.json`, (err, data) => {
+        const robot = JSON.parse(data);
+        let i = 0;
+        for (const index in robot) {
+          if (typeof(index) == 'number' || typeof(index) == 'string') {
+            const config = robot[index];
+            config.range = [config.minPos, config.maxPos];
+            delete config.minPos;
+            delete config.maxPos;
+            addRow();
+            updateRow(++i, config);
+          }
         }
-      }
+      });
     });
   }
 }
