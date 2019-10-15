@@ -2,11 +2,8 @@ const fs = require('fs');
 const robotPath = './App/JS/Resources/Robots';
 if (!fs.existsSync(robotPath)) {
   fs.mkdir(robotPath, (err) => {
-    if (err) {
-      console.error(`Error making directory: ${err}`);
-    } else {
-      console.log(`Created new directory at ${robotPath}`);
-    }
+    handleError(err, `Error making directory: ${err}`,
+        `Created new directory at ${robotPath}`);
   });
 }
 
@@ -119,7 +116,7 @@ function getGroups(index) {
  * @param {Number} index The index of the row
  * @param {String} group The group to remove
  */
-function removeGroup(index, group) { // eslint-disable-line no-unused-vars
+function removeGroup(index, group) {
   document.getElementById(`${group}-${index}`).remove();
 }
 
@@ -147,36 +144,62 @@ function createSingleGroup(index, group) {
 }
 
 /**
+ * Checks to see if the group should be appended
+ * @param {Array} groups The groups already present in the row
+ * @param {Number} index The index of the row in the table (1-indexed)
+ * @param {Node} active The active element
+ */
+function appendKey(groups, index, active) {
+  const id = active.id;
+  const value = active.value;
+  if (!groups.includes(value) && value !== '') {
+    new Promise((resolve, reject) => {
+      createSingleGroup(index, value);
+      resolve();
+    }).then(() => {
+      document.getElementById(id).value = '';
+    });
+  }
+}
+
+/**
+ * Checks to see if the group should be deleted
+ * @param {Object} event The keydown event
+ * @param {Node} active The  active element
+ * @param {Number} index The index of the row in the table (1-indexed)
+ */
+function deleteKey(event, active, index) {
+  const groups = getGroups(index);
+  if (groups.length > 0) {
+    if (active.value == '' || event.ctrlKey) {
+      event.preventDefault();
+      const last = groups[groups.length - 1];
+
+      new Promise((resolve, reject) => {
+        removeGroup(index, last);
+        resolve();
+      }).then(() => {
+        active.value = last;
+      });
+    }
+  }
+}
+
+/**
  * Adds a new group if there is not one already
  * @param {Object} event The keydown event
  */
 function callKey(event) {
   const active = document.activeElement;
-  if (active.nodeName == 'INPUT' && active.type == 'text') {
-    const parts = active.id.split('-');
-    const type = parts[0];
-    const index = parts[1];
-
-    if (type == 'groupinput') {
-      const groups = getGroups(index);
-      if (event.key == ',' || event.key == ' ' || event.key == 'Enter') {
-        if (!groups.includes(active.value) && active.value != '') {
-          createSingleGroup(index, active.value);
-          setTimeout(function() {
-            active.value = '';
-          }, 1);
-        }
-      } else if (event.key == 'Backspace') {
-        if (groups.length > 0) {
-          if (active.value == '' || event.ctrlKey) {
-            const last = groups[groups.length - 1];
-            removeGroup(index, last);
-            setTimeout(function() {
-              active.value = last;
-            }, 1);
-          }
-        }
-      }
+  const [type, index] = active.id.split('-');
+  if (active.nodeName == 'INPUT' && active.type == 'text' &&
+  type == 'groupinput') {
+    const groups = getGroups(index);
+    if ([',', ' ', 'Enter'].includes(event.key)) {
+      event.preventDefault();
+      appendKey(groups, index, active);
+    } else if (event.key == 'Backspace') {
+      deleteKey(event, active, index);
     }
   }
 }
@@ -237,10 +260,10 @@ function createElements(index) {
 /**
  * Sets the values of the inputs in the min and max column
  * @param {Number} index The index of the row in the table (1-indexed)
- * @param {Number} min The new value of the input in the min column
- * @param {Number} max The new value of the input in the max column
+ * @param {Array} range The min & max to set to
  */
-function setRangeValues(index, min, max) {
+function setRangeValues(index, range) {
+  const [min, max] = range;
   document.getElementById(`min-${index}`).value = min;
   document.getElementById(`max-${index}`).value = max;
 }
@@ -261,37 +284,122 @@ function onValueChange(index) {
 }
 
 /**
+ * Selects an option based on a comparison to defaul values
+ * @param {Any} value The value to compare to default
+ * @param {Any} defaultValue The default value
+ * @param {String} defaultId The id to use if value matches defaultValue
+ * @param {String} otherId The id to use if the value & default are different
+ */
+function selectOption(value, defaultValue, defaultId, otherId) {
+  if (value == defaultValue) {
+    document.getElementById(defaultId).checked = true;
+  } else {
+    document.getElementById(otherId).checked = true;
+  }
+}
+
+/**
+ *
+ * @param {Number} index The index of the row in the table
+ * @param {Array} groups All the groups to add
+ */
+function addGroups(index, groups) {
+  for (let i = 0; i < groups.length; ++i) {
+    if (!getGroups(index).includes(groups[i])) {
+      createSingleGroup(index, groups[i]);
+    }
+  }
+}
+
+/**
+ * Updates the necessary inputs for a given option
+ * @param {String} key The key of the item to modify
+ * @param {Object} options The object containing all options
+ * @param {Number} index The index of the row in the table (1-indexed)
+ */
+function handleOption(key, options, index) {
+  switch (key) {
+    case 'id':
+      document.getElementById(`id-${index}`).value = options.id;
+      break;
+    case 'model':
+      document.getElementById(`model-${index}`).value = options.model;
+      break;
+    case 'protocol':
+      const protocol = options.protocol;
+      selectOption(protocol, 1, `protocol1-${index}`, `protocol2-${index}`);
+      break;
+    case 'mode':
+      selectOption(options.mode, 'wheel', `wheel-${index}`, `joint-${index}`);
+      break;
+    case 'range':
+      setRangeValues(index, options.range);
+      break;
+    case 'groups':
+      addGroups(index, options.groups);
+      break;
+    default:
+      console.warn(`Invalid option: ${key}`);
+      break;
+  }
+}
+
+/**
  * Updates a row with the given parameters
  * @param {Number} index
- * @param {Number} id
- * @param {String} model
- * @param {Number} protocol
- * @param {String} mode
- * @param {Number} min
- * @param {Number} max
- * @param {Array} groups
+ * @param {Object} options The options to update to
  */
-function updateRow(index, id, model, protocol, mode, min, max, groups) {
-  document.getElementById(`id-${index}`).value = id;
-  document.getElementById(`model-${index}`).value = model;
+function updateRow(index, options) {
+  for (const key in options) {
+    if (options.hasOwnProperty(key)) {
+      handleOption(key, options, index);
+    }
+  }
+}
 
-  if (protocol == 1) {
-    document.getElementById(`protocol1-${index}`).checked = true;
-  } else {
-    document.getElementById(`protocol2-${index}`).checked = true;
+/**
+ * Adds onchange listeners to items that require them
+ * @param {Number} index The index of the row in the table (1-indexed)
+ */
+function addListeners(index) {
+  document.getElementById(`joint-${index}`).onchange = function() {
+    setRangeValues(index, 0, 1024);
+  };
+
+  document.getElementById(`wheel-${index}`).onchange = function() {
+    setRangeValues(index, 0, 0);
+  };
+
+  document.getElementById(`min-${index}`).onchange = function() {
+    onValueChange(index);
+  };
+
+  document.getElementById(`max-${index}`).onchange = function() {
+    onValueChange(index);
+  };
+}
+
+/**
+ * Creates options based on the values of previous rows
+ * @param {Number} index The index of the row in the table
+ * @return {Object} The options created
+ */
+function createOptions(index) {
+  const options = {
+    protocol: 1,
+    mode: 'joint',
+    model: readDir('./App/JS/Resources/Servos/')[0].split('.')[0],
+  };
+  if (index > 1) {
+    options.protocol =
+      document.getElementById(`protocol1-${index - 1}`).checked? 1 : 2;
+    options.mode =
+      document.getElementById(`wheel-${index - 1}`).checked? 'wheel' : 'joint';
+    options.model = document.getElementById(`model-${index - 1}`).value;
+    options.groups = getGroups(index);
   }
 
-  if (mode == 'wheel') {
-    document.getElementById(`wheel-${index}`).checked = true;
-  } else {
-    document.getElementById(`joint-${index}`).checked = true;
-  }
-
-  setRangeValues(index, min, max);
-
-  for (let i = 0; i < groups.length; ++i) {
-    createSingleGroup(index, groups[i]);
-  }
+  return options;
 }
 
 /**
@@ -310,45 +418,8 @@ function addRow() {
 
   parent.appendChild(row);
 
-  let mode = 'joint';
-  let protocol = 2;
-  let model;
-  let groups = [];
-
-  if (index > 1) {
-    model = document.getElementById(`model-${index - 1}`).value;
-
-    if (document.getElementById(`protocol1-${index - 1}`).checked) {
-      protocol = 1;
-    }
-
-    if (document.getElementById(`wheel-${index - 1}`).checked) {
-      mode = 'wheel';
-    }
-
-    groups = getGroups(index);
-  } else {
-    protocol = 1;
-    model = readDir('./App/JS/Resources/Servos/')[0].split('.')[0];
-  }
-
-  updateRow(index, index, model, protocol, mode, 0, 1024, groups);
-
-  document.getElementById(`joint-${index}`).onchange = function() {
-    setRangeValues(index, 0, 1024);
-  };
-
-  document.getElementById(`wheel-${index}`).onchange = function() {
-    setRangeValues(index, 0, 0);
-  };
-
-  document.getElementById(`min-${index}`).onchange = function() {
-    onValueChange(index);
-  };
-
-  document.getElementById(`max-${index}`).onchange = function() {
-    onValueChange(index);
-  };
+  updateRow(index, createOptions(index));
+  addListeners(index);
 }
 
 /**
@@ -381,29 +452,16 @@ function createRobot() {
   const count = document.getElementById('parent').childElementCount;
   const servos = {};
   for (let i = 1; i < count; i++) {
-    const model = document.getElementById(`model-${i}`).value;
     const id = parseInt(document.getElementById(`id-${i}`).value);
-    let protocol = 1;
-
-    if (document.getElementById(`protocol2-${i}`).checked) {
-      protocol = 2;
-    }
-
-    const servo = {};
-    servo.model = model;
-    servo.id = id;
-    servo.protocol = protocol;
-    servo.minPos = parseInt(document.getElementById(`min-${i}`).value);
-    servo.maxPos = parseInt(document.getElementById(`max-${i}`).value);
-
-    if (document.getElementById(`wheel-${i}`).checked) {
-      servo.mode = 'wheel';
-    } else {
-      servo.mode = 'joint';
-    }
-    servo.groups = getGroups(i);
-
-    servos[id] = servo;
+    servos[id] = {
+      model: document.getElementById(`model-${i}`).value,
+      id: id,
+      protocol: document.getElementById(`protocol1-${i}`).checked? 1 : 2,
+      minPos: parseInt(document.getElementById(`min-${i}`).value),
+      maxPos: parseInt(document.getElementById(`max-${i}`).value),
+      mode: document.getElementById(`wheel-${i}`).checked? 'wheel' : 'joint',
+      groups: getGroups(i),
+    };
   }
 
   return servos;
@@ -436,6 +494,20 @@ function saveRobot() { // eslint-disable-line no-unused-vars
 }
 
 /**
+ * Handles the error status of functions
+ * @param {String} err The error message output by the function
+ * @param {String} errorMessage The error message to output
+ * @param {String} successMessage The success message to output
+ */
+function handleError(err, errorMessage, successMessage) {
+  if (err) {
+    console.error(errorMessage);
+  } else {
+    console.log(successMessage);
+  }
+}
+
+/**
  * Deletes the selected robot
  */
 function deleteRobot() { // eslint-disable-line no-unused-vars
@@ -443,11 +515,7 @@ function deleteRobot() { // eslint-disable-line no-unused-vars
   const name = parent.value;
 
   fs.unlink(`${robotPath}/${name}.json`, (err) => {
-    if (err) {
-      console.error(`Error removing file: ${err}`);
-    } else {
-      console.log(`Removed robot ${name}`);
-    }
+    handleError(err, `Error removing file: ${err}`, `Removed robot ${name}`);
   });
 
   for (let i = 0; i < parent.length; ++i) {
@@ -463,22 +531,31 @@ function deleteRobot() { // eslint-disable-line no-unused-vars
 /**
  * Removes all rows in the table, except the header
  * @param {Boolean} newRow Whether or not to add a new row
+ * @return {Promise} A promise that is resolved when all rows are removed
  */
 function removeAllRows(newRow) {
   const children = document.getElementById('parent').childElementCount;
-  for (let i = 0; i < children; ++i) {
-    setTimeout(() => {
+  return new Promise((resolve, reject) => {
+    for (let i = 0; i < children; ++i) {
       removeLastRow(1);
-    }, 0.1);
-  }
+    }
 
-  if (newRow) {
-    setTimeout(() => {
+    if (newRow) {
       addRow();
-    }, children * 0.1 + 0.5);
-  }
+    }
+    resolve();
+  });
 }
 
+/**
+ * Switches the visibility of the robot name input & delete button
+ * @param {String} nameDisplay The display setting for the name input
+ * @param {String} deleteDisplay The display setting for the delete button
+ */
+function switchInputVisibility(nameDisplay, deleteDisplay) {
+  document.getElementById('name').style.display = nameDisplay;
+  document.getElementById('delete').style.display = deleteDisplay;
+}
 /**
  * Loads a robot for the user to edit
  * @param {String} name The name of the robot
@@ -488,23 +565,24 @@ function loadRobot(name) {
   document.getElementById('robot-select').value = name;
   if (name == '') {
     removeAllRows(true);
-    document.getElementById('name').style.display = 'inline';
-    document.getElementById('delete').style.display = 'none';
+    switchInputVisibility('inline', 'none');
   } else {
-    removeAllRows(false);
-    document.getElementById('name').style.display = 'none';
-    document.getElementById('delete').style.display = 'inline';
-    fs.readFile(`App/JS/Resources/Robots/${name}.json`, (err, data) => {
-      const robot = JSON.parse(data);
-      let i = 0;
-      for (const index in robot) {
-        if (typeof(index) == 'number' || typeof(index) == 'string') {
-          const servo = robot[index];
-          addRow();
-          updateRow(++i, index, servo.model, servo.protocol, servo.mode,
-              servo.minPos, servo.maxPos, servo.groups);
+    switchInputVisibility('none', 'inline');
+    removeAllRows(false).then(() => {
+      fs.readFile(`App/JS/Resources/Robots/${name}.json`, (err, data) => {
+        const robot = JSON.parse(data);
+        let i = 0;
+        for (const index in robot) {
+          if (typeof(index) == 'number' || typeof(index) == 'string') {
+            const config = robot[index];
+            config.range = [config.minPos, config.maxPos];
+            delete config.minPos;
+            delete config.maxPos;
+            addRow();
+            updateRow(++i, config);
+          }
         }
-      }
+      });
     });
   }
 }

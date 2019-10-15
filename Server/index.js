@@ -1,31 +1,41 @@
-const { spawn } = require('child_process');
+const {spawn} = require('child_process');
 const dgram = require('dgram');
 const server = dgram.createSocket('udp4');
-let client = "";
+let client = '';
 
 const commands = {
   'Driving': [
     'python3',
-    ['-u', './Driving/server.py']
+    ['-u', './Driving/server.py'],
   ],
   'Fileserver': [
     'node',
-    ['./fileServer.js']
-  ]
-}
+    ['./fileServer.js'],
+  ],
+};
 
-let children = {};
+const children = {};
 
+/**
+ * Outputs the data from a given data stream
+ * @param {String} data The data to output
+ * @param {String} index The index of the command
+ * @param {String} name The name of the output method
+ */
 function handleListeners(data, index, name) {
   console.log(`${index} ${name}: ${data}`);
   server.send(`${index} ${name}: ${data}`, 5002, client);
 }
 
+/**
+ * Adds stdout and stderr listeners to a given command
+ * @param {String} index The index of the command
+ */
 function addListeners(index) {
   const outputs = [children[index].stdout, children[index].stderr];
   for (let i = 0; i < outputs.length; i++) {
     outputs[i].on('data', (data) =>
-    handleListeners(data, index, 'stdout'));
+      handleListeners(data, index, i == 0? 'stdout' : 'stderr'));
   }
 
   children[index].on('close', (code) => {
@@ -46,7 +56,7 @@ server.on('message', (msg, rinfo) => {
   if (commands.hasOwnProperty(msg)) {
     children[msg] = spawn(commands[msg][0], commands[msg][1]);
     addListeners(msg);
-    console.log(`Started function: ${msg}`)
+    console.log(`Started function: ${msg}`);
   }
 });
 

@@ -126,7 +126,7 @@ function initialiseTable(servo) {
 /**
  * Creates and initialises a {@link Dynamixel} servo using input from HTML
  */
-function openTable() {
+function openTable() { // eslint-disable-line no-unused-vars
   const model = document.getElementById('model').value;
   const id = document.getElementById('id').value;
   const protocol = document.getElementById('protocol').value;
