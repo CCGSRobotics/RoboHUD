@@ -3,7 +3,7 @@ plugins:
   eslint:
     enabled: true
     config:
-      config: Scripts/.eslintrc.json
+      config: .eslintrc.json
   bandit:
     enabled: true
   cppcheck:
