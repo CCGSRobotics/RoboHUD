@@ -22,12 +22,13 @@
   "dependencies": {
     "cheerio": "^1.0.0-rc.3",
     "cheerio-tableparser": "^1.0.1",
-    "eslint": "^6.5.1",
-    "eslint-config-google": "^0.13.0",
     "request-promise": "^4.2.4"
   },
   "devDependencies": {
     "electron": "^6.0.12",
-    "electron-builder": "^21.2.0"
+    "electron-builder": "^21.2.0",
+    "eslint": "^6.5.1",
+    "eslint-config-google": "^0.14.0",
+    "remark-lint": "^6.0.5"
   }
 }
