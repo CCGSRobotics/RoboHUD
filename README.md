@@ -18,21 +18,21 @@ Features on the roadmap (may be already implemented, check the projects page for
 -   Gyroscope/accelerometer/magnetometer positional visualisation
 -   Full customisability through settings
 
-# Reporting bugs & requesting features
+## Reporting bugs & requesting features
 
 If you have any issue with the software, please feel free to [create an issue](https://github.com/CCGSRobotics/RoboHUD/issues/new), and we can take a look at addressing your problem. To view the currently tracked bugs, take a look at the [bugs project page](https://github.com/CCGSRobotics/RoboHUD/projects/6). There is also a [feature requests](https://github.com/CCGSRobotics/RoboHUD/projects/2) project if you would like to see what other people are asking for!
 
-# Installation
+## Installation
 
 There are multiple options for installation. With the installation script, you can install the client and/or the server software. To do so, simply use the provided installation script in [Scripts/install.sh](Scripts/install.sh).
 
-## Installing the client
+### Installing the client
 
 To install the GUI on a UNIX-based system (Linux or MacOS), run the following command:
 
 `curl -o- -L https://raw.githubusercontent.com/CCGSRobotics/RoboHUD/master/Scripts/install.sh | sh`
 
-## Installing the server
+### Installing the server
 
 To copy the server across to the robot, you will need to have run the necessary [setup scripts](https://github.com/CCGSRobotics/WiFi-Setup-Scripts), so that the SSH server and WiFi are properly configured. To install the server, make sure that you are in the RoboHUD directory `cd RoboHUD/` and run the following command, making sure to replace HOSTNAME with the robot's hostname (in most cases this will be pi@192.168.100.1):
 
@@ -40,12 +40,12 @@ To copy the server across to the robot, you will need to have run the necessary 
 
 The hostname is made up of 2 parts: the username (usually pi) @ the ip address (usually 192.168.100.1). That is why the standard hostname is pi@192.168.100.1.
 
-## Installing both
+### Installing both
 
 To install both parts of the GUI, run:
 
 `curl -o- -L https://raw.githubusercontent.com/CCGSRobotics/RoboHUD/master/Scripts/install.sh | sh -ss -- -h HOSTNAME`
 
-## Using the script without curl
+### Using the script without curl
 
 As mentioned previously, the script is located in the Scripts/ directory, for use when the GUI is already downloaded (as demonstrated in [Installing the server](#installing-the-server)).
