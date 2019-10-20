@@ -20,7 +20,7 @@ COMMANDS = {
         'cpp': ['cpplint FILENAME'],
         'html': ['htmlhint FILENAME', '-c Scripts/htmlhintrc.json'],
         'py': ['pylint FILENAME'],
-        'md': ['node node_modules/remark-cli/cli.js FILENAME']
+        'md': ['node node_modules/remark-cli/cli.js FILENAME --no-stdout --frail']
         }
 
 CHECKS = {
