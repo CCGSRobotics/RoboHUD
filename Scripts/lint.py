@@ -8,12 +8,12 @@ import glob
 
 PARSER = argparse.ArgumentParser(description=
                                  'Lint all files in the given directory')
-PARSER.add_argument('paths', metavar='paths', type=str, nargs='*', default=['**/*'],
+PARSER.add_argument('paths', metavar='paths', type=str, nargs='*',
                     help='The paths to lint (defaults to .)')
 ARGS = PARSER.parse_args()
 
 
-EXCLUDE = ['node_modules', '.git', '.eslintrc.json', './Scripts/htmlhintrc.json']
+EXCLUDE = ['node_modules', '.git', '.eslintrc.json', 'htmlhintrc.json']
 GOOD_FILES = []
 BAD_FILES = []
 COMMANDS = {
@@ -55,7 +55,6 @@ class Linter:
                     lintable[language] = [name]
         else:
             print('Unable to load linter: {}'.format(name))
-
     def lint_file(self, filename):
         if self.available:
             print('----- Linting {}'.format(filename))
@@ -78,16 +77,22 @@ def lint_file(path):
 
 def excluded(filepath):
     for exclusion in EXCLUDE:
-        directory = os.path.join(os.path.realpath(exclusion), '')
-        filepath = os.path.realpath(filepath)
-        if os.path.commonprefix([filepath, directory]) == directory:
+        filepath = os.path.basename(os.path.realpath(filepath))
+        exclusion = os.path.basename(exclusion)
+        print(filepath, exclusion)
+        if filepath == exclusion:
             return True
     return False
 
 try:
     globs = []
+
+    if ARGS.paths == []:
+        globs.append(os.listdir(os.getcwd()))
     for arg in ARGS.paths:
-        globs.append([path for path in glob.glob(arg, recursive=True) if not excluded(path)])
+        if os.path.isdir(arg):
+            arg += '**/*'
+        globs.append([path for path in glob.glob(arg, recursive=True) if not excluded(path) and os.path.isfile(path)])
     for item in globs:
         for path in item:
             lint_file(path)
