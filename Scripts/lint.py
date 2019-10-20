@@ -5,6 +5,7 @@ import os
 import subprocess
 import argparse
 import glob
+from multiprocessing import Process
 
 PARSER = argparse.ArgumentParser(description=
                                  'Lint all files in the given directory')
@@ -57,8 +58,14 @@ class Linter:
             print('Unable to load linter: {}'.format(name))
     def lint_file(self, filename):
         if self.available:
-            print('----- Linting {}'.format(filename))
-            subprocess.run(self.script.format(filename), shell=True)
+            proc = subprocess.Popen(self.script.format(filename), shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+            out, _ = proc.communicate()
+            out = out.decode('utf-8')
+            if proc.returncode != 0:
+                print('Linting errors found in {}:'.format(filename))
+                print(out)
+            else:
+                print('Linted {} and found no errors'.format(filename))
 
 def new_linter(name, languages, script, check):
     linters[name] = Linter(name, languages, script, check)
@@ -66,20 +73,20 @@ def new_linter(name, languages, script, check):
 new_linter('CCPLint', ['.cc', '.cpp', '.ino'], 'cpplint {}', 'which cpplint')
 new_linter('ESLint', ['.js', '.json'], 'node node_modules/eslint/bin/eslint.js -c .eslintrc.json {}', '[ -e node_modules/eslint/bin/eslint.js ]')
 new_linter('HTMLHint', ['.html'], 'htmlhint -c Scripts/.htmlhintrc.json {}', 'which htmlhint')
-new_linter('PyLint', ['.py'], 'pylint {}', 'which pylint')
+new_linter('PyLint', ['.py'], 'pylint -s n {}', 'which pylint')
 new_linter('ReMark', ['.md'], 'node node_modules/remark-cli/cli.js --no-stdout --frail {}', '[ -e node_modules/remark-cli/cli.js ]')
 
 def lint_file(path):
     filename, extension = os.path.splitext(path)
     if extension in lintable:
         for linter in lintable[extension]:
-            linters[linter].lint_file(path)
+            p = Process(target=linters[linter].lint_file, args=(path,))
+            p.start()
 
 def excluded(filepath):
     for exclusion in EXCLUDE:
         filepath = os.path.basename(os.path.realpath(filepath))
         exclusion = os.path.basename(exclusion)
-        print(filepath, exclusion)
         if filepath == exclusion:
             return True
     return False
