@@ -1,29 +1,30 @@
 ---
-name: Bug report
-about: Create a report to help us improve the GUI
-
+name: Bug Report
+about: Create a bug report to let us know how to improve RoboHUD
 ---
 
 **Describe the bug**
-A clear and concise description of what the bug is.
+What is the bug?
 
-**To Reproduce**
-Steps to reproduce the behavior:
-1. Go to '...'
-2. Click on '....'
-3. Scroll down to '....'
-4. See error
+**Steps to reproduce**
+
+1.  Go to '...'
+2.  Click on '....'
+3.  Scroll down to '....'
+4.  See error
 
 **Expected behavior**
 A clear and concise description of what you expected to happen.
 
 **Screenshots**
-If applicable, add screenshots to help explain your problem.
+If applicable, please add screenshots to help explain your problem.
 
 **Please complete the following information:**
- - OS: [e.g. Ubuntu 14.04]
- - Electron version
- - Project version [e.g. latest]
+
+-   OS: (e.g. Ubuntu 14.04)
+-   Electron version
+-   Project version (e.g. tag v1.0.0, commit 2deaac6)
+-   Development version (yes/no)
 
 **Additional context**
 Add any other context about the problem here.

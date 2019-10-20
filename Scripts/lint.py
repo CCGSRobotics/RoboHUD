@@ -19,14 +19,16 @@ COMMANDS = {
         'js': ['node node_modules/eslint/bin/eslint.js FILENAME', '-c .eslintrc.json'],
         'cpp': ['cpplint FILENAME'],
         'html': ['htmlhint FILENAME', '-c Scripts/htmlhintrc.json'],
-        'py': ['pylint FILENAME']
+        'py': ['pylint FILENAME'],
+        'md': ['node node_modules/remark-cli/cli.js FILENAME --no-stdout --frail']
         }
 
 CHECKS = {
-    'js': ['[[ -e node_modules/eslint/bin/eslint.js ]]'],
+    'js': ['[ -e node_modules/eslint/bin/eslint.js ]'],
     'cpp': ['which cpplint'],
     'html': ['which htmlhint'],
     'py': ['which pylint'],
+    'md': ['[ -e node_modules/remark-cli/cli.js ]']
 }
 EXISTS = {}
 
@@ -37,6 +39,7 @@ for lang in CHECKS:
         print('Able to use language: {}'.format(lang))
         EXISTS[lang] = True
     else:
+        print(res)
         print('Unable to use language: {} (Not installed)'.format(lang))
         EXISTS[lang] = False
 

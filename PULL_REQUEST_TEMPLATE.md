@@ -1,12 +1,19 @@
-# Changes
-<!--- Please list a summary of all the changes you have made (use an asterisk at the start of each new line)--->
-* Change 1
-* Change 2
+## Changes
 
-# Reason for this change
+<!--- Please list a summary of all the changes you have made (use an asterisk at the start of each new line)--->
+
+-   Feature 1
+-   Feature 2
+-   Bug fix 1
+
+## Reason for these changes
+
 <!--- Please describe the reasoning behind your commits --->
 
-# Checklist
-<!--- Mark the square brackets [] with Y, N or additional information--->
-* I have talked to someone about making this change []
-* This change has been tested or has been approved by a senior member []
+## Analysis & code quality
+
+<!--- What static code analysis tools have you used to check your code? --->
+
+-   Codeclimate
+-   `Scripts/lint.py`
+-   Snyk
