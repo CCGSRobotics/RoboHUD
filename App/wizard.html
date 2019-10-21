@@ -1,18 +1,42 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <title>Remote Dynamixel Wizard</title>
   <script src="JS/wizard.js"></script>
   <link rel="stylesheet" href="CSS/wizard.css">
 </head>
+
 <body>
   <div id="select">
-    <input type="text" id="model" placeholder="Model">
+    <select id="model"></select>
     <input type="text" id="id" placeholder="ID">
     <input type="text" id="protocol" placeholder="Protocol #">
-    <button onclick="openTable()">Go!</button>
+    <button type="submit" onclick="openTable()">Go!</button>
   </div>
   <table id="control_table"></table>
+
+  <script>
+    const fs = require('fs');
+    const files = fs.readdirSync('App/JS/Resources/Servos');
+
+    const model = document.getElementById('model');
+
+    files.forEach((item) => {
+      item = item.split('.');
+
+      if (item[1] === 'csv') {
+        const option = document.createElement('OPTION');
+
+        option.value = item[0];
+        option.innerHTML = item[0];
+
+        model.appendChild(option);
+      }
+
+    });
+  </script>
 </body>
+
 </html>
