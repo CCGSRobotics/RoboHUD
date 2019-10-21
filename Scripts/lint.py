@@ -4,15 +4,17 @@
 import os
 import subprocess
 import argparse
+import glob
+from multiprocessing import Process
 
 PARSER = argparse.ArgumentParser(description=
                                  'Lint all files in the given directory')
-PARSER.add_argument('paths', metavar='paths', type=str, nargs='*', default=['.'],
+PARSER.add_argument('paths', metavar='paths', type=str, nargs='*',
                     help='The paths to lint (defaults to .)')
 ARGS = PARSER.parse_args()
 
 
-EXCLUDE = ['node_modules', '.git']
+EXCLUDE = ['node_modules', '.git', '.eslintrc.json', 'htmlhintrc.json']
 GOOD_FILES = []
 BAD_FILES = []
 COMMANDS = {
@@ -31,97 +33,93 @@ CHECKS = {
     'md': ['[ -e node_modules/remark-cli/cli.js ]']
 }
 EXISTS = {}
+LINTABLE = {}
+LINTERS = {}
+COLOURS = {
+    'okblue': '\033[94m',
+    'okgreen': '\033[92m',
+    'warn': '\033[93m',
+    'err': '\033[91m',
+    'bold': '\033[1m',
+    'underline': '\033[4m',
+    'end': '\x1b[0m'
+}
 
-for lang in CHECKS:
-    devnull = open(os.devnull, 'wb')
-    res = subprocess.call(CHECKS[lang], stdout=devnull, stderr=devnull, shell=True)
-    if not res:
-        print('Able to use language: {}'.format(lang))
-        EXISTS[lang] = True
+def prettyprint(colours, string):
+    if isinstance(colours, list):
+        pre = ''.join([COLOURS[i] for i in colours])
     else:
-        print(res)
-        print('Unable to use language: {} (Not installed)'.format(lang))
-        EXISTS[lang] = False
+        pre = COLOURS[colours]
+    print(pre + string + COLOURS['end'])
 
-def lint(filename):
-    """Lint a single file and return the result.
+class Linter:
+    def __init__(self, name, languages, script, check):
+        self.name = name
+        self.languages = languages
+        self.script = script
+        self.check = check
 
-    Parameters:
-    filename (str): The name of the file
-    """
-    print('----- Linting {}'.format(filename))
+        self.available = subprocess.run(self.check, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, shell=True).returncode == 0
 
-    ext = os.path.splitext(filename)[1][1:]
-    COMMANDS[ext][0] = COMMANDS[ext][0].replace('FILENAME', filename)
-    result = subprocess.call(COMMANDS[ext], shell=True)
-    COMMANDS[ext][0] = COMMANDS[ext][0].replace(filename, 'FILENAME')
-
-    return result
-
-def check_file(name):
-    """Check to see if a file is applicable for linting.
-
-    Parameters:
-    name (str): The name of the file
-    """
-    index = name.rfind('.')
-    _, ext = name[:index], name[index+1:]
-    if ext in COMMANDS and EXISTS[ext]:
-        filename = os.path.join(root, name)
-        result = lint(filename)
-        if result != 0:
-            BAD_FILES.append(os.path.join(root, name))
+        if self.available:
+            prettyprint(['okblue', 'underline'], 'Loaded linter: {}'.format(name))
+            print('\n'.join(['  Able to use language: {}'.format(lang) for lang in languages]))
+            global LINTABLE
+            for language in languages:
+                if language in LINTABLE:
+                    LINTABLE[language].append(name)
+                else:
+                    LINTABLE[language] = [name]
         else:
-            GOOD_FILES.append(os.path.join(root, name))
-            print('\33[32mFile passed all linting tests!\33[0m\n')
-
-def check_dir(root_dir, dirs, files):
-    """Check a directory for lintable files.
-
-    Parameters:
-    root_dir (str): The base filepath
-    dirs (list): Every subdirectory of the directory
-    files (list): Every file directly inside the directory
-    """
-    dirs[:] = [d for d in dirs if d not in EXCLUDE]
-    files[:] = [f for f in files if f not in EXCLUDE]
-    for name in files:
-        check_file(os.path.join(root_dir, name))
-
-def check_dirs(directory):
-    """Call check_dir on every path in a directory.
-
-    Parameters:
-    directory (str): The path of the directory to operate on
-    """
-    for root_dir, dirs, files in os.walk(directory, topdown=True):
-        check_dir(root_dir, dirs, files)
-try:
-    if ARGS.paths == []:
-        check_dirs('.')
-    else:
-        for path in ARGS.paths:
-            root = '.'
-            if os.path.isfile(path):
-                check_file(path)
+            prettyprint(['err', 'underline'], 'Unable to load linter: {}'.format(name))
+    def lint_file(self, filename):
+        if self.available:
+            proc = subprocess.Popen(self.script.format(filename), shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+            out, _ = proc.communicate()
+            out = out.decode('utf-8')
+            if proc.returncode != 0:
+                prettyprint('warn', 'Linting errors found in {}:'.format(filename))
+                print(out)
             else:
-                check_dirs(path)
+                prettyprint('okgreen', 'Linted {} and found no errors'.format(filename))
+
+def new_linter(name, languages, script, check):
+    LINTERS[name] = Linter(name, languages, script, check)
+
+new_linter('CCPLint', ['.cc', '.cpp', '.ino'], 'cpplint {}', 'which cpplint')
+new_linter('ESLint', ['.js', '.json'], 'node node_modules/eslint/bin/eslint.js -c .eslintrc.json {}', '[ -e node_modules/eslint/bin/eslint.js ]')
+new_linter('HTMLHint', ['.html'], 'htmlhint -c Scripts/.htmlhintrc.json {}', 'which htmlhint')
+new_linter('PyLint', ['.py'], 'pylint -s n {}', 'which pylint')
+new_linter('ReMark', ['.md'], 'node node_modules/remark-cli/cli.js --no-stdout --frail {}', '[ -e node_modules/remark-cli/cli.js ]')
+
+def lint_file(path):
+    _, extension = os.path.splitext(path)
+    if extension in LINTABLE:
+        for linter in LINTABLE[extension]:
+            proc = Process(target=LINTERS[linter].lint_file, args=(path,))
+            proc.start()
+
+def excluded(filepath):
+    for exclusion in EXCLUDE:
+        filepath = os.path.basename(os.path.realpath(filepath))
+        exclusion = os.path.basename(exclusion)
+        if filepath == exclusion:
+            return True
+    return False
+
+try:
+    GLOBS = []
+
+    if ARGS.paths == []:
+        GLOBS.append(os.listdir(os.getcwd()))
+    for arg in ARGS.paths:
+        if os.path.isdir(arg):
+            arg += '**/*'
+        GLOBS.append([path for path in glob.glob(arg, recursive=True) if not excluded(path) and os.path.isfile(path)])
+    for item in GLOBS:
+        for file_path in item:
+            lint_file(file_path)
 
 except KeyboardInterrupt:
-    print('Cancelled! Exiting...')
+    prettyprint(['err', 'bold'], 'Cancelled! Exiting...')
     quit()
-
-for i in GOOD_FILES:
-    print('\33[32m' + i + '\33[0m')
-for i in BAD_FILES:
-    print('\33[31m' + i + '\33[0m')
-
-if BAD_FILES != []:
-    ERROR = ''
-    if len(BAD_FILES) == 1:
-        ERROR = '1 file breaks its corresponding styleguide'
-    else:
-        ERROR = '{} files break their corresponding styleguides'.format(len(BAD_FILES))
-
-    raise Exception(ERROR)
-print('Congratulations! No files break their corresponding styleguides')
