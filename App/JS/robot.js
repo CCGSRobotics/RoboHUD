@@ -363,11 +363,11 @@ function updateRow(index, options) {
  */
 function addListeners(index) {
   document.getElementById(`joint-${index}`).onchange = function() {
-    setRangeValues(index, 0, 1024);
+    setRangeValues(index, [0, 1024]);
   };
 
   document.getElementById(`wheel-${index}`).onchange = function() {
-    setRangeValues(index, 0, 0);
+    setRangeValues(index, [0, 0]);
   };
 
   document.getElementById(`min-${index}`).onchange = function() {
