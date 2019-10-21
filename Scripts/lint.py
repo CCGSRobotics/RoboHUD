@@ -35,6 +35,22 @@ CHECKS = {
 EXISTS = {}
 lintable = {}
 linters = {}
+COLOURS = {
+    'okblue': '\033[94m',
+    'okgreen': '\033[92m',
+    'warn': '\033[93m',
+    'err': '\033[91m',
+    'bold': '\033[1m',
+    'underline': '\033[4m',
+    'end': '\x1b[0m'
+}
+
+def prettyprint(colours, string):
+    if type(colours) == list:
+        pre = ''.join([COLOURS[i] for i in colours])
+    else:
+        pre = COLOURS[colours]
+    print(pre + string + COLOURS['end'])
 
 class Linter:
     def __init__(self, name, languages, script, check):
@@ -46,7 +62,7 @@ class Linter:
         self.available = subprocess.run(self.check, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, shell=True).returncode == 0
 
         if self.available:
-            print('Loaded linter: {}'.format(name))
+            prettyprint(['okblue', 'underline'], 'Loaded linter: {}'.format(name))
             print('\n'.join(['  Able to use language: {}'.format(lang) for lang in languages]))
             global lintable
             for language in languages:
@@ -55,17 +71,17 @@ class Linter:
                 else:
                     lintable[language] = [name]
         else:
-            print('Unable to load linter: {}'.format(name))
+            prettyprint(['err', 'underline'], 'Unable to load linter: {}'.format(name))
     def lint_file(self, filename):
         if self.available:
             proc = subprocess.Popen(self.script.format(filename), shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
             out, _ = proc.communicate()
             out = out.decode('utf-8')
             if proc.returncode != 0:
-                print('Linting errors found in {}:'.format(filename))
+                prettyprint('warn', 'Linting errors found in {}:'.format(filename))
                 print(out)
             else:
-                print('Linted {} and found no errors'.format(filename))
+                prettyprint('okgreen', 'Linted {} and found no errors'.format(filename))
 
 def new_linter(name, languages, script, check):
     linters[name] = Linter(name, languages, script, check)
@@ -105,5 +121,5 @@ try:
             lint_file(path)
 
 except KeyboardInterrupt:
-    print('Cancelled! Exiting...')
+    prettyprint(['err', 'bold'], 'Cancelled! Exiting...')
     quit()
