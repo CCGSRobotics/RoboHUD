@@ -77,3 +77,6 @@ dist/
 
 # Pycache
 Server/Driving/__pycache__/
+
+# MacOS stupid file
+.DS_Store
