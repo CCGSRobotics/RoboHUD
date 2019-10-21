@@ -110,9 +110,6 @@ function initialiseTable(servo) {
 
     // console.log(name, value)
     const element = document.getElementById(`${name} Value`);
-    if (element == null) {
-      console.log(name);
-    }
     element.innerHTML = value;
   });
 
