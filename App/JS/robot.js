@@ -573,7 +573,7 @@ function loadRobot(name) {
         const robot = JSON.parse(data);
         let i = 0;
         for (const index in robot) {
-          if (typeof(index) == 'number' || typeof(index) == 'string') {
+          if (robot.hasOwnProperty(index)) {
             const config = robot[index];
             config.range = [config.minPos, config.maxPos];
             delete config.minPos;

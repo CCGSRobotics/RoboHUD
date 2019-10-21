@@ -161,7 +161,7 @@ class Robot {
       this.options = {};
 
       for (const index in servos) {
-        if (typeof(index) === 'number' || typeof(index) == 'string') {
+        if (servos.hasOwnProperty(index)) {
           const servo = servos[index];
           const id = servo.id;
           const groups = servo.groups;
@@ -228,7 +228,7 @@ class Robot {
     }
 
     for (const item in this.groups[group]) {
-      if (typeof(item) === 'number' || typeof(item) == 'string') {
+      if (this.groups[group].hasOwnProperty(item)) {
         const index = this.groups[group][item];
         if (typeof(index) == 'string') {
           this.moveGroup(index, percentage, position);
