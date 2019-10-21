@@ -33,8 +33,8 @@ CHECKS = {
     'md': ['[ -e node_modules/remark-cli/cli.js ]']
 }
 EXISTS = {}
-lintable = {}
-linters = {}
+LINTABLE = {}
+LINTERS = {}
 COLOURS = {
     'okblue': '\033[94m',
     'okgreen': '\033[92m',
@@ -64,12 +64,12 @@ class Linter:
         if self.available:
             prettyprint(['okblue', 'underline'], 'Loaded linter: {}'.format(name))
             print('\n'.join(['  Able to use language: {}'.format(lang) for lang in languages]))
-            global lintable
+            global LINTABLE
             for language in languages:
-                if language in lintable:
-                    lintable[language].append(name)
+                if language in LINTABLE:
+                    LINTABLE[language].append(name)
                 else:
-                    lintable[language] = [name]
+                    LINTABLE[language] = [name]
         else:
             prettyprint(['err', 'underline'], 'Unable to load linter: {}'.format(name))
     def lint_file(self, filename):
@@ -84,7 +84,7 @@ class Linter:
                 prettyprint('okgreen', 'Linted {} and found no errors'.format(filename))
 
 def new_linter(name, languages, script, check):
-    linters[name] = Linter(name, languages, script, check)
+    LINTERS[name] = Linter(name, languages, script, check)
 
 new_linter('CCPLint', ['.cc', '.cpp', '.ino'], 'cpplint {}', 'which cpplint')
 new_linter('ESLint', ['.js', '.json'], 'node node_modules/eslint/bin/eslint.js -c .eslintrc.json {}', '[ -e node_modules/eslint/bin/eslint.js ]')
@@ -93,11 +93,11 @@ new_linter('PyLint', ['.py'], 'pylint -s n {}', 'which pylint')
 new_linter('ReMark', ['.md'], 'node node_modules/remark-cli/cli.js --no-stdout --frail {}', '[ -e node_modules/remark-cli/cli.js ]')
 
 def lint_file(path):
-    filename, extension = os.path.splitext(path)
-    if extension in lintable:
-        for linter in lintable[extension]:
-            p = Process(target=linters[linter].lint_file, args=(path,))
-            p.start()
+    _, extension = os.path.splitext(path)
+    if extension in LINTABLE:
+        for linter in LINTABLE[extension]:
+            proc = Process(target=LINTERS[linter].lint_file, args=(path,))
+            proc.start()
 
 def excluded(filepath):
     for exclusion in EXCLUDE:
@@ -108,17 +108,17 @@ def excluded(filepath):
     return False
 
 try:
-    globs = []
+    GLOBS = []
 
     if ARGS.paths == []:
-        globs.append(os.listdir(os.getcwd()))
+        GLOBS.append(os.listdir(os.getcwd()))
     for arg in ARGS.paths:
         if os.path.isdir(arg):
             arg += '**/*'
-        globs.append([path for path in glob.glob(arg, recursive=True) if not excluded(path) and os.path.isfile(path)])
-    for item in globs:
-        for path in item:
-            lint_file(path)
+        GLOBS.append([path for path in glob.glob(arg, recursive=True) if not excluded(path) and os.path.isfile(path)])
+    for item in GLOBS:
+        for file_path in item:
+            lint_file(file_path)
 
 except KeyboardInterrupt:
     prettyprint(['err', 'bold'], 'Cancelled! Exiting...')
