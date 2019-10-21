@@ -66,7 +66,7 @@ function parseDynamixelTable(table) {
  * @return {String} The CSV-formatted table containing all of the control table
  */
 function generateCSV(html, indexes) {
-  if (indexes == null || indexes == undefined || indexes.length == 0) {
+  if (indexes == null || indexes.length == 0) {
     console.error('Invalid argument!' +
     'Ensure that the argument "indexes" is valid!');
     return '';
@@ -317,7 +317,7 @@ function getFile() { // eslint-disable-line no-unused-vars
  * Uploads the data stored in fileData through TCP to a listening fileserver
  */
 function uploadFile() { // eslint-disable-line no-unused-vars
-  if (fileData == null || fileData == undefined || fileData == '') {
+  if (fileData == null || fileData == '') {
     console.error('There is no downloaded file!');
     return;
   }
