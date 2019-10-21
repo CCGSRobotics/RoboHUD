@@ -46,7 +46,7 @@ COLOURS = {
 }
 
 def prettyprint(colours, string):
-    if type(colours) == list:
+    if isinstance(colours, list):
         pre = ''.join([COLOURS[i] for i in colours])
     else:
         pre = COLOURS[colours]
