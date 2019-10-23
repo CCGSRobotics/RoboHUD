@@ -234,16 +234,17 @@ def initialise_dynamixel(model, dynamixel_id, protocol):
 
     table = open(filepath, 'r').readlines()
     first_line = table[0].split(', ')
+    data_index = first_line.index('Data Name')
     control_table = {}
     for row in range(1, len(table)):
         line = table[row].split(', ')
         build = {}
-        build[line[2]] = {}
+        build[line[data_index]] = {}
         for iterator, item in enumerate(line):
-            if line[iterator] != line[2]:
+            if line[iterator] != line[data_index]:
                 new = item.strip()
                 if new.isdigit():
                     new = int(new)
-                build[line[2]][first_line[iterator].strip()] = new
+                build[line[data_index]][first_line[iterator].strip()] = new
         control_table = {**control_table, **build}
     return Dynamixel(model, dynamixel_id, protocol, control_table)
