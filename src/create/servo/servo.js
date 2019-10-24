@@ -254,7 +254,7 @@ function saveFile() {
   fileData = headings + '\n';
   fileData += grid.join('\n');
 
-  fs.writeFile(`src/JS/Resources/Servos/${filename}.csv`,
+  fs.writeFile(`src/conf/Servos/${filename}.csv`,
       fileData, function(err) {
         if (err) {
           console.error('Failed to write file! Do you have access?');

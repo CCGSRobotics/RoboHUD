@@ -1,4 +1,4 @@
-const {sendData, Dynamixel} = require('./JS/main.js');
+const {sendData, Dynamixel} = require('../../lib/driving.js');
 const dgram = require('dgram');
 const server = dgram.createSocket('udp4');
 

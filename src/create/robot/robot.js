@@ -1,5 +1,5 @@
 const fs = require('fs');
-const robotPath = './src/JS/Resources/Robots';
+const robotPath = './src/conf/Robots';
 if (!fs.existsSync(robotPath)) {
   fs.mkdir(robotPath, (err) => {
     handleError(err, `Error making directory: ${err}`,
@@ -53,7 +53,7 @@ function createModel(index) {
   const model = document.createElement('td');
   const select = document.createElement('select');
   select.setAttribute('id', `model-${index}`);
-  const servos = readDir('./src/JS/Resources/Servos');
+  const servos = readDir('./src/conf/Servos');
 
   for (let i = 0; i < servos.length; ++i) {
     const option = document.createElement('option');
@@ -388,7 +388,7 @@ function createOptions(index) {
   const options = {
     protocol: 1,
     mode: 'joint',
-    model: readDir('./src/JS/Resources/Servos/')[0].split('.')[0],
+    model: readDir('./src/conf/Servos/')[0].split('.')[0],
   };
   if (index > 1) {
     options.protocol =
@@ -477,7 +477,7 @@ function saveRobot() { // eslint-disable-line no-unused-vars
     name = document.getElementById('name').value;
   }
 
-  fs.writeFile(`./src/JS/Resources/Robots/${name}.json`, config, function(err) {
+  fs.writeFile(`./src/conf/Robots/${name}.json`, config, function(err) {
     if (err) {
       console.error('Failed to write file! Do you have access?');
       console.error(err);
@@ -569,7 +569,7 @@ function loadRobot(name) {
   } else {
     switchInputVisibility('none', 'inline');
     removeAllRows(false).then(() => {
-      fs.readFile(`src/JS/Resources/Robots/${name}.json`, (err, data) => {
+      fs.readFile(`src/conf/Robots/${name}.json`, (err, data) => {
         const robot = JSON.parse(data);
         let i = 0;
         for (const index in robot) {
