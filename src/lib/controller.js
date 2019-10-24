@@ -66,7 +66,7 @@ class Controller extends EventEmitter {
    * @param {Number} index The index of the node
    * @param {Array} range The min & max range
    */
-  AddControllerNode(name, button, index, range) {
+  addControllerNode(name, button, index, range) {
     this.nodes[name] = new ControllerInputNode(button, index, range);
   }
 
@@ -94,4 +94,4 @@ class Controller extends EventEmitter {
   }
 }
 
-module.exports.controller = Controller;
+module.exports.Controller = Controller;
