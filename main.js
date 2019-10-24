@@ -111,6 +111,12 @@ const template = [
         },
       },
       {
+        label: 'Create New Controller',
+        click() {
+          win.loadFile('App/controller.html');
+        },
+      },
+      {
         label: 'Create New Servo',
         click() {
           win.loadFile('App/createServo.html');
