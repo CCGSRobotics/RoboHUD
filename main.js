@@ -105,22 +105,30 @@ const template = [
         },
       },
       {
-        label: 'Create New Robot',
-        click() {
-          win.loadFile('src/create/robot/robot.html');
-        },
-      },
-      {
-        label: 'Create New Controller',
-        click() {
-          win.loadFile('src/create/controller/controller.html');
-        },
-      },
-      {
-        label: 'Create New Servo',
-        click() {
-          win.loadFile('src/create/servo/servo.html');
-        },
+        label: 'Create New',
+        submenu: [
+          {
+            label: 'Robot',
+            click() {
+              win.loadFile('src/create/robot/robot.html');
+            },
+          },
+          {
+            label: 'Profile',
+          },
+          {
+            label: 'Controller',
+            click() {
+              win.loadFile('src/create/controller/controller.html');
+            },
+          },
+          {
+            label: 'Servo',
+            click() {
+              win.loadFile('src/create/servo/servo.html');
+            },
+          },
+        ],
       },
     ],
   },
