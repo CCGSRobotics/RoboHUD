@@ -50,7 +50,7 @@ class Dynamixel {
     this.minPos = 0;
     this.maxPos = 1023;
 
-    const path = `./App/JS/Resources/Servos/${model}.csv`;
+    const path = `./src/JS/Resources/Servos/${model}.csv`;
     fs.readFile(path, (err, data) => {
       if (err) {
         if (err.code === 'ENOENT') {
@@ -145,7 +145,7 @@ class Robot {
    * @param {Object} name The name of the configuration file
    */
   constructor(name) {
-    const path = `./App/JS/Resources/Robots/${name}.json`;
+    const path = `./src/JS/Resources/Robots/${name}.json`;
     fs.readFile(path, (err, data) => {
       if (err) {
         if (err.code === 'ENOENT') {
