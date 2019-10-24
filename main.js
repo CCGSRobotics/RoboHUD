@@ -17,7 +17,7 @@ function createWindow() {
       nodeIntegration: true,
     },
   });
-  win.loadFile('src/utils/index/index.html');
+  win.loadFile('src/utils/client/client.html');
   win.webContents.openDevTools();
 
   win.on('closed', () => {
@@ -95,7 +95,7 @@ const template = [
       {
         label: 'Main Driving View',
         click() {
-          win.loadFile('src/utils/index/index.html');
+          win.loadFile('src/utils/client/client.html');
         },
       },
       {
