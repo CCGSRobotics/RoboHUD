@@ -57,6 +57,10 @@ class Controller extends EventEmitter {
     this.connected = false;
 
     this.nodes = {};
+
+    this.onchange = function(item, value) {
+      console.log(`${item}: ${value}`);
+    };
   }
 
   /**
@@ -68,6 +72,17 @@ class Controller extends EventEmitter {
    */
   addControllerNode(name, button, index, range) {
     this.nodes[name] = new ControllerInputNode(button, index, range);
+  }
+
+  updateNodes() {
+    for (const item in this.nodes) {
+      if (this.nodes.hasOwnProperty(item)) {
+        this.nodes[item].removeAllListeners('change');
+        this.nodes[item].on('change', (value) => {
+          this.onchange(item, value);
+        });
+      }
+    }
   }
 
   /**
