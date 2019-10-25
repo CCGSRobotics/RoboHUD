@@ -17,7 +17,7 @@ function createWindow() {
       nodeIntegration: true,
     },
   });
-  win.loadFile('App/wizard.html');
+  win.loadFile('src/utils/client/client.html');
   win.webContents.openDevTools();
 
   win.on('closed', () => {
@@ -95,32 +95,40 @@ const template = [
       {
         label: 'Main Driving View',
         click() {
-          win.loadFile('App/index.html');
+          win.loadFile('src/utils/client/client.html');
         },
       },
       {
         label: 'Remote Dynamixel Wizard',
         click() {
-          win.loadFile('App/wizard.html');
+          win.loadFile('src/utils/wizard/wizard.html');
         },
       },
       {
-        label: 'Create New Robot',
-        click() {
-          win.loadFile('App/robot.html');
-        },
-      },
-      {
-        label: 'Create New Controller',
-        click() {
-          win.loadFile('App/controller.html');
-        },
-      },
-      {
-        label: 'Create New Servo',
-        click() {
-          win.loadFile('App/createServo.html');
-        },
+        label: 'Create New',
+        submenu: [
+          {
+            label: 'Robot',
+            click() {
+              win.loadFile('src/create/robot/robot.html');
+            },
+          },
+          {
+            label: 'Profile',
+          },
+          {
+            label: 'Controller',
+            click() {
+              win.loadFile('src/create/controller/controller.html');
+            },
+          },
+          {
+            label: 'Servo',
+            click() {
+              win.loadFile('src/create/servo/servo.html');
+            },
+          },
+        ],
       },
     ],
   },

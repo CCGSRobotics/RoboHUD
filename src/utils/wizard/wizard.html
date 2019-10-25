@@ -4,8 +4,8 @@
 <head>
   <meta charset="UTF-8">
   <title>Remote Dynamixel Wizard</title>
-  <script src="JS/wizard.js"></script>
-  <link rel="stylesheet" href="CSS/wizard.css">
+  <script src="wizard.js"></script>
+  <link rel="stylesheet" href="wizard.css">
 </head>
 
 <body>
@@ -19,7 +19,7 @@
 
   <script>
     const fs = require('fs');
-    const files = fs.readdirSync('App/JS/Resources/Servos');
+    const files = fs.readdirSync('./src/conf/Servos');
 
     const model = document.getElementById('model');
 
