@@ -18,7 +18,46 @@ function handleChange(index, item, value) {
 }
 
 /**
- * Generates a progress bar for every node in the controller
+ * Generates a label containing an input for a given node
+ * @param {Number} index The index of the controller
+ * @param {String} key The key of the specific controller node
+ * @return {Node} The generated label
+ */
+function generateLabel(index, key) {
+  const label = document.createElement('label');
+  const input = document.createElement('input');
+  input.type = 'text';
+  input.value = key;
+  input.id = `${index}-${key}-input`;
+  input.addEventListener('change', (event) => {
+    const oldName = event.target.id.split('-')[1];
+    const newName = event.target.value;
+    renameNode(oldName, newName, index);
+    event.target.id = `${index}-${newName}-input`;
+  });
+
+  label.appendChild(input);
+  return label;
+}
+
+/**
+ * Generates a progress bar containing an input for a given node
+ * @param {Number} index The index of the controller
+ * @param {String} key The key of the specific controller node
+ * @return {Node} The generated label
+ */
+function generateProgress(index, key) {
+  const node = controllers[index].nodes[key];
+  const progress = document.createElement('progress');
+  progress.id = `${index}-${key}`;
+  progress.value = node.min;
+  progress.max = node.isButton? node.max : 2;
+
+  return progress;
+}
+
+/**
+ * Generates a progress bar & input for every node in the controller
  * @param {Number} index The index of the controller
  */
 function generateNodes(index) {
@@ -30,12 +69,8 @@ function generateNodes(index) {
   for (const key in controller.nodes) {
     if (controller.nodes.hasOwnProperty(key)) {
       const node = controller.nodes[key];
-      const progress = document.createElement('progress');
-      progress.id = `${controller.index}-${key}`;
-
-      progress.value = node.min;
-      progress.max = node.isButton? node.max : 2;
-      parent.appendChild(progress);
+      parent.appendChild(generateProgress(index, key));
+      parent.appendChild(generateLabel(index, key));
       parent.appendChild(document.createElement('br'));
 
       handleChange(index, key, node.value);
