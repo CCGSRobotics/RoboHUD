@@ -1,4 +1,5 @@
 const {Controller} = require('../../lib/controller');
+const fs = require('fs');
 const controllers = [];
 
 /**
@@ -57,6 +58,22 @@ function generateProgress(index, key) {
 }
 
 /**
+ * Generates a name input for a controller
+ * @param {Number} index The index of the controller
+ * @return {Node} The generated input
+ */
+function generateName(index) {
+  const name = document.createElement('input');
+  name.type = 'text';
+  name.id = `name-${index}`;
+  name.addEventListener('change', () => {
+    saveController(index);
+  });
+
+  return name;
+}
+
+/**
  * Generates a progress bar & input for every node in the controller
  * @param {Number} index The index of the controller
  */
@@ -64,6 +81,8 @@ function generateNodes(index) {
   const controller = controllers[index];
   const parent = document.createElement('div');
   parent.id = `controller-${index}`;
+  parent.appendChild(generateName(index));
+  parent.appendChild(document.createElement('br'));
   document.getElementById('controllers').appendChild(parent);
 
   for (const key in controller.nodes) {
@@ -148,6 +167,50 @@ function renameNode(oldName, newName, index) {
   delete nodes[oldName];
 
   controllers[index].updateNodes();
+}
+
+/**
+ * Generates the configuration of a given controller
+ * @param {Number} index The index of the controller
+ * @return {Object} The generated config
+ */
+function generateConfig(index) {
+  const controller = controllers[index];
+  const config = {};
+  config.id = controller.id;
+  config.index = controller.index;
+  config.nodes = {};
+
+  for (const key in controller.nodes) {
+    if (controller.nodes.hasOwnProperty(key)) {
+      const node = controller.nodes[key];
+      config.nodes[key] = {};
+      config.nodes[key].isButton = node.isButton;
+      config.nodes[key].index = node.index;
+      config.nodes[key].min = node.min;
+      config.nodes[key].max = node.max;
+    }
+  }
+
+  return config;
+}
+
+/**
+ * Saves a given controller's config
+ * @param {Number} index The index of the controller
+ */
+function saveController(index) {
+  const name = document.getElementById(`name-${index}`).value;
+  const config = JSON.stringify(generateConfig(index));
+
+  fs.writeFile(`./src/conf/Controllers/${name}.json`, config, (err) => {
+    if (err) {
+      console.error('Failed to write file! Do you have access?');
+      console.error(err);
+    } else {
+      console.log('Saved config successfully!');
+    }
+  });
 }
 
 // This should be migrated to animations for cleaner code
