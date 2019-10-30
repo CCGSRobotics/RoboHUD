@@ -1,4 +1,5 @@
 const EventEmitter = require('events');
+const fs = require('fs');
 
 /**
  * A class representing a single button/axis on a controller
@@ -64,6 +65,17 @@ class Controller extends EventEmitter {
   }
 
   /**
+   * Loads a controller configuration file
+   * @param {String} name The name of the configuration file
+   */
+  loadConfig(name) {
+    const path = `./src/conf/${name}.json`;
+    fs.readFile(path, (err, data) => {
+      console.log(data);
+    });
+  }
+
+  /**
    * Adds a new controller node to the list of nodes
    * @param {String} name The name to give the input node
    * @param {Boolean} button If the node is a button or not
@@ -71,9 +83,21 @@ class Controller extends EventEmitter {
    * @param {Array} range The min & max range
    */
   addControllerNode(name, button, index, range) {
+    for (const node in this.nodes) {
+      if (this.nodes.hasOwnProperty(node)) {
+        const item = this.nodes[node];
+        if (item.index == index && item.isButton == button) {
+          console.warn(`Refusing to add node ${name} (duplicate)`);
+          return;
+        }
+      }
+    }
     this.nodes[name] = new ControllerInputNode(button, index, range);
   }
 
+  /**
+   * Updates the 'change' event listeners of every node
+   */
   updateNodes() {
     for (const item in this.nodes) {
       if (this.nodes.hasOwnProperty(item)) {

@@ -35,6 +35,10 @@ function generateLabel(index, key) {
     const newName = event.target.value;
     renameNode(oldName, newName, index);
     event.target.id = `${index}-${newName}-input`;
+
+    if (controllers[index].saved) {
+      saveController(index);
+    }
   });
 
   label.appendChild(input);
@@ -66,6 +70,10 @@ function generateName(index) {
   const name = document.createElement('input');
   name.type = 'text';
   name.id = `name-${index}`;
+  if (controllers[index].saveLocation !== null) {
+    name.value = controllers[index].saveLocation;
+  }
+
   name.addEventListener('change', () => {
     saveController(index);
   });
@@ -106,9 +114,10 @@ function updateControllers() {
     controllers[index].onchange = (item, value) => {
       handleChange(index, item, value);
     };
+    controllers[index].updateNodes();
     for (const node in nodes) {
       if (nodes.hasOwnProperty(node)) {
-        controllers[index].updateNodes();
+        handleChange(index, node, nodes[node].value);
       }
     }
   }
@@ -121,17 +130,19 @@ function updateControllers() {
 function handleConnect(index) {
   console.log('Controller connected');
   const gamepad = navigator.getGamepads()[index];
-  controllers[index].id = gamepad.id;
-  for (let axis = 0; axis < gamepad.axes.length; ++axis) {
-    controllers[index].addControllerNode(`Unnamed axis #${axis}`,
-        false, axis, [0, 1]);
-  }
-  for (let button = 0; button < gamepad.buttons.length; ++button) {
-    controllers[index].addControllerNode(`Unnamed button #${button}`,
-        true, button, [0, 1]);
-  }
+  if (Object.keys(controllers[index].nodes).length === 0) {
+    controllers[index].id = gamepad.id;
+    for (let axis = 0; axis < gamepad.axes.length; ++axis) {
+      controllers[index].addControllerNode(`Unnamed axis #${axis}`,
+          false, axis, [0, 1]);
+    }
+    for (let button = 0; button < gamepad.buttons.length; ++button) {
+      controllers[index].addControllerNode(`Unnamed button #${button}`,
+          true, button, [0, 1]);
+    }
 
-  controllers[index].updateNodes();
+    controllers[index].updateNodes();
+  }
   updateControllers();
 }
 
@@ -146,6 +157,8 @@ function handleDisconnect(index) {
 
 for (let i = 0; i < 4; ++i) {
   controllers.push(new Controller('', i));
+  controllers[i].saved = false;
+  controllers[i].saveLocation = null;
   controllers[i].on('connect', () => {
     return handleConnect(i);
   });
@@ -165,8 +178,9 @@ function renameNode(oldName, newName, index) {
   Object.defineProperty(nodes, newName,
       Object.getOwnPropertyDescriptor(nodes, oldName));
   delete nodes[oldName];
-
   controllers[index].updateNodes();
+
+  document.getElementById(`${index}-${oldName}`).id = `${index}-${newName}`;
 }
 
 /**
@@ -179,6 +193,7 @@ function generateConfig(index) {
   const config = {};
   config.id = controller.id;
   config.index = controller.index;
+  config.controller = controller.name;
   config.nodes = {};
 
   for (const key in controller.nodes) {
@@ -201,6 +216,10 @@ function generateConfig(index) {
  */
 function saveController(index) {
   const name = document.getElementById(`name-${index}`).value;
+  if (name === '' || name == null) {
+    return;
+  }
+
   const config = JSON.stringify(generateConfig(index));
 
   fs.writeFile(`./src/conf/Controllers/${name}.json`, config, (err) => {
@@ -209,6 +228,8 @@ function saveController(index) {
       console.error(err);
     } else {
       console.log('Saved config successfully!');
+      controllers[index].saved = true;
+      controllers[index].saveLocation = name;
     }
   });
 }
