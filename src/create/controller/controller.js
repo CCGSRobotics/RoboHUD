@@ -181,6 +181,9 @@ function renameNode(oldName, newName, index) {
   controllers[index].updateNodes();
 
   document.getElementById(`${index}-${oldName}`).id = `${index}-${newName}`;
+  const input = document.getElementById(`${index}-${oldName}-input`);
+  input.id = newName;
+  input.value = newName;
 }
 
 /**
@@ -208,6 +211,41 @@ function generateConfig(index) {
   }
 
   return config;
+}
+
+/**
+ * Loads a compatible controller for editing
+ * @param {String} name The name of the controller file
+ */
+function loadController(name) {
+  const path = `./src/conf/Controllers/${name}.json`;
+  fs.readFile(path, (err, data) => {
+    if (err) {
+      console.error('Error reading config file:');
+      console.error(err);
+    } else {
+      const config = JSON.parse(data);
+      const index = config.index;
+      const nodes = config.nodes;
+
+      for (const item in nodes) {
+        if (nodes.hasOwnProperty(item)) {
+          const node = nodes[item];
+          for (const name in controllers[index].nodes) {
+            if (controllers[index].nodes.hasOwnProperty(name)) {
+              const oldNode = controllers[index].nodes[name];
+              if (oldNode.isButton == node.isButton &&
+                  oldNode.index == node.index) {
+                if (item !== name) {
+                  renameNode(name, item, index);
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  });
 }
 
 /**
