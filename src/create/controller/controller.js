@@ -1,6 +1,7 @@
 const {Controller} = require('../../lib/controller');
 const fs = require('fs');
 const controllers = [];
+const configs = {};
 
 /**
  * Updates the relevant progress bar when called via the 'change' event
@@ -118,6 +119,35 @@ function updateControllers() {
     for (const node in nodes) {
       if (nodes.hasOwnProperty(node)) {
         handleChange(index, node, nodes[node].value);
+      }
+    }
+    scanForConfig(controllers[index].id);
+  }
+}
+
+/**
+ * Scans the controller configuration directory for matching files
+ * @param {String} id The ID of the controller
+ */
+function scanForConfig(id) {
+  const path = './src/conf/Controllers';
+  const files = fs.readdirSync(path);
+
+  if (Object.entries(configs).length === 0) {
+    for (let i = 0; i < files.length; ++i) {
+      const data = fs.readFileSync(`${path}/${files[i]}`);
+      const config = JSON.parse(data.toString());
+      const name = files[i].split('.')[0];
+      configs[name] = {id: config.id};
+    }
+  }
+
+  for (const item in configs) {
+    if (configs.hasOwnProperty(item)) {
+      const config = configs[item];
+      if (config.id === id) {
+        loadController(item);
+        return;
       }
     }
   }
@@ -244,6 +274,8 @@ function loadController(name) {
           }
         }
       }
+
+      document.getElementById(`name-${index}`).value = name;
     }
   });
 }
