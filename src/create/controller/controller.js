@@ -182,7 +182,7 @@ function handleConnect(index) {
       }
       controllers[index].updateNodes();
     }
-    
+
     updateControllers();
   });
 }
