@@ -9,9 +9,18 @@
   "private": false,
   "build": {
     "appId": "com.ccgsrobotics.robohud",
+    "productName": "RoboHUD",
+    "linux": {
+      "category": "Robotics",
+      "icon": "Assets/icon.png",
+      "synopsis": "The RoboHUD GUI, developed by CCGS Robotics"
+    },
     "files": [
       "**/*",
       "!Server/"
+    ],
+    "extraFiles": [
+      "src/conf"
     ]
   },
   "scripts": {
