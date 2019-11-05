@@ -129,29 +129,34 @@ function updateControllers() {
  * Scans the controller configuration directory for matching files
  * @param {String} id The ID of the controller
  * @param {Number} index The index of the controller
+ * @return {Promise} A promise that resolves with true if config is found
  */
 function scanForConfig(id, index) {
-  const path = './src/conf/Controllers';
-  const files = fs.readdirSync(path);
+  return new Promise((resolve, reject) => {
+    const path = './src/conf/Controllers';
+    const files = fs.readdirSync(path);
 
-  if (Object.entries(configs).length === 0) {
-    for (let i = 0; i < files.length; ++i) {
-      const data = fs.readFileSync(`${path}/${files[i]}`);
-      const config = JSON.parse(data.toString());
-      const name = files[i].split('.')[0];
-      configs[name] = {id: config.id};
-    }
-  }
-
-  for (const item in configs) {
-    if (configs.hasOwnProperty(item)) {
-      const config = configs[item];
-      if (config.id === id) {
-        loadController(item, index);
-        return;
+    if (Object.entries(configs).length === 0) {
+      for (let i = 0; i < files.length; ++i) {
+        const data = fs.readFileSync(`${path}/${files[i]}`);
+        const config = JSON.parse(data.toString());
+        const name = files[i].split('.')[0];
+        configs[name] = {id: config.id};
       }
     }
-  }
+
+    for (const item in configs) {
+      if (configs.hasOwnProperty(item)) {
+        const config = configs[item];
+        if (config.id === id) {
+          loadController(item, index);
+          resolve(true);
+        }
+      }
+    }
+
+    resolve(false);
+  });
 }
 
 /**
@@ -161,20 +166,26 @@ function scanForConfig(id, index) {
 function handleConnect(index) {
   console.log('Controller connected');
   const gamepad = navigator.getGamepads()[index];
-  if (Object.keys(controllers[index].nodes).length === 0) {
-    controllers[index].id = gamepad.id;
-    for (let axis = 0; axis < gamepad.axes.length; ++axis) {
-      controllers[index].addControllerNode(`Unnamed axis #${axis}`,
-          false, axis, [0, 1]);
-    }
-    for (let button = 0; button < gamepad.buttons.length; ++button) {
-      controllers[index].addControllerNode(`Unnamed button #${button}`,
-          true, button, [0, 1]);
+
+  scanForConfig(gamepad.id, index).then((found) => {
+    if (!found) {
+      if (Object.keys(controllers[index].nodes).length === 0) {
+        controllers[index].id = gamepad.id;
+        for (let axis = 0; axis < gamepad.axes.length; ++axis) {
+          controllers[index].addControllerNode(`Unnamed axis #${axis}`,
+              false, axis, [0, 1]);
+        }
+        for (let button = 0; button < gamepad.buttons.length; ++button) {
+          controllers[index].addControllerNode(`Unnamed button #${button}`,
+              true, button, [0, 1]);
+        }
+      }
+      controllers[index].updateNodes();
+      generateNodes(index);
     }
 
-    controllers[index].updateNodes();
-  }
-  updateControllers();
+    updateControllers();
+  });
 }
 
 /**
@@ -259,23 +270,28 @@ function loadController(name, index) {
       const config = JSON.parse(data);
       const nodes = config.nodes;
 
-      for (const item in nodes) {
-        if (nodes.hasOwnProperty(item)) {
-          const node = nodes[item];
-          for (const name in controllers[index].nodes) {
-            if (controllers[index].nodes.hasOwnProperty(name)) {
-              const oldNode = controllers[index].nodes[name];
-              if (oldNode.isButton == node.isButton &&
-                  oldNode.index == node.index) {
-                if (item !== name) {
-                  renameNode(name, item, index);
-                }
-              }
-            }
+      controllers[index].nodes = {};
+      const parent = document.getElementById(`controller-${index}`);
+      if (parent !== null) {
+        const children = parent.children;
+        for (let i = 0; i < children.length; ++i) {
+          const child = children[i];
+          if (child.tagName !== 'INPUT') {
+            parent.removeChild(child);
           }
         }
       }
 
+      for (const item in nodes) {
+        if (nodes.hasOwnProperty(item)) {
+          const node = nodes[item];
+          controllers[index].addControllerNode(item, node.isButton,
+              node.index, [node.min, node.max]);
+        }
+      }
+
+      generateNodes(index);
+      controllers[index].updateNodes();
       document.getElementById(`name-${index}`).value = name;
     }
   });
