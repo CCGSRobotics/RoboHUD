@@ -132,7 +132,7 @@ function updateControllers() {
  * @return {Promise} A promise that resolves with true if config is found
  */
 function scanForConfig(id, index) {
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     const path = './src/conf/Controllers';
     const files = fs.readdirSync(path);
 
