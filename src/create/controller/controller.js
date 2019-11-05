@@ -121,15 +121,16 @@ function updateControllers() {
         handleChange(index, node, nodes[node].value);
       }
     }
-    scanForConfig(controllers[index].id);
+    scanForConfig(controllers[index].id, index);
   }
 }
 
 /**
  * Scans the controller configuration directory for matching files
  * @param {String} id The ID of the controller
+ * @param {Number} index The index of the controller
  */
-function scanForConfig(id) {
+function scanForConfig(id, index) {
   const path = './src/conf/Controllers';
   const files = fs.readdirSync(path);
 
@@ -146,7 +147,7 @@ function scanForConfig(id) {
     if (configs.hasOwnProperty(item)) {
       const config = configs[item];
       if (config.id === id) {
-        loadController(item);
+        loadController(item, index);
         return;
       }
     }
@@ -246,8 +247,9 @@ function generateConfig(index) {
 /**
  * Loads a compatible controller for editing
  * @param {String} name The name of the controller file
+ * @param {Number} index The index of the controller
  */
-function loadController(name) {
+function loadController(name, index) {
   const path = `./src/conf/Controllers/${name}.json`;
   fs.readFile(path, (err, data) => {
     if (err) {
@@ -255,7 +257,6 @@ function loadController(name) {
       console.error(err);
     } else {
       const config = JSON.parse(data);
-      const index = config.index;
       const nodes = config.nodes;
 
       for (const item in nodes) {
