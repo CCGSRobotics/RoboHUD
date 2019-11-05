@@ -181,9 +181,8 @@ function handleConnect(index) {
         }
       }
       controllers[index].updateNodes();
-      generateNodes(index);
     }
-
+    
     updateControllers();
   });
 }
@@ -195,18 +194,29 @@ function handleConnect(index) {
 function handleDisconnect(index) {
   console.log('Controller disconnected');
   document.getElementById(`controller-${index}`).remove();
+  removeChildren(index);
+  resetController(index);
+}
+
+/**
+ * Resets a controller to default state
+ * @param {Number} index The index of the controller
+ */
+function resetController(index) {
+  controllers[index] = new Controller('', index);
+  controllers[index].saved = false;
+  controllers[index].saveLocation = null;
+  controllers[index].on('connect', () => {
+    return handleConnect(index);
+  });
+  controllers[index].on('disconnect', () => {
+    return handleDisconnect(index);
+  });
 }
 
 for (let i = 0; i < 4; ++i) {
-  controllers.push(new Controller('', i));
-  controllers[i].saved = false;
-  controllers[i].saveLocation = null;
-  controllers[i].on('connect', () => {
-    return handleConnect(i);
-  });
-  controllers[i].on('disconnect', () => {
-    return handleDisconnect(i);
-  });
+  controllers.push(null);
+  resetController(i);
 }
 
 /**
@@ -256,6 +266,21 @@ function generateConfig(index) {
 }
 
 /**
+ * Removes all children in a controller visualisation div
+ * @param {Number} index The index of the controller
+ */
+function removeChildren(index) {
+  const parent = document.getElementById(`controller-${index}`);
+  if (parent !== null) {
+    const children = parent.children;
+    for (let i = 0; i < children.length; ++i) {
+      const child = children[i];
+      parent.removeChild(child);
+    }
+  }
+}
+
+/**
  * Loads a compatible controller for editing
  * @param {String} name The name of the controller file
  * @param {Number} index The index of the controller
@@ -271,16 +296,7 @@ function loadController(name, index) {
       const nodes = config.nodes;
 
       controllers[index].nodes = {};
-      const parent = document.getElementById(`controller-${index}`);
-      if (parent !== null) {
-        const children = parent.children;
-        for (let i = 0; i < children.length; ++i) {
-          const child = children[i];
-          if (child.tagName !== 'INPUT') {
-            parent.removeChild(child);
-          }
-        }
-      }
+      removeChildren(index);
 
       for (const item in nodes) {
         if (nodes.hasOwnProperty(item)) {
