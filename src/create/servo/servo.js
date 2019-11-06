@@ -1,4 +1,4 @@
-const fs = require('fs');
+const io = require('../../lib/io');
 const rp = require('request-promise');
 const cheerio = require('cheerio');
 const cheerioTableparser = require('cheerio-tableparser');
@@ -254,13 +254,11 @@ function saveFile() {
   fileData = headings + '\n';
   fileData += grid.join('\n');
 
-  fs.writeFile(`src/conf/Servos/${filename}.csv`,
-      fileData, function(err) {
-        if (err) {
-          console.error('Failed to write file! Do you have access?');
-        }
-        console.log(`Saved the file as ${filename}.csv`);
-      });
+  io.writeConf(`Servos/${filename}.csv`, fileData).then(() => {
+    console.log('Successfully wrote servo to file');
+  }).catch(() => {
+    console.error('Failed to write servo configuration');
+  });
 }
 
 /**

@@ -1,5 +1,5 @@
 const EventEmitter = require('events');
-const fs = require('fs');
+const io = require('./io');
 
 /**
  * A class representing a single button/axis on a controller
@@ -69,10 +69,12 @@ class Controller extends EventEmitter {
    * @param {String} name The name of the configuration file
    */
   loadConfig(name) {
-    const path = `./src/conf/${name}.json`;
-    fs.readFile(path, (err, data) => {
+    const path = `Controllers/${name}.json`;
+    io.readFile(path).then((data) => {
       console.log(data);
-    });
+    }).catch(() => {
+      console.error('Failed to read controller configuration');
+    })
   }
 
   /**

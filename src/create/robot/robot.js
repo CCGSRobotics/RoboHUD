@@ -1,11 +1,5 @@
-const fs = require('fs');
-const robotPath = './src/conf/Robots';
-if (!fs.existsSync(robotPath)) {
-  fs.mkdir(robotPath, (err) => {
-    handleError(err, `Error making directory: ${err}`,
-        `Created new directory at ${robotPath}`);
-  });
-}
+const io = require('../../lib/io');
+const robotPath = 'Robots';
 
 /**
  * Creates a number input inside a <td>
@@ -35,11 +29,13 @@ function createRange(id, min, max, value) {
  */
 function readDir(path) {
   const files = [];
-  fs.readdirSync(path).forEach((file) => {
-    if (!files.includes(file)) {
-      files.push(file);
+  const dir = io.readConfDirSync(path);
+
+  for (let i = 0; i < dir.length; ++i) {
+    if (!files.includes[dir[i]]) {
+      files.push(dir[i]);
     }
-  });
+  }
 
   return files;
 }
@@ -53,7 +49,7 @@ function createModel(index) {
   const model = document.createElement('td');
   const select = document.createElement('select');
   select.setAttribute('id', `model-${index}`);
-  const servos = readDir('./src/conf/Servos');
+  const servos = readDir('Servos');
 
   for (let i = 0; i < servos.length; ++i) {
     const option = document.createElement('option');
@@ -388,8 +384,14 @@ function createOptions(index) {
   const options = {
     protocol: 1,
     mode: 'joint',
-    model: readDir('./src/conf/Servos/')[0].split('.')[0],
+    model: null,
   };
+
+  const dir = readDir('Servos/');
+  if (dir !== null && dir.length > 0) {
+    options.model = dir[0].split('.')[0];
+  }
+
   if (index > 1) {
     options.protocol =
       document.getElementById(`protocol1-${index - 1}`).checked? 1 : 2;
@@ -477,19 +479,16 @@ function saveRobot() { // eslint-disable-line no-unused-vars
     name = document.getElementById('name').value;
   }
 
-  fs.writeFile(`./src/conf/Robots/${name}.json`, config, function(err) {
-    if (err) {
-      console.error('Failed to write file! Do you have access?');
-      console.error(err);
-    } else {
-      console.log(`Saved the file as ${name}.json`);
-      const select = document.getElementById('robot-select');
-      select.removeChild(select.lastChild);
-      select.appendChild(createOption(name));
-      select.appendChild(createOption(''));
-      select.value = name;
-      loadRobot(name);
-    }
+  io.writeConf(`Robots/${name}.json`, config).then(() => {
+    console.log(`Saved the file as ${name}.json`);
+    const select = document.getElementById('robot-select');
+    select.removeChild(select.lastChild);
+    select.appendChild(createOption(name));
+    select.appendChild(createOption(''));
+    select.value = name;
+    loadRobot(name);
+  }).catch(() => {
+    console.error('Failed to write robot configuration');
   });
 }
 
@@ -514,9 +513,7 @@ function deleteRobot() { // eslint-disable-line no-unused-vars
   const parent = document.getElementById('robot-select');
   const name = parent.value;
 
-  fs.unlink(`${robotPath}/${name}.json`, (err) => {
-    handleError(err, `Error removing file: ${err}`, `Removed robot ${name}`);
-  });
+  io.removeConf(`Robots/${name}.json`)
 
   for (let i = 0; i < parent.length; ++i) {
     if (parent.options[i].value == name) {
@@ -569,7 +566,7 @@ function loadRobot(name) {
   } else {
     switchInputVisibility('none', 'inline');
     removeAllRows(false).then(() => {
-      fs.readFile(`src/conf/Robots/${name}.json`, (err, data) => {
+      io.readConf(`Robots/${name}.json`).then((data) => {
         const robot = JSON.parse(data);
         let i = 0;
         for (const index in robot) {
@@ -582,6 +579,8 @@ function loadRobot(name) {
             updateRow(++i, config);
           }
         }
+      }).catch(() => {
+        console.error('Failed to read robot configuration');
       });
     });
   }

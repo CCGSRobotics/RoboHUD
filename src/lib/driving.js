@@ -3,7 +3,7 @@ const dgram = require('dgram');
 // be done about it, so the line must be ignored
 // eslint-disable-next-line new-cap
 const socket = new dgram.createSocket('udp4');
-const fs = require('fs');
+const io = require('./io');
 
 // Note: this should be made part of the settings later
 const defaultPort = 5001;
@@ -50,17 +50,8 @@ class Dynamixel {
     this.minPos = 0;
     this.maxPos = 1023;
 
-    const path = `./src/conf/Servos/${model}.csv`;
-    fs.readFile(path, (err, data) => {
-      if (err) {
-        if (err.code === 'ENOENT') {
-          console.error(`The file at path ${path} does not exist!`);
-          return;
-        }
-
-        throw err;
-      }
-
+    const path = `Servos/${model}.csv`;
+    io.readConf(path).then((data) => {
       this.controlTable = {};
 
       const fileData = data.toString().split('\n').filter(function(element) {
@@ -86,6 +77,8 @@ class Dynamixel {
       }
 
       sendData(`(init)-${model}-${id}-${protocol}`);
+    }).catch(() => {
+      console.error('Failed to read Dynamixel configuration');
     });
   }
 
@@ -145,16 +138,8 @@ class Robot {
    * @param {Object} name The name of the configuration file
    */
   constructor(name) {
-    const path = `./src/conf/Robots/${name}.json`;
-    fs.readFile(path, (err, data) => {
-      if (err) {
-        if (err.code === 'ENOENT') {
-          console.error(`The file at path ${path} does not exist!`);
-          return;
-        }
-
-        throw err;
-      }
+    const path = `Robots/${name}.json`;
+    io.readConf(path).then((data) => {
       const servos = JSON.parse(data);
       this.servos = {};
       this.groups = {};
@@ -184,6 +169,8 @@ class Robot {
           `but got ${typeof(index)} (${index})`);
         }
       }
+    }).catch(() => {
+      console.error('Failed to read robot configuration');
     });
 
     this.server = dgram.createSocket('udp4');
