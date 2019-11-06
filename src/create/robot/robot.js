@@ -513,7 +513,7 @@ function deleteRobot() { // eslint-disable-line no-unused-vars
   const parent = document.getElementById('robot-select');
   const name = parent.value;
 
-  io.removeConf(`Robots/${name}.json`)
+  io.removeConf(`Robots/${name}.json`);
 
   for (let i = 0; i < parent.length; ++i) {
     if (parent.options[i].value == name) {

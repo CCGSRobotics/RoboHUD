@@ -74,7 +74,7 @@ class Controller extends EventEmitter {
       console.log(data);
     }).catch(() => {
       console.error('Failed to read controller configuration');
-    })
+    });
   }
 
   /**
