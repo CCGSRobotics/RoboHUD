@@ -15,17 +15,16 @@
       "icon": "Assets/icon.png",
       "synopsis": "The RoboHUD GUI, developed by CCGS Robotics"
     },
+    "win": {
+      "icon": "Assets/icon.ico"
+    },
     "files": [
       "**/*",
       "!Server/"
-    ],
-    "extraFiles": [
-      "src/conf"
     ]
   },
   "scripts": {
-    "pack": "electron-builder --dir",
-    "dist": "electron-builder"
+    "pack": "node node_modules/electron-builder/out/cli/cli.js . -lw"
   },
   "remarkConfig": {
     "plugins": ["remark-preset-lint-recommended"]
