@@ -24,7 +24,7 @@
     ]
   },
   "scripts": {
-    "pack": "node node_modules/electron-builder/out/cli/cli.js . -lw"
+    "pack": "node node_modules/electron-builder/out/cli/cli.js . -l"
   },
   "remarkConfig": {
     "plugins": ["remark-preset-lint-recommended"]

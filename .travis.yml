@@ -20,7 +20,7 @@ jobs:
       script: python3 Scripts/lint.py
     - stage: Build & release
       script: yarn
-      script: yarn dist
+      script: yarn run pack
       deploy:
         provider: releases
         api_key: $personal_access_token
