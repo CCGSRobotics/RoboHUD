@@ -24,7 +24,8 @@
     ]
   },
   "scripts": {
-    "pack": "node node_modules/electron-builder/out/cli/cli.js . -l"
+    "build": "node node_modules/electron-builder/out/cli/cli.js . -l AppImage --publish never",
+    "build-win": "node node_modules/electron-builder/out/cli/cli.js . -w nsis:ia32 --publish never "
   },
   "remarkConfig": {
     "plugins": ["remark-preset-lint-recommended"]
