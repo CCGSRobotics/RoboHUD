@@ -18,24 +18,26 @@
   <table id="control_table"></table>
 
   <script>
-    const fs = require('fs');
-    const files = fs.readdirSync('./src/conf/Servos');
+    const io = require('../../lib/io');
+    const files = io.readConfDirSync('Servos');
 
     const model = document.getElementById('model');
-
-    files.forEach((item) => {
-      item = item.split('.');
-
-      if (item[1] === 'csv') {
-        const option = document.createElement('OPTION');
-
-        option.value = item[0];
-        option.innerHTML = item[0];
-
-        model.appendChild(option);
-      }
-
-    });
+    
+    if (files !== null && files.length > 0) {
+      files.forEach((item) => {
+        item = item.split('.');
+  
+        if (item[1] === 'csv') {
+          const option = document.createElement('OPTION');
+  
+          option.value = item[0];
+          option.innerHTML = item[0];
+  
+          model.appendChild(option);
+        }
+  
+      });
+    }
   </script>
 </body>
 

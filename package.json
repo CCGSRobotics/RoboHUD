@@ -9,14 +9,23 @@
   "private": false,
   "build": {
     "appId": "com.ccgsrobotics.robohud",
+    "productName": "RoboHUD",
+    "linux": {
+      "category": "Robotics",
+      "icon": "Assets/icon.png",
+      "synopsis": "The RoboHUD GUI, developed by CCGS Robotics"
+    },
+    "win": {
+      "icon": "Assets/icon.ico"
+    },
     "files": [
       "**/*",
       "!Server/"
     ]
   },
   "scripts": {
-    "pack": "electron-builder --dir",
-    "dist": "electron-builder"
+    "build": "node node_modules/electron-builder/out/cli/cli.js . -l AppImage --publish never",
+    "build-win": "node node_modules/electron-builder/out/cli/cli.js . -w nsis:ia32 --publish never "
   },
   "remarkConfig": {
     "plugins": ["remark-preset-lint-recommended"]

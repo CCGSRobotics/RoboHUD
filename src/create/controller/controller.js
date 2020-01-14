@@ -1,5 +1,5 @@
 const {Controller} = require('../../lib/controller');
-const fs = require('fs');
+const io = require('../../lib/io');
 const controllers = [];
 const configs = {};
 
@@ -133,12 +133,12 @@ function updateControllers() {
  */
 function scanForConfig(id, index) {
   return new Promise((resolve) => {
-    const path = './src/conf/Controllers';
-    const files = fs.readdirSync(path);
+    const path = 'Controllers';
+    const files = io.readConfDirSync(path);
 
     if (Object.entries(configs).length === 0) {
       for (let i = 0; i < files.length; ++i) {
-        const data = fs.readFileSync(`${path}/${files[i]}`);
+        const data = io.readConfSync(`${path}/${files[i]}`);
         const config = JSON.parse(data.toString());
         const name = files[i].split('.')[0];
         configs[name] = {id: config.id};
@@ -286,30 +286,27 @@ function removeChildren(index) {
  * @param {Number} index The index of the controller
  */
 function loadController(name, index) {
-  const path = `./src/conf/Controllers/${name}.json`;
-  fs.readFile(path, (err, data) => {
-    if (err) {
-      console.error('Error reading config file:');
-      console.error(err);
-    } else {
-      const config = JSON.parse(data);
-      const nodes = config.nodes;
+  const path = `Controllers/${name}.json`;
+  io.readConf(path).then((data) => {
+    const config = JSON.parse(data);
+    const nodes = config.nodes;
 
-      controllers[index].nodes = {};
-      removeChildren(index);
+    controllers[index].nodes = {};
+    removeChildren(index);
 
-      for (const item in nodes) {
-        if (nodes.hasOwnProperty(item)) {
-          const node = nodes[item];
-          controllers[index].addControllerNode(item, node.isButton,
-              node.index, [node.min, node.max]);
-        }
+    for (const item in nodes) {
+      if (nodes.hasOwnProperty(item)) {
+        const node = nodes[item];
+        controllers[index].addControllerNode(item, node.isButton,
+            node.index, [node.min, node.max]);
       }
-
-      generateNodes(index);
-      controllers[index].updateNodes();
-      document.getElementById(`name-${index}`).value = name;
     }
+
+    generateNodes(index);
+    controllers[index].updateNodes();
+    document.getElementById(`name-${index}`).value = name;
+  }).catch(() => {
+    console.error('Failed to read controller configuration');
   });
 }
 
@@ -325,15 +322,12 @@ function saveController(index) {
 
   const config = JSON.stringify(generateConfig(index));
 
-  fs.writeFile(`./src/conf/Controllers/${name}.json`, config, (err) => {
-    if (err) {
-      console.error('Failed to write file! Do you have access?');
-      console.error(err);
-    } else {
-      console.log('Saved config successfully!');
-      controllers[index].saved = true;
-      controllers[index].saveLocation = name;
-    }
+  io.writeConf(`Controllers/${name}.json`, config).then(() => {
+    console.log('Saved config successfully!');
+    controllers[index].saved = true;
+    controllers[index].saveLocation = name;
+  }).catch(() => {
+    console.error('Failed to write controller configuration');
   });
 }
 

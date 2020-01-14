@@ -145,7 +145,10 @@ const template = [
 const menu = Menu.buildFromTemplate(template);
 Menu.setApplicationMenu(menu);
 
-app.on('ready', createWindow);
+app.on('ready', () => {
+  createWindow();
+  global.confDir = app.getPath('userData');
+});
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
