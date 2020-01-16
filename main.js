@@ -115,6 +115,9 @@ const template = [
           },
           {
             label: 'Profile',
+            click() {
+              win.loadFile('src/create/profile/profile.html');
+            },
           },
           {
             label: 'Controller',
