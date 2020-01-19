@@ -2,6 +2,22 @@
     display: inline;
 }
 
-.hidden {
-    display: none;
+.sidebar {
+    position: fixed;
+}
+
+.controlSelect {
+    left: 8%;
+    position: fixed;
+}
+
+.selected {
+    background-color: aqua;
+}
+
+#conf-container {
+    margin-left: 12%;
+    width: 85%;
+    height: 75%;
+    position: fixed;
 }
