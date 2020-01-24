@@ -1,6 +1,7 @@
 const {readConfDirSync, readConfSync} = require('../../lib/io');
 const controlTypes = ['Linear'];
 const currentConf = {};
+let previousMode = '';
 
 /**
  * Finds all groups in a robot config
@@ -27,6 +28,19 @@ function findGroups() {
 }
 
 /**
+ * Creates an inline paragraph populated with the given text
+ * @param {String} text The text to fill with
+ * @return {Node} The created element
+ */
+function createInlineText(text) {
+  const p = document.createElement('p');
+  p.className = 'inline';
+  p.innerHTML = text;
+
+  return p;
+}
+
+/**
  * Creates a placeholder option for a select box
  * @param {String} text The text to fill the placeholder
  * @return {Node} The created placeholder
@@ -50,14 +64,8 @@ function populateSelect(dir, id) {
   const select = document.getElementById(id);
 
   const dirList = readConfDirSync(dir);
-  const items = [];
 
   for (let i = 0; i < dirList.length; ++i) {
-    const config = JSON.parse(readConfSync(
-        `${dir}/${dirList[i]}`).toString());
-
-    items.push(config);
-
     const option = document.createElement('option');
     option.innerHTML = dirList[i].split('.')[0];
     select.appendChild(option);
@@ -66,6 +74,62 @@ function populateSelect(dir, id) {
 
 populateSelect('Controllers', 'controller-select');
 populateSelect('Robots', 'robot-select');
+
+/**
+ * Creates a select element with the given placeholder and children
+ * @param {String} placeholder The placeholder text
+ * @param {Array<String>} children The liat of options
+ * @return {Node} The generated select element
+ */
+function createSelect(placeholder, children) {
+  const select = document.createElement('select');
+  select.appendChild(createPlaceholder(placeholder));
+
+  for (let child = 0; child < children.length; ++child) {
+    const option = document.createElement('option');
+    const text = children[child];
+    option.value = text;
+    option.innerHTML = text;
+    select.appendChild(option);
+  }
+
+  return select;
+}
+
+/**
+ * Creates a div element with each child as a radio input
+ * @param {String} name The name of the category
+ * @param {Array<String>} children A list of children
+ * @param {Function} handle The click handler for each button
+ * @return {Node} The div filled with radio buttons
+ */
+function createRadio(name, children, handle) {
+  const parent = document.createElement('div');
+
+  for (let child = 0; child < children.length; ++child) {
+    const input = document.createElement('input');
+    const text = children[child];
+
+    input.type = 'radio';
+    input.name = name;
+    input.value = text;
+    input.id = `${name}-${text}`;
+    input.onclick = handle;
+
+    if (child == 0) {
+      input.checked = true;
+    }
+
+    parent.appendChild(input);
+
+    const label = document.createElement('label');
+    label.for = text;
+    label.innerHTML = text;
+    parent.appendChild(label);
+  }
+
+  return parent;
+}
 
 /**
  * Clears the mode-specific configuration screen
@@ -82,7 +146,8 @@ function clearChoice() {
  * Sets up linear configuration
  * @param {String} name The name of the controller node
  */
-function chooseLinear(name) {
+function createLinear(name) {
+  clearChoice();
   currentConf[name] = {
     mode: 'Linear',
   };
@@ -90,21 +155,28 @@ function chooseLinear(name) {
   const confContainer = document.getElementById('conf-container');
   const groups = findGroups();
 
-  const select = document.createElement('select');
-  select.appendChild(createPlaceholder('Choose a group'));
-
-  for (let i = 0; i < groups.length; ++i) {
-    const option = document.createElement('option');
-    option.value = groups[i];
-    option.innerHTML = groups[i];
-    select.appendChild(option);
-  };
-
-  select.onchange = function() {
+  confContainer.appendChild(createInlineText('Group: '));
+  const groupSelect = createSelect('Choose a group', groups);
+  groupSelect.onchange = function() {
     currentConf[name].controls = this.value;
   };
+  confContainer.appendChild(groupSelect);
 
-  confContainer.appendChild(select);
+  confContainer.appendChild(document.createElement('br'));
+  confContainer.appendChild(createInlineText('Invertable? '));
+  confContainer.appendChild(createRadio('invert', ['Yes', 'No'], (event) => {
+    const value = event.path[0].id.split('-')[1];
+    currentConf[name].invert = value;
+  }));
+  currentConf[name].invert = 'Yes';
+}
+
+/**
+ * Loads linear configuration
+ * @param {String} name The name of the controller node
+ */
+function loadLinear() {
+  // To Do
 }
 
 /**
@@ -121,12 +193,13 @@ function buttonClick(name) {
 
   const value = document.getElementById(`${name}-select`).value;
 
-  clearChoice();
   switch (value) {
     case 'Linear':
-      chooseLinear(name);
+      previousMode == value? loadLinear(name) : createLinear(name);
       break;
   }
+
+  previousMode = value;
 }
 
 const controllerNodes = document.getElementById('controller-nodes');
@@ -147,19 +220,13 @@ function addNode(name) {
   };
   container.appendChild(text);
 
-  const select = document.createElement('select');
+  const select = createSelect('Select', controlTypes);
   select.className = 'controlSelect';
-  select.appendChild(createPlaceholder('Select'));
   select.id = `${name}-select`;
   select.onchange = function() {
     buttonClick(name);
   };
 
-  for (let i = 0; i < controlTypes.length; ++i) {
-    const option = document.createElement('option');
-    option.innerHTML = controlTypes[i];
-    select.appendChild(option);
-  }
   container.appendChild(select);
 
   controllerNodes.appendChild(container);
