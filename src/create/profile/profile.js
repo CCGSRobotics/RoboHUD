@@ -2,6 +2,7 @@ const {readConfDirSync, readConfSync} = require('../../lib/io');
 const controlTypes = ['Linear'];
 const currentConf = {};
 let previousMode = '';
+let selectedNode = '';
 
 /**
  * Finds all groups in a robot config
@@ -47,7 +48,7 @@ function createInlineText(text) {
  */
 function createPlaceholder(text) {
   const option = document.createElement('option');
-  option.value = '';
+  option.value = 'choice';
   option.innerHTML = text;
   option.disabled = true;
   option.selected = true;
@@ -148,17 +149,28 @@ function clearChoice() {
  */
 function createLinear(name) {
   clearChoice();
-  currentConf[name] = {
-    mode: 'Linear',
-  };
+
+  if (currentConf[name] == undefined) {
+    currentConf[name] = {};
+  }
+
+  if (currentConf[name].mode !== 'Linear') {
+    currentConf[name] = {
+      mode: 'Linear',
+      invert: 'Yes',
+    };
+    currentConf[name].mode = 'Linear';
+    currentConf[name].invert = 'Yes';
+  }
 
   const confContainer = document.getElementById('conf-container');
   const groups = findGroups();
 
   confContainer.appendChild(createInlineText('Group: '));
   const groupSelect = createSelect('Choose a group', groups);
+  groupSelect.id = 'group-select';
   groupSelect.onchange = function() {
-    currentConf[name].controls = this.value;
+    currentConf[selectedNode].group = this.value;
   };
   confContainer.appendChild(groupSelect);
 
@@ -166,17 +178,31 @@ function createLinear(name) {
   confContainer.appendChild(createInlineText('Invertable? '));
   confContainer.appendChild(createRadio('invert', ['Yes', 'No'], (event) => {
     const value = event.path[0].id.split('-')[1];
-    currentConf[name].invert = value;
+    currentConf[selectedNode].invert = value;
   }));
-  currentConf[name].invert = 'Yes';
 }
 
 /**
  * Loads linear configuration
  * @param {String} name The name of the controller node
  */
-function loadLinear() {
-  // To Do
+function loadLinear(name) {
+  if (currentConf[name].mode !== 'Linear') {
+    currentConf[name] = {
+      mode: 'Linear',
+      invert: 'Yes',
+    };
+  }
+  const conf = currentConf[name];
+
+  document.getElementById(`invert-${conf.invert}`).checked = true;
+
+  const groupSelect = document.getElementById('group-select');
+  if (findGroups().includes(conf.group)) {
+    groupSelect.value = conf.group;
+  } else {
+    groupSelect.value = 'choice';
+  }
 }
 
 /**
@@ -184,6 +210,8 @@ function loadLinear() {
  * @param {String} name The name of the button
  */
 function buttonClick(name) {
+  selectedNode = name;
+
   const button = document.getElementById(`${name}-button`);
   const previousSelect = document.getElementsByClassName('selected');
   for (let i = 0; i < previousSelect.length; ++i) {
@@ -196,6 +224,9 @@ function buttonClick(name) {
   switch (value) {
     case 'Linear':
       previousMode == value? loadLinear(name) : createLinear(name);
+      break;
+    default:
+      clearChoice();
       break;
   }
 
@@ -221,7 +252,7 @@ function addNode(name) {
   container.appendChild(text);
 
   const select = createSelect('Select', controlTypes);
-  select.className = 'controlSelect';
+  select.className = 'groupelect';
   select.id = `${name}-select`;
   select.onchange = function() {
     buttonClick(name);
