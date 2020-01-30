@@ -1,8 +1,23 @@
 const {readConfDirSync, readConfSync} = require('../../lib/io');
-const controlTypes = ['Linear'];
+const controlTypes = ['Linear', 'Preset'];
 const currentConf = {};
 let previousMode = '';
 let selectedNode = '';
+let prevousPresetSelect = {
+  node: '',
+  item: '',
+};
+
+/**
+ * Finds the robot configuration based on user selection
+ * @return {Object} The parsed configuration
+ */
+function findRobotConf() {
+  const filename = currentConf.robot;
+  const conf = JSON.parse(readConfSync(`Robots/${filename}.json`));
+
+  return conf;
+}
 
 /**
  * Finds all groups in a robot config
@@ -10,8 +25,7 @@ let selectedNode = '';
  */
 function findGroups() {
   const groups = [];
-  const filename = currentConf.robot;
-  const conf = JSON.parse(readConfSync(`Robots/${filename}.json`));
+  const conf = findRobotConf();
 
   for (const servo in conf) {
     if (conf.hasOwnProperty(servo)) {
@@ -77,21 +91,64 @@ populateSelect('Controllers', 'controller-select');
 populateSelect('Robots', 'robot-select');
 
 /**
- * Creates a select element with the given placeholder and children
- * @param {String} placeholder The placeholder text
- * @param {Array<String>} children The liat of options
- * @return {Node} The generated select element
+ * Creates an array of options with the given children
+ * @param {Array<String>} children The list of options
+ * @return {Array<Node>} An array filled with the generated options
  */
-function createSelect(placeholder, children) {
-  const select = document.createElement('select');
-  select.appendChild(createPlaceholder(placeholder));
+function createOptions(children) {
+  const options = [];
 
   for (let child = 0; child < children.length; ++child) {
     const option = document.createElement('option');
     const text = children[child];
     option.value = text;
     option.innerHTML = text;
-    select.appendChild(option);
+    options.push(option);
+  }
+
+  return options;
+}
+
+/**
+ * Creates a select element with the given placeholder and children
+ * @param {String} placeholder The placeholder text
+ * @param {Array<String>} children The list of options
+ * @return {Node} The generated select element
+ */
+function createSelect(placeholder, children) {
+  const select = document.createElement('select');
+  select.appendChild(createPlaceholder(placeholder));
+
+  const options = createOptions(children);
+  for (let i = 0; i < options.length; ++i) {
+    select.appendChild(options[i]);
+  }
+
+  return select;
+}
+
+/**
+ * Creates a select element with the given placeholder and grouped children
+ * @param {String} placeholder The placeholder text
+ * @param {Object} children An object with a group as every node
+ * @return {Node} The generated select element
+ */
+function createGroupedSelect(placeholder, children) {
+  const select = document.createElement('select');
+  select.appendChild(createPlaceholder(placeholder));
+
+  for (const group in children) {
+    if (children.hasOwnProperty(group)) {
+      const options = createOptions(children[group]);
+      const optionGroup = document.createElement('optgroup');
+      optionGroup.label = group;
+
+      for (let i = 0; i < options.length; ++i) {
+        optionGroup.appendChild(options[i]);
+      }
+
+      select.appendChild(optionGroup);
+    }
   }
 
   return select;
@@ -206,6 +263,48 @@ function loadLinear(name) {
 }
 
 /**
+ * Sets up preset configuration
+ */
+function createPreset() {
+  clearChoice();
+
+  if (currentConf[selectedNode].mode !== 'Preset') {
+    currentConf[selectedNode] = {
+      mode: 'Preset',
+      items: {},
+    };
+  }
+  const confContainer = document.getElementById('conf-container');
+
+  const items = {Servos: []};
+  items.Groups = findGroups();
+  const conf = findRobotConf();
+  for (const servo in conf) {
+    if (conf.hasOwnProperty(servo)) {
+      items.Servos.push(servo);
+    }
+  }
+
+  const itemSelect = createGroupedSelect('Choose an item', items);
+  itemSelect.onchange = (event) => {
+    if (prevousPresetSelect.node == selectedNode) {
+      const item = prevousPresetSelect.item;
+      if (currentConf[selectedNode].items.hasOwnProperty(item)) {
+        delete currentConf[selectedNode].items[item];
+      }
+    }
+
+    currentConf[selectedNode].items[event.target.value] = null;
+
+    prevousPresetSelect = {
+      node: selectedNode,
+      item: event.target.value,
+    };
+  };
+  confContainer.appendChild(itemSelect);
+}
+
+/**
  * Updates the configuration screen to reflect the button clicked
  * @param {String} name The name of the button
  */
@@ -224,6 +323,9 @@ function buttonClick(name) {
   switch (value) {
     case 'Linear':
       previousMode == value? loadLinear(name) : createLinear(name);
+      break;
+    case 'Preset':
+      createPreset();
       break;
     default:
       clearChoice();
