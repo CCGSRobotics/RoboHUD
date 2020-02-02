@@ -90,22 +90,19 @@ function clearChoice() {
 
 /**
  * Sets up linear configuration
- * @param {String} name The name of the controller node
  */
-function createLinear(name) {
+function createLinear() {
   clearChoice();
 
-  if (currentConf[name] == undefined) {
-    currentConf[name] = {};
+  if (currentConf[selectedNode] == undefined) {
+    currentConf[selectedNode] = {};
   }
 
-  if (currentConf[name].mode !== 'Linear') {
-    currentConf[name] = {
+  if (currentConf[selectedNode].mode !== 'Linear') {
+    currentConf[selectedNode] = {
       mode: 'Linear',
       invert: 'Yes',
     };
-    currentConf[name].mode = 'Linear';
-    currentConf[name].invert = 'Yes';
   }
 
   const confContainer = document.getElementById('conf-container');
@@ -129,24 +126,20 @@ function createLinear(name) {
 
 /**
  * Loads linear configuration
- * @param {String} name The name of the controller node
  */
-function loadLinear(name) {
-  if (currentConf[name].mode !== 'Linear') {
-    currentConf[name] = {
-      mode: 'Linear',
-      invert: 'Yes',
-    };
-  }
-  const conf = currentConf[name];
+function loadLinear() {
+  const conf = currentConf[selectedNode];
 
-  document.getElementById(`invert-${conf.invert}`).checked = true;
-
-  const groupSelect = document.getElementById('group-select');
-  if (findGroups().includes(conf.group)) {
-    groupSelect.value = conf.group;
-  } else {
-    groupSelect.value = 'choice';
+  for (const item in conf) {
+    if (conf.hasOwnProperty(item)) {
+      switch (item) {
+        case 'invert':
+          document.getElementById(`invert-${conf.invert}`).checked = true;
+          break;
+        case 'group':
+          document.getElementById('group-select').value = conf.group;
+      }
+    }
   }
 }
 
@@ -189,7 +182,32 @@ function createPreset() {
       item: event.target.value,
     };
   };
+
+  itemSelect.id = 'item-select';
   confContainer.appendChild(itemSelect);
+}
+
+/**
+ * Loads preset configuration
+ */
+function loadPreset() {
+  const conf = currentConf[selectedNode];
+
+  for (const item in conf) {
+    if (conf.hasOwnProperty(item)) {
+      switch (item) {
+        case 'items':
+          const itemSelect = document.getElementById('item-select');
+          // This will need to be fixed once the UI supports multiple items
+          for (const item in conf.items) {
+            if (conf.items.hasOwnProperty(item)) {
+              itemSelect.value = item;
+            }
+          }
+          break;
+      }
+    }
+  }
 }
 
 /**
@@ -207,13 +225,33 @@ function buttonClick(name) {
   button.className = 'selected';
 
   const value = document.getElementById(`${name}-select`).value;
+  const preconfigured = currentConf[selectedNode].mode == value;
 
   switch (value) {
     case 'Linear':
-      previousMode == value? loadLinear(name) : createLinear(name);
+      if (previousMode !== value) {
+        createLinear();
+      } else if (!preconfigured) {
+        currentConf[selectedNode] = {
+          mode: 'Linear',
+          group: 'choice',
+          invert: 'Yes',
+        };
+      }
+
+      loadLinear();
       break;
     case 'Preset':
-      createPreset();
+      if (previousMode !== value) {
+        createPreset();
+      } else if (!preconfigured) {
+        currentConf[selectedNode] = {
+          mode: 'Preset',
+          items: {'choice': 0},
+        };
+      }
+
+      loadPreset();
       break;
     default:
       clearChoice();
@@ -260,6 +298,7 @@ const robotSelect = document.getElementById('robot-select');
 
 /**
  * Updates the controller node list
+ * @return {null} Null return to satisfy Deepscan error
  */
 function controllerChange() {
   currentConf.controller = controllerSelect.value;
@@ -271,13 +310,18 @@ function controllerChange() {
       addNode(node);
     }
   }
+
+  return null;
 }
 
 /**
  * Updates the robot configuration value
+ * @return {null} Null return to satisfy Deepscan error
  */
 function robotChange() {
   currentConf.robot = robotSelect.value;
+
+  return null;
 }
 
 
