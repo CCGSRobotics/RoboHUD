@@ -1,5 +1,7 @@
 const {readConfDirSync, readConfSync} = require('../../lib/io');
-const {createSelect, createGroupedSelect, createRadio} =
+const {createSelect, createGroupedSelect, createRadio,
+  createTableHeaderText, createTableHeader, createTableData,
+  createTableRow, createTable} =
   require('../../lib/html');
 const controlTypes = ['Linear', 'Preset'];
 const currentConf = {};
@@ -144,19 +146,10 @@ function loadLinear() {
 }
 
 /**
- * Sets up preset configuration
+ * Creates a row in the
+ * @param {Number} index The index of the row
  */
-function createPreset() {
-  clearChoice();
-
-  if (currentConf[selectedNode].mode !== 'Preset') {
-    currentConf[selectedNode] = {
-      mode: 'Preset',
-      items: {},
-    };
-  }
-  const confContainer = document.getElementById('conf-container');
-
+function createPresetRow(index) {
   const items = {Servos: []};
   items.Groups = findGroups();
   const conf = findRobotConf();
@@ -168,23 +161,93 @@ function createPreset() {
 
   const itemSelect = createGroupedSelect('Choose an item', items);
   itemSelect.onchange = (event) => {
-    if (prevousPresetSelect.node == selectedNode) {
+    const prevNode = prevousPresetSelect.node;
+    const prevIndex = prevousPresetSelect.index;
+    if (prevNode == selectedNode && prevIndex == index) {
       const item = prevousPresetSelect.item;
       if (currentConf[selectedNode].items.hasOwnProperty(item)) {
         delete currentConf[selectedNode].items[item];
       }
     }
 
-    currentConf[selectedNode].items[event.target.value] = null;
+    const value = document.getElementById(`preset-value-${index}`).value;
+    currentConf[selectedNode].items[event.target.value] = parseInt(value);
 
     prevousPresetSelect = {
       node: selectedNode,
       item: event.target.value,
+      index: index,
     };
   };
 
-  itemSelect.id = 'item-select';
-  confContainer.appendChild(itemSelect);
+  itemSelect.id = `item-select-${index}`;
+  const children = [createTableData(itemSelect)];
+
+  const valueInput = document.createElement('input');
+  valueInput.type = 'number';
+  valueInput.min = 0;
+  valueInput.max = 100;
+  valueInput.value = 0;
+  valueInput.id = `preset-value-${index}`;
+
+  valueInput.onchange = () => {
+    const item = document.getElementById(`item-select-${index}`).value;
+    const value = document.getElementById(`preset-value-${index}`).value;
+    if (item != 'choice') {
+      currentConf[selectedNode].items[item] = parseInt(value);
+    }
+  };
+  children.push(createTableData(valueInput));
+
+  const row = createTableRow(children);
+  document.getElementById('preset-table').appendChild(row);
+}
+
+/**
+ * Sets up preset configuration
+ */
+function createPreset() {
+  clearChoice();
+
+  if (currentConf[selectedNode].mode !== 'Preset') {
+    currentConf[selectedNode] = {
+      mode: 'Preset',
+      items: {},
+    };
+  }
+
+  const header = [createTableHeaderText('Item'),
+    createTableHeaderText('Percentage')];
+
+  const addRowButton = document.createElement('button');
+  addRowButton.onclick = () => {
+    const length = document.getElementById('preset-table').rows.length;
+    createPresetRow(length);
+  };
+
+  addRowButton.innerHTML = '+';
+  header.push(createTableHeader(addRowButton));
+
+  const removeRowButton = document.createElement('button');
+  removeRowButton.onclick = () => {
+    const table = document.getElementById('preset-table');
+    const index = table.rows.length - 1;
+
+    if (index > 0) {
+      const value = document.getElementById(`item-select-${index}`).value;
+      table.deleteRow(index);
+      delete currentConf[selectedNode].items[value];
+    }
+  };
+
+  removeRowButton.innerHTML = '-';
+  header.push(createTableHeader(removeRowButton));
+
+  const table = createTable(header);
+  table.id = 'preset-table';
+  document.getElementById('conf-container').appendChild(table);
+
+  createPresetRow(0);
 }
 
 /**
@@ -261,15 +324,12 @@ function buttonClick(name) {
   previousMode = value;
 }
 
-const controllerNodes = document.getElementById('controller-nodes');
-
 /**
  * Adds a node to the controller node list
  * @param {String} name The name of the node
+ * @return {Node} A table row containing the text and select
  */
 function addNode(name) {
-  const container = document.createElement('div');
-
   const text = document.createElement('button');
   text.className = 'inline';
   text.innerHTML = name;
@@ -277,7 +337,6 @@ function addNode(name) {
   text.onclick = function() {
     buttonClick(name);
   };
-  container.appendChild(text);
 
   const select = createSelect('Select', controlTypes);
   select.className = 'groupelect';
@@ -286,11 +345,11 @@ function addNode(name) {
     buttonClick(name);
   };
 
-  container.appendChild(select);
-
-  controllerNodes.appendChild(container);
-
   currentConf[name] = {};
+
+  const children = [createTableData(text), createTableData(select)];
+  const row = createTableRow(children);
+  return row;
 }
 
 const controllerSelect = document.getElementById('controller-select');
@@ -305,11 +364,18 @@ function controllerChange() {
 
   const conf = JSON.parse(readConfSync(
       `Controllers/${controllerSelect.value}.json`));
+
+  const headings = [createTableHeaderText('Item'),
+    createTableHeaderText('Mode')];
+
+  const rows = [createTableRow(headings)];
   for (const node in conf.nodes) {
     if (conf.nodes.hasOwnProperty(node)) {
-      addNode(node);
+      rows.push(addNode(node));
     }
   }
+
+  document.body.appendChild(createTable(rows));
 
   return null;
 }

@@ -112,10 +112,94 @@ function createRadio(name, children, handle) {
   return parent;
 }
 
+/**
+ * Creates a <p> element
+ * @param {String} text The text inside the element
+ * @return {Node} The created element
+ */
+function createParagraph(text) {
+  const paragraph = document.createElement('p');
+  paragraph.innerHTML = text;
+
+  return paragraph;
+}
+
+/**
+ * Creates a <th> element
+ * @param {Node} child The child inside the header
+ * @return {Node} The created element
+ */
+function createTableHeader(child) {
+  const header = document.createElement('th');
+  header.appendChild(child);
+
+  return header;
+}
+
+/**
+ * Creates a <th> element with the given text
+ * @param {String} text The text inside the header
+ * @return {Node} The created element
+ */
+function createTableHeaderText(text) {
+  const header = document.createElement('th');
+  header.innerHTML = text;
+
+  return header;
+}
+
+/**
+ * Creates a <tr> element
+ * @param {Node} child The child inside the item
+ * @return {Node} The created element
+ */
+function createTableData(child) {
+  const data = document.createElement('td');
+  data.appendChild(child);
+
+  return data;
+}
+
+/**
+ * Creates a <tr> element populated with nodes
+ * @param {Array<Node>} children The children inside the row
+ * @return {Node} The created element
+ */
+function createTableRow(children) {
+  const row = document.createElement('tr');
+
+  for (let i = 0; i < children.length; ++i) {
+    row.appendChild(children[i]);
+  }
+
+  return row;
+}
+
+/**
+ * Creates a <table> element
+ * @param {Array<Node>} children The rows inside the table
+ * @return {Node} The created element
+ */
+function createTable(children) {
+  const table = document.createElement('table');
+
+  for (let i = 0; i < children.length; ++i) {
+    table.appendChild(children[i]);
+  }
+
+  return table;
+}
+
 module.exports = {
   createPlaceholder: createPlaceholder,
   createOptions: createOptions,
   createSelect: createSelect,
   createGroupedSelect: createGroupedSelect,
   createRadio: createRadio,
-}
+  createParagraph: createParagraph,
+  createTableHeader: createTableHeader,
+  createTableHeaderText: createTableHeaderText,
+  createTableData: createTableData,
+  createTableRow: createTableRow,
+  createTable: createTable,
+};
