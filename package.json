@@ -18,7 +18,7 @@
     "@json-editor/json-editor": "^1.2.1",
     "apexcharts": "^2.2.2",
     "chart.js": "^2.7.3",
-    "express": "^3.21.2",
+    "express": "^4.0.0",
     "mout": "^1.0.0",
     "npm": "^6.2.0",
     "python-shell": "^0.5.0",
