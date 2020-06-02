@@ -15,7 +15,7 @@
     "jsdoc": "^3.6.2"
   },
   "dependencies": {
-    "@json-editor/json-editor": "^1.2.1",
+    "@json-editor/json-editor": "^2.2.1",
     "apexcharts": "^2.2.2",
     "chart.js": "^2.7.3",
     "express": "^4.0.0",
