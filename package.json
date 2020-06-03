@@ -8,7 +8,7 @@
     "package-windows-user-program-files": "node .\\node_modules\\electron-packager\\cli.js  . RoboHUD --platform=win32"
   },
   "devDependencies": {
-    "electron": "^3.0.14",
+    "electron": "^9.0.2",
     "electron-packager": "^14.0.0",
     "eslint": "^6.0.0",
     "eslint-config-google": "^0.13.0",
