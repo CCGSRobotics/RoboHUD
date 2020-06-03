@@ -11,7 +11,7 @@
     "electron": "^9.0.2",
     "electron-packager": "^14.0.0",
     "eslint": "^6.0.0",
-    "eslint-config-google": "^0.13.0",
+    "eslint-config-google": "^0.14.0",
     "jsdoc": "^3.6.2"
   },
   "dependencies": {
