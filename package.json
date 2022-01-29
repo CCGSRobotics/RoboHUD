@@ -20,7 +20,7 @@
     "chart.js": "^2.7.3",
     "express": "^4.0.0",
     "mout": "^1.0.0",
-    "npm": "^7.5.2",
+    "npm": "^8.3.0",
     "python-shell": "^2.0.3",
     "shelljs": "^0.8.2",
     "stream-split": "^1.1.0",
